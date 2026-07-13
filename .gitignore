@@ -1,5 +1,6 @@
 # 1. Bỏ qua tất cả các file có đuôi là .log (Ví dụ: test.log, error.log...)
 # *.log
+*.class
 
 # 2. Bỏ qua một file cụ thể (Ví dụ file chứa mật khẩu hoặc config riêng)
 # config.json

@@ -5,6 +5,7 @@
 # 2. Bỏ qua một file cụ thể (Ví dụ file chứa mật khẩu hoặc config riêng)
 # config.json
 # secret.txt
+HelloController.class
 
 # 3. Bỏ qua toàn bộ một thư mục (Ví dụ: thư mục chứa kết quả test)
 # test_results/

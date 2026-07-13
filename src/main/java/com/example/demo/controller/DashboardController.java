@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.util.Collections;
 import com.example.demo.model.BankAccount;
 import com.example.demo.model.Transaction;
 import com.example.demo.repository.BankAccountRepository;
@@ -43,6 +44,7 @@ public class DashboardController {
         model.addAttribute("account", myAccount);
 
         List<Transaction> txList = transactionRepository.findAll();
+        Collections.reverse(txList);
         model.addAttribute("transactionList", txList);
         model.addAttribute("hasTransactions", !txList.isEmpty());
 

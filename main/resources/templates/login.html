@@ -6,6 +6,25 @@
   <title>E-Banking - Đăng nhập hệ thống</title>
   <link rel="stylesheet" th:href="@{/style.css}">
   <link rel="stylesheet" th:href="@{/Login/login.css}">
+  
+  <style>
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-wrapper input {
+      width: 100%;
+      padding-right: 40px;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 1.1rem;
+    }
+  </style>
 </head>
 <body>
 
@@ -32,7 +51,10 @@
 
           <div class="input-group">
             <label for="password">Mật khẩu</label>
-            <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
+            <div class="password-wrapper">
+              <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
+              <span class="toggle-password" id="togglePasswordBtn" title="Hiển thị mật khẩu">👁️</span>
+            </div>
           </div>
 
           <div class="form-actions-row">
@@ -56,5 +78,19 @@
       </div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+      const passwordInput = document.getElementById("password");
+
+      togglePasswordBtn.addEventListener("click", function () {
+        const isPassword = passwordInput.getAttribute("type") === "password";
+        passwordInput.setAttribute("type", isPassword ? "text" : "password");
+        this.textContent = isPassword ? "🙈" : "👁️";
+        this.title = isPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu";
+      });
+    });
+  </script>
 </body>
 </html>

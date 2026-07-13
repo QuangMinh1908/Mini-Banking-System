@@ -39,7 +39,7 @@ public class HelloController {
         public String handleLogin(@RequestParam("accountname") String accountname,
                                 @RequestParam("password") String password,
                                 HttpSession session,
-                                RedirectAttributes redirectAttributes, // Dùng cái này để hiện thông báo 1 lần
+                                RedirectAttributes redirectAttributes,
                                 Model model) {
             Optional<BankAccount> accountOpt = bankAccountRepository.findByAccountName(accountname);
 
@@ -72,7 +72,6 @@ public class HelloController {
         }
 
         model.addAttribute("username", session.getAttribute("username"));
-
         model.addAttribute("accounts", bankAccountRepository.findByRole("user"));
         return "admin";
     }

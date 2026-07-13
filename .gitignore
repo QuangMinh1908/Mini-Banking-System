@@ -1,0 +1,14 @@
+# 1. Bỏ qua tất cả các file có đuôi là .log (Ví dụ: test.log, error.log...)
+# *.log
+
+# 2. Bỏ qua một file cụ thể (Ví dụ file chứa mật khẩu hoặc config riêng)
+# config.json
+# secret.txt
+
+# 3. Bỏ qua toàn bộ một thư mục (Ví dụ: thư mục chứa kết quả test)
+# test_results/
+# logs/
+target/
+
+# 4. Bỏ qua file môi trường (Cực kỳ quan trọng để không lộ key/mật khẩu)
+# .env

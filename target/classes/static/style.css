@@ -1,0 +1,176 @@
+/* ==========================================================================
+   1. CSS VARIABLES (ĐỊNH NGHĨA BIẾN TOÀN CỤC)
+   ========================================================================== */
+:root {
+  /* Hệ màu sắc (Color Palette) - Chuẩn ngân hàng số hiện đại */
+  --color-primary: #2563eb;       /* Xanh dương chủ đạo: tạo sự tin cậy */
+  --color-primary-hover: #1d4ed8; 
+  --color-background: #f1f5f9;    /* Màu nền tổng thể (xám rất nhạt) */
+  --color-surface: #ffffff;       /* Màu nền của các thẻ card/bento */
+  
+  /* Màu văn bản (Typography Colors) */
+  --text-main: #0f172a;           /* Chữ chính (Đen/Xanh đen đậm) */
+  --text-muted: #64748b;          /* Chữ phụ, mô tả (Xám) */
+  
+  /* Màu trạng thái giao dịch (Status Colors) */
+  --color-success: #10b981;       /* Xanh lá: Tiền vào, Thành công */
+  --color-danger: #ef4444;        /* Đỏ: Tiền ra, Lỗi, Khóa tài khoản */
+  --color-warning: #f59e0b;       /* Cam: Chờ xử lý, Cảnh báo */
+
+  /* Bố cục & Lưới (Bento Grid & Spacing) */
+  --gap-bento: 1.5rem;            /* Khoảng cách chuẩn giữa các ô trong lưới */
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+
+  /* Bo góc & Đổ bóng (Border Radius & Shadows) */
+  --radius-card: 1.25rem;         /* Bo góc khá tròn, đặc trưng của UI hiện đại/Bento */
+  --radius-button: 0.5rem;
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* Phông chữ (Typography) */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ==========================================================================
+   2. RESET & GLOBAL STYLES (ĐỊNH DẠNG CƠ BẢN)
+   ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--text-main);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: var(--color-primary);
+  transition: color 0.2s ease;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  outline: none;
+}
+
+/* ==========================================================================
+   3. UTILITY CLASSES (CÁC CLASS DÙNG CHUNG)
+   ========================================================================== */
+
+/* Nút bấm (Buttons) */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #fff;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Khung giao diện Bento Grid chung cho các Widget/Cards */
+.bento-card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.3s ease;
+}
+
+.bento-card:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+/* Định dạng số tiền (Số dư) */
+.amount-text {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.amount-positive { color: var(--color-success); }
+.amount-negative { color: var(--color-danger); }
+
+/* ==========================================================================
+   POPUP (MODAL) ĐĂNG XUẤT
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 42, 0.6); /* Lớp phủ đen mờ */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* Luôn nằm trên cùng */
+  
+  /* Mặc định ẩn đi */
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Khi có class 'active', popup sẽ hiện ra */
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-box {
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  
+  /* Hiệu ứng trượt từ trên xuống một chút khi xuất hiện */
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-box {
+  transform: translateY(0);
+}
+
+.modal-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.modal-box p {
+  color: var(--text-muted);
+  margin: var(--spacing-sm) 0 var(--spacing-lg);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+/* Nút bấm phụ (Nút Không) */
+.btn-secondary {
+  background-color: #e2e8f0;
+  color: var(--text-main);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #cbd5e1;
+}

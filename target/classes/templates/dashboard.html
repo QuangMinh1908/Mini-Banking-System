@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển Server-side</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/Dashboard/dashboard.css}">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="logo-text">E-Bank</h2>
+                <button class="close-btn" type="button">✕</button>
+            </div>
+            <ul class="nav-links">
+                <li><a class="active" th:href="@{/dashboard}">Tổng quan</a></li>
+                <li><a href="#">Chuyển khoản</a></li>
+                <li><a href="#">Báo cáo</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" class="logout-link" id="logoutLink">Đăng xuất</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <button class="menu-btn" type="button">☰</button>
+                <div class="search-box">
+                    <input type="text" placeholder="Tìm kiếm giao dịch...">
+                </div>
+                <div class="user-profile">
+                    <span class="user-name" th:text="${username}">Tên người dùng</span>
+                    <div class="avatar" th:text="${#strings.substring(username, 0, 1)}">M</div>
+                </div>
+            </header>
+
+            <div th:if="${successMessage}" style="background-color: #d1fae5; color: #047857; padding: 1rem; border-radius: var(--radius-button); margin: var(--spacing-lg) var(--spacing-lg) 0; font-weight: 600; box-shadow: var(--shadow-card);">
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <div th:if="${txSuccessMessage}" style="background-color: #d1fae5; color: #047857; padding: 1rem; border-radius: var(--radius-button); margin: var(--spacing-lg) var(--spacing-lg) 0; font-weight: 600; box-shadow: var(--shadow-card);">
+                <span th:text="${txSuccessMessage}"></span>
+            </div>
+
+            <div th:if="${txErrorMessage}" style="background-color: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: var(--radius-button); margin: var(--spacing-lg) var(--spacing-lg) 0; font-weight: 600; box-shadow: var(--shadow-card);">
+                <span th:text="${txErrorMessage}"></span>
+            </div>
+
+            <section class="bento-grid-container">
+                <div class="bento-card card-balance">
+                    <div>
+                        <p class="card-label">Số dư hiện tại</p>
+                        <h2 class="amount-text amount-positive" th:text="${#numbers.formatDecimal(account.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">12,450,000 VND</h2>
+                        <p class="account-number">TK <span th:text="${#numbers.formatInteger(account.id, 4)}"></span> • <span th:text="${account.accountName}"></span></p>
+                        <div class="action-grid">
+                            <div class="action-item">Nạp tiền</div>
+                            <div class="action-item">Rút tiền</div>
+                            <div class="action-item">Chuyển khoản</div>
+                            <div class="action-item">Lịch sử</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bento-card">
+                    <div class="card-header-flex">
+                        <h3>Giao dịch mới nhất</h3>
+                        <span class="badge">Mới</span>
+                    </div>
+                    <div th:if="${latestTransaction != null}">
+                        <p><strong>Mã:</strong> <span th:text="${latestTransaction.transactionId}"></span></p>
+                        <p><strong>Loại:</strong> 
+                            <span th:text="${latestTransaction.type == 'DEPOSIT' ? 'Nạp tiền' : (latestTransaction.type == 'WITHDRAW' ? 'Rút tiền' : 'Chuyển khoản')}"></span>
+                        </p>
+                        <p><strong>Số tiền:</strong> <span th:text="${#numbers.formatDecimal(latestTransaction.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span></p>
+                    </div>
+                    <p th:unless="${latestTransaction != null}">Chưa có giao dịch nào.</p>
+                </div>
+
+                <div class="bento-card card-transactions">
+                    <div class="card-header-flex">
+                        <h3>Lịch sử giao dịch</h3>
+                        <a href="#">Xem tất cả</a>
+                    </div>
+                    <ul class="transaction-list" th:if="${hasTransactions}">
+                        <li class="transaction-item" th:each="tx : ${transactionList}">
+                            <div class="tx-info">
+                                <strong th:text="${tx.type == 'DEPOSIT' ? 'Nạp tiền' : (tx.type == 'WITHDRAW' ? 'Rút tiền' : 'Chuyển khoản')}"></strong>
+                                <span th:text="${tx.transactionId}"></span>
+                            </div>
+                            <div th:class="'tx-amount ' + ${tx.type == 'DEPOSIT' ? 'amount-positive' : 'amount-negative'}" 
+                                 th:text="${tx.type == 'DEPOSIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></div>
+                        </li>
+                    </ul>
+                    <p th:unless="${hasTransactions}">Danh sách giao dịch sẽ hiện ở đây khi có dữ liệu.</p>
+                </div>
+
+                <div class="bento-card">
+                    <div class="card-header-flex">
+                        <h3>Tạo giao dịch mới</h3>
+                        <span class="badge">Server-side</span>
+                    </div>
+                    <form th:action="@{/dashboard/create-transaction}" th:object="${newTransactionForm}" method="post">
+                        <div class="input-group">
+                            <label>Mã giao dịch</label>
+                            <input type="text" th:field="*{transactionId}" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Loại giao dịch</label>
+                            <select th:field="*{type}">
+                                <option value="Nạp tiền">Nạp tiền</option>
+                                <option value="Rút tiền">Rút tiền</option>
+                                <option value="Chuyển khoản">Chuyển khoản</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Số tiền</label>
+                            <input type="number" th:field="*{amount}" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Gửi lên Server</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-box bento-card">
+            <div class="modal-icon">⚠️</div>
+            <h3>Xác nhận đăng xuất</h3>
+            <p>Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc này không?</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCancelLogout">Không</button>
+                <button class="btn-primary" id="btnConfirmLogout" style="background-color: var(--color-danger);">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logoutLink = document.getElementById('logoutLink');
+        const modal = document.getElementById('logoutModal');
+        const btnCancel = document.getElementById('btnCancelLogout');
+        const btnConfirm = document.getElementById('btnConfirmLogout');
+
+        logoutLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            modal.classList.add('active');
+        });
+
+        btnCancel.addEventListener('click', function () {
+            modal.classList.remove('active');
+        });
+
+        btnConfirm.addEventListener('click', function () {
+            window.location.href = '/logout';
+        });
+    </script>
+</body>
+</html>

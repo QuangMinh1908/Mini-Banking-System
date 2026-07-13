@@ -1,0 +1,157 @@
+/* ==========================================================================
+   KHU VỰC ADMIN CONTENT
+   ========================================================================== */
+.admin-container {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.page-header h2 {
+  font-size: 1.5rem;
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   THANH BỘ LỌC (FILTER BAR)
+   ========================================================================== */
+.filter-bar {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: 1rem var(--spacing-lg); /* Ghi đè padding của bento-card cho gọn hơn */
+  align-items: center;
+  flex-wrap: wrap; /* Cho phép rớt dòng trên mobile */
+}
+
+.filter-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-button);
+  outline: none;
+}
+
+.filter-select {
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-button);
+  outline: none;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   BẢNG DỮ LIỆU (DATA TABLE)
+   ========================================================================== */
+.table-container {
+  overflow-x: auto; /* Cực kỳ quan trọng: Cho phép cuộn ngang bảng trên điện thoại */
+  padding: 0; /* Xóa padding để bảng tràn sát viền thẻ bento-card */
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px; /* Đảm bảo bảng không bị bóp méo quá nhỏ */
+}
+
+.data-table th, .data-table td {
+  padding: 1rem var(--spacing-lg);
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.data-table th {
+  background-color: #f8fafc;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f1f5f9; /* Hiệu ứng hover từng dòng */
+}
+
+/* ==========================================================================
+   NHÃN TRẠNG THÁI (BADGES)
+   ========================================================================== */
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px; /* Bo tròn dạng viên thuốc */
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-active {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.badge-locked {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ==========================================================================
+   CÁC NÚT HÀNH ĐỘNG & PHÂN TRANG
+   ========================================================================== */
+.action-cell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.btn-icon:hover {
+  background-color: #e2e8f0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 1rem var(--spacing-lg);
+  border-top: 1px solid #e2e8f0;
+}
+
+.page-btn {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.page-btn:hover:not(.disabled):not(.active) {
+  background-color: #f1f5f9;
+}
+
+.page-btn.active {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.page-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Quản lý Khách hàng</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+  <link rel="stylesheet" th:href="@{/Dashboard/dashboard.css}">
+  <link rel="stylesheet" th:href="@{/Admin/admin.css}">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2 class="logo-text">E-Bank Admin</h2>
+      </div>
+      <ul class="nav-links">
+        <li><a th:href="@{/admin}" class="active">Quản lý Khách hàng</a></li>
+        <li><a href="#">Duyệt giao dịch</a></li>
+        <li><a href="#">Báo cáo hệ thống</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="logout-link" id="logoutLink">Đăng xuất</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="search-box"></div>
+        <div class="user-profile">
+          <span class="user-name" th:text="${username}">Quản trị viên</span>
+          <div class="avatar" style="background-color: #ef4444;">AD</div>
+        </div>
+      </header>
+
+      <div class="admin-container">
+        <div th:if="${successMessage}" style="background-color: #d1fae5; color: #047857; padding: 1rem; border-radius: var(--radius-button); margin-bottom: var(--spacing-md); font-weight: 600; box-shadow: var(--shadow-card);">
+            <span th:text="${successMessage}"></span>
+        </div>
+        
+        <div class="page-header">
+          <h2>Danh sách Khách hàng</h2>
+          <button class="btn-primary">+ Thêm khách hàng</button>
+        </div>
+
+        <div class="filter-bar bento-card">
+          <input type="text" class="filter-input" placeholder="Tìm tên, SĐT, Email...">
+          <select class="filter-select">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="active">Đang hoạt động</option>
+            <option value="locked">Bị khóa</option>
+          </select>
+          <button class="btn-primary" style="padding: 0.5rem 1rem;">Lọc</button>
+        </div>
+
+        <div class="table-container bento-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Họ và Tên</th>
+                <th>Số điện thoại</th>
+                <th>Tổng số dư (VND)</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="acc : ${accounts}">
+                <td th:text="'#KH' + ${#numbers.formatInteger(acc.id, 3)}">#KH001</td>
+                <td th:text="${acc.username}">Nguyễn Văn A</td>
+                <td>090xxxxxxx</td>
+                <td class="amount-positive" th:text="${acc.balance != null ? #numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT') : '0'}">125,500,000</td>
+                <td><span class="badge badge-active">Hoạt động</span></td>
+                <td class="action-cell">
+                  <button class="btn-icon">👁️</button>
+                  <button class="btn-icon">✏️</button>
+                  <button class="btn-icon">🔒</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="pagination">
+            <button class="page-btn disabled">Trước</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">Sau</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="logoutModal">
+    <div class="modal-box bento-card">
+      <div class="modal-icon">⚠️</div>
+      <h3>Xác nhận đăng xuất</h3>
+      <p>Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc này không?</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnCancelLogout">Không</button>
+        <button class="btn-primary" id="btnConfirmLogout" style="background-color: var(--color-danger);">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const logoutLink = document.getElementById('logoutLink');
+    const modal = document.getElementById('logoutModal');
+    const btnCancel = document.getElementById('btnCancelLogout');
+    const btnConfirm = document.getElementById('btnConfirmLogout');
+
+    logoutLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      modal.classList.add('active');
+    });
+
+    btnCancel.addEventListener('click', function () {
+      modal.classList.remove('active');
+    });
+
+    btnConfirm.addEventListener('click', function () {
+      window.location.href = '/logout';
+    });
+  </script>
+</body>
+</html>

@@ -14,3 +14,9 @@ target/
 
 # 4. Bỏ qua file môi trường (Cực kỳ quan trọng để không lộ key/mật khẩu)
 # .env
+
+# Bỏ qua thư mục target ở mọi cấp độ
+**/target/
+
+# Bỏ qua tất cả các file class
+**/*.class

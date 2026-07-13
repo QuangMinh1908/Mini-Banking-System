@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.BankAccount;
 import com.example.demo.repository.BankAccountRepository;
-import java.util.List;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

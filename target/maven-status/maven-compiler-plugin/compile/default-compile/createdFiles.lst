@@ -1,7 +1,0 @@
-com/example/demo/repository/BankAccountRepository.class
-com/example/demo/model/BankAccount.class
-com/example/demo/DemoApplication.class
-com/example/demo/controller/HelloController.class
-com/example/demo/controller/DashboardController.class
-com/example/demo/model/Transaction.class
-com/example/demo/repository/TransactionRepository.class

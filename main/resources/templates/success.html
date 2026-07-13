@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giao dịch thành công</title>
+</head>
+<body>
+    <h2 style="color: green;" th:text="${successMessage}">Tin nhắn thành công mặc định</h2>
+    
+    <h3>Thông tin bạn vừa gửi lên Server:</h3>
+    <p>Mã giao dịch: <strong th:text="${resultData.transactionId}"></strong></p>
+    <p>Loại giao dịch: <strong th:text="${resultData.type}"></strong></p>
+    <p>Số tiền: <strong th:text="${resultData.amount}"></strong></p>
+    <p>Thời gian Server ghi nhận: <strong th:text="${resultData.timestamp}"></strong></p>
+
+    <br>
+    <a th:href="@{/dashboard}">Quay lại Bảng điều khiển</a>
+</body>
+</html>

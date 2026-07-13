@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Banking - Đăng nhập hệ thống</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+  <link rel="stylesheet" th:href="@{/Login/login.css}">
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-banner">
+      <div class="banner-content">
+        <h1>Ngân hàng số<br>thế hệ mới</h1>
+        <p>Trải nghiệm giao dịch nhanh chóng, an toàn và tiện lợi ngay trên thiết bị của bạn. Quản lý tài chính chưa bao giờ dễ dàng đến thế.</p>
+      </div>
+    </div>
+
+    <div class="login-form-wrapper">
+      <div class="login-box bento-card">
+        <div class="login-header">
+          <h2>Đăng nhập</h2>
+          <p>Chào mừng bạn quay trở lại!</p>
+        </div>
+
+        <form th:action="@{/login}" method="post" class="login-form" autocomplete="off">
+          <div class="input-group">
+            <label for="accountname">Tên đăng nhập hoặc SĐT</label>
+            <input type="text" id="accountname" name="accountname" autocomplete="username" placeholder="Nhập tài khoản của bạn" required>
+          </div>
+
+          <div class="input-group">
+            <label for="password">Mật khẩu</label>
+            <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
+          </div>
+
+          <div class="form-actions-row">
+            <label class="checkbox-container">
+              <input type="checkbox" id="remember"> Nhớ tài khoản
+            </label>
+            <a href="#" class="forgot-password">Quên mật khẩu?</a>
+          </div>
+
+          <button type="submit" class="btn-primary login-btn">Đăng nhập ngay</button>
+
+          <div th:if="${errorMessage}" style="margin-top: 0.9rem; padding: 0.75rem; border-radius: 0.75rem; background: #fee2e2; color: #b91c1c; font-weight: 600;">
+            <span th:text="${errorMessage}"></span>
+          </div>
+
+          <div th:if="${param.logout}" style="margin-top: 0.9rem; padding: 0.75rem; border-radius: 0.75rem; background: #dbeafe; color: #1d4ed8; font-weight: 600;">
+            Bạn đã đăng xuất thành công.
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

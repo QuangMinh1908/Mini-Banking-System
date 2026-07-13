@@ -1,0 +1,236 @@
+/* ==========================================================================
+   LAYOUT CHUNG DASHBOARD
+   ========================================================================== */
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* Ngăn cuộn trang tổng thể, chỉ cuộn phần nội dung */
+  background-color: var(--color-background);
+}
+
+/* ==========================================================================
+   SIDEBAR (THANH ĐIỀU HƯỚNG)
+   ========================================================================== */
+.sidebar {
+  width: 260px;
+  background-color: var(--color-surface);
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg) 0;
+  transition: transform 0.3s ease;
+  z-index: 100;
+}
+
+.sidebar-header {
+  padding: 0 var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-text {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.close-btn {
+  display: none; /* Ẩn trên máy tính */
+  background: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.nav-links {
+  list-style: none;
+  flex: 1;
+}
+
+.nav-links li a {
+  display: block;
+  padding: 0.75rem var(--spacing-lg);
+  color: var(--text-muted);
+  font-weight: 500;
+  border-left: 3px solid transparent;
+}
+
+.nav-links li a:hover, .nav-links li a.active {
+  background-color: #eff6ff;
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+}
+
+.sidebar-footer {
+  padding: 0 var(--spacing-lg);
+}
+
+.logout-link {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   MAIN CONTENT & TOPBAR
+   ========================================================================== */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Cho phép cuộn nội dung */
+}
+
+.topbar {
+  background-color: var(--color-surface);
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.menu-btn {
+  display: none; /* Ẩn trên máy tính */
+  background: none;
+  font-size: 1.5rem;
+  color: var(--text-main);
+}
+
+.search-box input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-button);
+  width: 250px;
+  outline: none;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* ==========================================================================
+   BENTO GRID (LƯỚI HIỂN THỊ DỮ LIỆU)
+   ========================================================================== */
+.bento-grid-container {
+  padding: var(--spacing-lg);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Lưới 3 cột */
+  gap: var(--gap-bento);
+}
+
+/* Các thẻ Grid */
+.card-balance {
+  grid-column: span 2; /* Trải dài 2 cột */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-label { color: var(--text-muted); font-size: 0.9rem; }
+.account-number { color: var(--text-muted); margin-bottom: var(--spacing-md); }
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.action-item {
+  background: var(--color-background);
+  padding: 0.75rem;
+  border-radius: var(--radius-button);
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.action-item:hover { background: #e2e8f0; }
+
+.card-transactions {
+  grid-column: span 2;
+}
+
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.transaction-list { list-style: none; }
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.transaction-item:last-child { border-bottom: none; }
+
+.tx-info strong { display: block; font-size: 0.95rem; }
+.tx-info span { color: var(--text-muted); font-size: 0.8rem; }
+.tx-amount { font-weight: bold; }
+
+.savings-info { margin-top: 1rem; }
+.savings-detail { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; }
+
+/* ==========================================================================
+   RESPONSIVE (THÍCH ỨNG MOBILE)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  /* Chuyển Bento về 2 cột trên Tablet */
+  .bento-grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .card-balance, .card-transactions {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Xử lý Sidebar trên Mobile (Kiểu trượt) */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    transform: translateX(-100%); /* Ẩn sidebar đi */
+  }
+  
+  .sidebar.active {
+    transform: translateX(0); /* Hiển thị sidebar khi bấm nút */
+  }
+
+  .close-btn { display: block; }
+  .menu-btn { display: block; }
+
+  /* Ẩn bớt thanh tìm kiếm trên điện thoại cho gọn */
+  .search-box { display: none; }
+  .user-name { display: none; }
+
+  /* Chuyển Bento về 1 cột trên Mobile */
+  .bento-grid-container {
+    grid-template-columns: 1fr;
+    padding: var(--spacing-md);
+  }
+  .card-balance, .card-transactions {
+    grid-column: span 1;
+  }
+}

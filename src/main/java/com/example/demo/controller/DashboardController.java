@@ -34,10 +34,8 @@ public class DashboardController {
             return "admin".equals(role) ? "redirect:/admin" : "redirect:/login";
         }
 
-        // Lấy ID đã định danh từ Session
         Long currentAccountId = (Long) session.getAttribute("accountId");
         
-        // Truy vấn chính xác tài khoản đang đăng nhập bằng findById
         BankAccount myAccount = bankAccountRepository.findById(currentAccountId).orElseThrow();
         
         model.addAttribute("username", session.getAttribute("username"));
@@ -63,7 +61,6 @@ public class DashboardController {
         String role = (String) session.getAttribute("role");
         if (!"user".equals(role)) return "redirect:/login";
 
-        // Định danh người dùng đang giao dịch
         Long currentAccountId = (Long) session.getAttribute("accountId");
         BankAccount myAccount = bankAccountRepository.findById(currentAccountId).orElseThrow();
         
@@ -89,7 +86,6 @@ public class DashboardController {
         
         bankAccountRepository.save(myAccount);
 
-        // Lưu đúng ID của người tạo vào lịch sử giao dịch (ép kiểu về Integer theo Model cũ của bạn)
         transaction.setAccountId(currentAccountId.intValue());
         transaction.setTimestamp(LocalDateTime.now());
         if (transaction.getTransactionId() == null || transaction.getTransactionId().isBlank()) {

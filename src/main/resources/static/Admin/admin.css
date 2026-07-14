@@ -26,9 +26,9 @@
 .filter-bar {
   display: flex;
   gap: var(--spacing-md);
-  padding: 1rem var(--spacing-lg); /* Ghi đè padding của bento-card cho gọn hơn */
+  padding: 1rem var(--spacing-lg);
   align-items: center;
-  flex-wrap: wrap; /* Cho phép rớt dòng trên mobile */
+  flex-wrap: wrap;
 }
 
 .filter-input {
@@ -53,14 +53,14 @@
    BẢNG DỮ LIỆU (DATA TABLE)
    ========================================================================== */
 .table-container {
-  overflow-x: auto; /* Cực kỳ quan trọng: Cho phép cuộn ngang bảng trên điện thoại */
-  padding: 0; /* Xóa padding để bảng tràn sát viền thẻ bento-card */
+  overflow-x: auto;
+  padding: 0;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px; /* Đảm bảo bảng không bị bóp méo quá nhỏ */
+  min-width: 700px;
 }
 
 .data-table th, .data-table td {
@@ -79,7 +79,7 @@
 }
 
 .data-table tbody tr:hover {
-  background-color: #f1f5f9; /* Hiệu ứng hover từng dòng */
+  background-color: #f1f5f9;
 }
 
 /* ==========================================================================
@@ -87,7 +87,7 @@
    ========================================================================== */
 .badge {
   padding: 0.25rem 0.75rem;
-  border-radius: 9999px; /* Bo tròn dạng viên thuốc */
+  border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
 }

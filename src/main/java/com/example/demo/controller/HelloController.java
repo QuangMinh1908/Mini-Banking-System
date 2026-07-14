@@ -62,7 +62,6 @@ public class HelloController {
                 return "login";        
         }
 
-    // Hàm Admin đã được cập nhật logic lấy dữ liệu từ DB
     @GetMapping("/admin")
     public String admin(HttpSession session, Model model) {
         String role = (String) session.getAttribute("role");

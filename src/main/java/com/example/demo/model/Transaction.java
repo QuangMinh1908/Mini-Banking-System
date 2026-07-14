@@ -17,7 +17,7 @@ public class Transaction {
     @Column(name = "transaction_type")
     private String type;
 
-    @Column(name = "amount")
+    @Column(precision = 19, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "transaction_date") // Cập nhật lại tên cột cho khớp SQL

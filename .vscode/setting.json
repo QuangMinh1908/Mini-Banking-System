@@ -1,0 +1,10 @@
+{
+  "remote.autoForwardPorts": true,
+  "remote.autoForwardPortsSource": "output",
+  "remote.portsAttributes": {
+    "8080": {
+      "label": "E-Bank Spring Boot",
+      "onAutoForward": "openBrowser"
+    }
+  }
+}

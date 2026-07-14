@@ -17,6 +17,7 @@ public class BankAccount {
     @Column(name = "account_name")
     private String accountName;
 
+    @Column(precision = 19, scale = 2)
     private BigDecimal balance;
 
     // Constructors

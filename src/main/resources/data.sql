@@ -4,14 +4,14 @@ CREATE TABLE IF NOT EXISTS accounts (
     password VARCHAR(255),
     role VARCHAR(20),
     account_name VARCHAR(255),
-    balance DOUBLE
+    balance DECIMAL(19, 2)
 );
 
 CREATE TABLE IF NOT EXISTS transactions (
     transaction_id VARCHAR(50) PRIMARY KEY,
     account_id INT NOT NULL,
     transaction_type VARCHAR(255),
-    amount DOUBLE,
+    amount DECIMAL(19, 2),
     transaction_date TIMESTAMP
 );
 

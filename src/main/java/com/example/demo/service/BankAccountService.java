@@ -5,6 +5,7 @@ import com.example.demo.repository.BankAccountRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
 import java.util.List;
 
 @Service
@@ -45,5 +46,17 @@ public class BankAccountService {
             
             repository.save(existingAccount);
         }
+    }
+
+    public List<BankAccount> searchCustomers(String keyword) {
+        List<BankAccount> results;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            results = repository.searchByKeyword(keyword.trim());
+        } else {
+            results = repository.findAll();
+        }
+        return results.stream()
+                .filter(account -> !"admin".equalsIgnoreCase(account.getRole()))
+                .collect(Collectors.toList());
     }
 }

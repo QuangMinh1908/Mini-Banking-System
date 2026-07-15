@@ -80,16 +80,16 @@ public class HelloController {
         }
 
     @GetMapping("/admin")
-    public String admin(HttpSession session, Model model) {
+    public String admin(HttpSession session, Model model, @RequestParam(name = "keyword", required = false) String keyword) {
         String role = (String) session.getAttribute("role");
         if (!"admin".equals(role)) {
             return "user".equals(role) ? "redirect:/dashboard" : "redirect:/login";
         }
 
         model.addAttribute("username", session.getAttribute("username"));
-        model.addAttribute("accounts", bankAccountService.getAllUsers());
-        // Khởi tạo Object rỗng để map dữ liệu từ Form thêm mới
+        model.addAttribute("accounts", bankAccountService.searchCustomers(keyword));
         model.addAttribute("newAccount", new BankAccount());
+        model.addAttribute("keyword", keyword);
         return "admin";
     }
 

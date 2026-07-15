@@ -16,8 +16,8 @@
       </div>
       <ul class="nav-links">
         <li><a th:href="@{/admin}" class="active">Quản lý Khách hàng</a></li>
-        <li><a href="#">Duyệt giao dịch</a></li>
-        <li><a href="#">Báo cáo hệ thống</a></li>
+        <li><a href="#">Quản lý Giao dịch</a></li>
+        <li><a href="#">Quản lý Tài khoản</a></li>
       </ul>
       <div class="sidebar-footer">
         <a href="#" class="logout-link" id="logoutLink">Đăng xuất</a>
@@ -43,15 +43,17 @@
           <button class="btn-primary" id="btnOpenAddForm">+ Thêm khách hàng</button>
         </div>
 
-        <div class="filter-bar bento-card">
-          <input type="text" class="filter-input" placeholder="Tìm tên, SĐT, Email...">
+        <form th:action="@{/admin}" method="get" class="filter-bar bento-card">
+          <input type="text" name="keyword" class="filter-input" placeholder="Tìm tên, SĐT, Username..." th:value="${keyword}">
+          
           <select class="filter-select">
             <option value="all">Tất cả trạng thái</option>
             <option value="active">Đang hoạt động</option>
             <option value="locked">Bị khóa</option>
           </select>
-          <button class="btn-primary" style="padding: 0.5rem 1rem;">Lọc</button>
-        </div>
+          
+          <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem;">Lọc / Tìm kiếm</button>
+        </form>
 
         <div class="table-container bento-card">
           <table class="data-table">
@@ -138,8 +140,9 @@
         </div>
 
         <div class="input-group">
-            <label>Số dư ban đầu (VND):</label>
-            <input type="number" step="0.01" th:field="*{balance}" required placeholder="0.00">
+          <label>Số dư ban đầu (VND):</label>
+          <input type="text" th:field="*{balance}" required placeholder="0.00" 
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
         </div>
 
         <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.5rem;">Xác nhận thêm</button>
@@ -178,7 +181,8 @@
 
         <div class="input-group">
           <label>Số dư (VND):</label>
-          <input type="number" step="0.01" id="editBalance" name="balance" required>
+          <input type="text" id="editBalance" name="balance" required placeholder="0.00" 
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
         </div>
 
         <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.5rem;">Cập nhật thông tin</button>

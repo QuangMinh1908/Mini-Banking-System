@@ -32,3 +32,5 @@ INSERT INTO accounts (id, account_name, password, role, username, balance) VALUE
 INSERT INTO transactions (transaction_id, account_id, transaction_type, amount, transaction_date) VALUES
 ('TXN-20260708-001', 1, 'DEPOSIT', 2000000.00, CURRENT_TIMESTAMP - INTERVAL '3' DAY),
 ('TXN-20260708-002', 1, 'WITHDRAW', 500000.00, CURRENT_TIMESTAMP - INTERVAL '2' DAY);
+
+ALTER TABLE accounts ALTER COLUMN id RESTART WITH 11;

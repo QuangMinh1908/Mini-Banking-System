@@ -41,6 +41,7 @@ public class BankAccountService {
         if (existingAccount != null) {
             existingAccount.setUsername(updatedAccount.getUsername());
             existingAccount.setBalance(updatedAccount.getBalance());
+            existingAccount.setPhoneNumber(updatedAccount.getPhoneNumber());
             
             repository.save(existingAccount);
         }

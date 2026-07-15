@@ -13,6 +13,7 @@ public class BankAccount {
     private String username;
     private String password;
     private String role;
+    private String phoneNumber;
 
     @Column(name = "account_name")
     private String accountName;
@@ -46,4 +47,7 @@ public class BankAccount {
 
     public BigDecimal getBalance() { return balance; }
     public void setBalance(BigDecimal balance) { this.balance = balance; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 }

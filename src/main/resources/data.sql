@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     password VARCHAR(255),
     role VARCHAR(20),
     account_name VARCHAR(255),
+    phone_number VARCHAR(20),
     balance DECIMAL(19, 2)
 );
 
@@ -16,17 +17,17 @@ CREATE TABLE IF NOT EXISTS transactions (
 );
 
 --Dữ liệu tài khoản mẫu
-INSERT INTO accounts (id, account_name, password, role, username, balance) VALUES
-(1, 'user', 'Demo@2026', 'user', 'Trần Quang Minh', 5000000),
-(2, 'admin', 'SecureAdmin!2026', 'admin', 'Quản trị viên', 0),
-(3, 'mai', 'Mai123@', 'user', 'Nguyễn Thị Mai', 25000000),
-(4, 'bach', 'Bach123@', 'user', 'Lê Hoàng Bách', 340000),
-(5, 'linh', 'Linh321@', 'user', 'Nguyễn Ngọc Linh', 8000),
-(6, 'han', 'Han456@', 'user', 'Đỗ Văn Hấn', 85000000000),
-(7, 'nam', 'Nam789@', 'user', 'Phạm Văn Nam', 1234567890),
-(8, 'hoa', 'Hoa987@', 'user', 'Trần Thị Hoa', 50000000),
-(9, 'tuan', 'Tuan654@', 'user', 'Nguyễn Văn Tuấn', 7500000),
-(10, 'hien', 'Hien321@', 'user', 'Lê Thị Hiền', 12000000);
+INSERT INTO accounts (id, account_name, password, role, username, phone_number, balance) VALUES
+(1, 'user', 'Demo@2026', 'user', 'Trần Quang Minh', '0987654321', 5000000),
+(2, 'admin', 'SecureAdmin!2026', 'admin', 'Quản trị viên', '0912345678', 0),
+(3, 'mai', 'Mai123@', 'user', 'Nguyễn Thị Mai', '0909876543', 25000000),
+(4, 'bach', 'Bach123@', 'user', 'Lê Hoàng Bách', '0938765432', 340000),
+(5, 'linh', 'Linh321@', 'user', 'Nguyễn Ngọc Linh', '0947654321', 8000),
+(6, 'han', 'Han456@', 'user', 'Đỗ Văn Hấn', '0956789012', 85000000000),
+(7, 'nam', 'Nam789@', 'user', 'Phạm Văn Nam', '0965432109', 1234567890),
+(8, 'hoa', 'Hoa987@', 'user', 'Trần Thị Hoa', '0976543210', 50000000),
+(9, 'tuan', 'Tuan654@', 'user', 'Nguyễn Văn Tuấn', '0987654321', 7500000),
+(10, 'hien', 'Hien321@', 'user', 'Lê Thị Hiền', '0998765432', 12000000);
 
 -- Dữ liệu giao dịch mẫu
 INSERT INTO transactions (transaction_id, account_id, transaction_type, amount, transaction_date) VALUES

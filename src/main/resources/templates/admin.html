@@ -205,11 +205,6 @@
                   maxlength="10" pattern="[0-9]{10}" title="Số điện thoại phải bao gồm đúng 10 chữ số"
                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
-        <div class="input-group">
-          <label>Số dư (VND):</label>
-          <input type="text" id="editBalance" name="balance" required placeholder="0" 
-            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-        </div>
         <button type="submit" class="btn-primary w-100">Cập nhật thông tin</button>
       </form>
     </div>
@@ -260,7 +255,6 @@
       document.getElementById('editAccountName').value = accountName;
       document.getElementById('editUsername').value = username;
       document.getElementById('editPhoneNumber').value = phoneNumber;
-      document.getElementById('editBalance').value = balance;
       editCustomerModal.classList.add('active');
     }
 

@@ -1,147 +1,146 @@
-/* ==========================================================================
-   LAYOUT ĐĂNG NHẬP (SPLIT-SCREEN)
-   ========================================================================== */
 .login-container {
-  display: flex;
-  height: 100vh;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh;
+  width: 100%;
+  gap: 2rem;
+  background: radial-gradient(50% 50% at 50% 50%, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.login-header-top {
+  text-align: center;
   width: 100%;
 }
 
-/* --- Khu vực Banner (Bên trái) --- */
-.login-banner {
-  flex: 1; /* Chiếm 50% chiều rộng */
-  background: linear-gradient(135deg, var(--color-primary), #0f172a);
+.logo-icon {
+  width: 56px;
+  height: 56px;
+  background-color: #0f172a;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-lg);
-  color: #ffffff;
+  color: white;
+  margin: 0 auto 1.5rem;
 }
 
-.banner-content {
-  max-width: 480px;
+.login-header-top h1 {
+  font-size: 1.875rem;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
 }
 
-.banner-content h1 {
-  font-size: 3rem;
-  line-height: 1.2;
-  margin-bottom: var(--spacing-md);
-}
-
-.banner-content p {
-  font-size: 1.1rem;
-  opacity: 0.85;
-  line-height: 1.6;
-}
-
-/* --- Khu vực Form (Bên phải) --- */
-.login-form-wrapper {
-  flex: 1; /* Chiếm 50% chiều rộng */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-background);
-  padding: var(--spacing-lg);
+.login-header-top {
+  text-align: center;
+  width: 100%;
+  margin-top: 4rem !important;
+  margin-bottom: 1.5rem !important;
 }
 
 .login-box {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
+  margin: 0 auto !important; 
 }
 
-.login-header {
-  text-align: center;
-  margin-bottom: var(--spacing-lg);
-}
-
-.login-header h2 {
-  font-size: 1.75rem;
-  color: var(--text-main);
-}
-
-.login-header p {
-  color: var(--text-muted);
-  margin-top: 0.25rem;
-}
-
-/* --- Thành phần trong Form --- */
 .input-group {
   margin-bottom: 1.25rem;
 }
 
-.input-group label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-main);
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 0.5rem;
+}
+
+.label-row label {
+  margin-bottom: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.forgot-password {
+  font-size: 0.8125rem;
+  color: #2563eb;
+  font-weight: 500;
 }
 
 .input-group input {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid #cbd5e1; /* Xám nhạt */
-  border-radius: var(--radius-button);
-  font-family: var(--font-family);
-  font-size: 1rem;
-  color: var(--text-main);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background-color: #f8fafc;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .input-group input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); /* Hiệu ứng glow nhẹ khi focus */
-}
-
-/* --- Các hành động phụ --- */
-.form-actions-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  font-size: 0.875rem;
+  border-color: #2563eb;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .checkbox-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--text-muted);
+  font-size: 0.875rem;
+  color: #64748b;
   cursor: pointer;
 }
 
 .login-btn {
-  width: 100%; /* Kéo dài nút bằng chiều rộng form */
+  width: 100%;
   font-size: 1rem;
   padding: 0.875rem;
+  background-color: #0f172a;
+  color: #ffffff;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background-color: #1e293b;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #64748b;
+  font-size: 0.8125rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.divider span {
+  padding: 0 1rem;
 }
 
 .login-footer {
   text-align: center;
-  margin-top: var(--spacing-lg);
+  margin-top: 1rem;
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: #64748b;
 }
 
 .login-footer a {
-  font-weight: 600;
-}
-
-/* ==========================================================================
-   RESPONSIVE (THÍCH ỨNG MOBILE)
-   ========================================================================== */
-@media (max-width: 768px) {
-  .login-banner {
-    display: none; /* Ẩn banner trên điện thoại để tiết kiệm diện tích */
-  }
-  
-  .login-form-wrapper {
-    background-color: var(--color-surface); /* Đổi màu nền về trắng */
-  }
-
-  .login-box {
-    box-shadow: none; /* Bỏ đổ bóng trên mobile cho giao diện phẳng hơn */
-    padding: 0;
-  }
+  color: #2563eb;
+  font-weight: 500;
 }

@@ -1,43 +1,94 @@
 package com.example.demo.model;
-import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transactions")
 public class Transaction {
-
     @Id
-    @Column(name = "transaction_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "transaction_id", unique = true)
     private String transactionId;
 
-    @Column(name = "account_id")
-    private Integer accountId; // Cột mới thêm để liên kết với bảng accounts
+    private String type; // DEPOSIT, WITHDRAW, TRANSFER
 
-    @Column(name = "transaction_type")
-    private String type;
+    @ManyToOne
+    @JoinColumn(name = "from_account_id")
+    private Account fromAccount;
 
-    @Column(precision = 19, scale = 2)
-    private BigDecimal amount;
+    @ManyToOne
+    @JoinColumn(name = "to_account_id")
+    private Account toAccount;
 
-    @Column(name = "transaction_date") // Cập nhật lại tên cột cho khớp SQL
-    private LocalDateTime timestamp;
+    private Double amount;
+    private String description;
+    private LocalDateTime transactionDate;
 
-    public Transaction() {}
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
-    // Getters và Setters
-    public String getTransactionId() { return transactionId; }
-    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public Integer getAccountId() { return accountId; }
-    public void setAccountId(Integer accountId) { this.accountId = accountId; }
+    public String getTransactionId() {
+        return transactionId;
+    }
 
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
 
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public String getType() {
+        return type;
+    }
 
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Account getFromAccount() {
+        return fromAccount;
+    }
+
+    public void setFromAccount(Account fromAccount) {
+        this.fromAccount = fromAccount;
+    }
+
+    public Account getToAccount() {
+        return toAccount;
+    }
+
+    public void setToAccount(Account toAccount) {
+        this.toAccount = toAccount;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getTransactionDate() {
+        return transactionDate;
+    }
+
+    public void setTransactionDate(LocalDateTime transactionDate) {
+        this.transactionDate = transactionDate;
+    }
 }

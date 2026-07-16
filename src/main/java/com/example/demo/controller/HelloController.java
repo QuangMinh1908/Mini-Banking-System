@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.BankAccount;
-import com.example.demo.repository.BankAccountRepository;
-import com.example.demo.service.BankAccountService;
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,18 +15,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class HelloController {
 
-    private final BankAccountRepository bankAccountRepository;
-    private final BankAccountService bankAccountService;
+    private final UserRepository userRepository;
+    private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public HelloController(BankAccountRepository bankAccountRepository, BankAccountService bankAccountService) {
-        this.bankAccountRepository = bankAccountRepository;
-        this.bankAccountService = bankAccountService;
+    public HelloController(UserRepository userRepository, UserService userService) {
+        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @GetMapping("/")
@@ -43,33 +44,33 @@ public class HelloController {
     }
 
     @PostMapping("/login")
-        public String handleLogin(@RequestParam("accountname") String accountname,
+        public String handleLogin(@RequestParam("username") String username,
                                 @RequestParam("password") String password,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes,
                                 Model model) {
-            Optional<BankAccount> accountOpt = bankAccountRepository.findByAccountName(accountname);
+            Optional<User> userOpt = userRepository.findByUsername(username);
 
-            if (accountOpt.isPresent()) {
-                BankAccount account = accountOpt.get();
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
                 boolean isPasswordMatch = false;
 
-                    if (account.getPassword().startsWith("$2a$")) {
-                        isPasswordMatch = passwordEncoder.matches(password, account.getPassword());
+                    if (user.getPassword().startsWith("$2a$")) {
+                        isPasswordMatch = passwordEncoder.matches(password, user.getPassword());
                     } else {
-                        isPasswordMatch = account.getPassword().equals(password);
+                        isPasswordMatch = user.getPassword().equals(password);
                     }
                     
                     if (isPasswordMatch) {
-                        session.setAttribute("role", account.getRole());
-                        session.setAttribute("username", account.getAccountName());
-                        session.setAttribute("accountId", account.getId());
+                        session.setAttribute("role", user.getRole());
+                        session.setAttribute("username", user.getUsername());
+                        session.setAttribute("userId", user.getId());
 
-                        if ("admin".equals(account.getRole())) {
+                        if ("admin".equals(user.getRole())) {
                             redirectAttributes.addFlashAttribute("successMessage", "✅ Đăng nhập thành công! Chào mừng Quản trị viên quay lại E-Bank.");
                             return "redirect:/admin";
                         } else {
-                            redirectAttributes.addFlashAttribute("successMessage", "✅ Đăng nhập thành công! Chào mừng " + account.getUsername() + " quay lại.");
+                            redirectAttributes.addFlashAttribute("successMessage", "✅ Đăng nhập thành công! Chào mừng " + user.getUsername() + " quay lại.");
                             return "redirect:/dashboard";
                         }
                     }
@@ -86,9 +87,9 @@ public class HelloController {
             return "user".equals(role) ? "redirect:/dashboard" : "redirect:/login";
         }
 
-        model.addAttribute("username", session.getAttribute("username"));
-        model.addAttribute("accounts", bankAccountService.searchCustomers(keyword));
-        model.addAttribute("newAccount", new BankAccount());
+        List<User> users = userService.searchCustomers(keyword);
+        model.addAttribute("users", users);
+        model.addAttribute("newUser", new User());
         model.addAttribute("keyword", keyword);
         return "admin";
     }
@@ -105,23 +106,20 @@ public class HelloController {
     }
 
     @PostMapping("/admin/add-customer")
-    public String addCustomer(@ModelAttribute("newAccount") BankAccount newAccount, RedirectAttributes redirectAttributes) {
-        bankAccountService.createCustomer(newAccount);
-        redirectAttributes.addFlashAttribute("successMessage", "✅ Thêm khách hàng mới thành công!");
-        return "redirect:/admin";
-    }
-
-    @PostMapping("/admin/delete-customer/{id}")
-    public String deleteCustomer(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        bankAccountService.deleteCustomer(id);
-        redirectAttributes.addFlashAttribute("successMessage", "✅ Đã xóa khách hàng thành công!");
+    public String addCustomer(@ModelAttribute("newUser") User newUser) {
+        userService.createCustomer(newUser);
         return "redirect:/admin";
     }
 
     @PostMapping("/admin/update-customer")
-    public String updateCustomer(@ModelAttribute BankAccount editAccount, RedirectAttributes redirectAttributes) {
-        bankAccountService.updateCustomer(editAccount);
-        redirectAttributes.addFlashAttribute("successMessage", "✅ Cập nhật thông tin khách hàng thành công!");
+    public String updateCustomer(@ModelAttribute User updatedUser) {
+        userService.updateCustomer(updatedUser);
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/delete-customer/{id}")
+    public String deleteCustomer(@PathVariable Long id) {
+        userService.deleteCustomer(id);
         return "redirect:/admin";
     }
 }

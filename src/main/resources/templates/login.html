@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-Banking - Đăng nhập hệ thống</title>
+  <title>E-Banking - Welcome back</title>
   <link rel="stylesheet" th:href="@{/style.css}">
   <link rel="stylesheet" th:href="@{/login.css}">
   
@@ -23,63 +23,62 @@
       cursor: pointer;
       user-select: none;
       font-size: 1.1rem;
+      color: var(--text-muted);
     }
   </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <div class="login-banner">
-      <div class="banner-content">
-        <h1>Ngân hàng số<br>thế hệ mới</h1>
-        <p>Trải nghiệm giao dịch nhanh chóng, an toàn và tiện lợi ngay trên thiết bị của bạn. Quản lý tài chính chưa bao giờ dễ dàng đến thế.</p>
+<div class="login-header-top">
+      <div class="logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>        
       </div>
+      <h1> Chào mừng người dùng quay lại </h1>
+      <p> Đăng nhập vào tài khoản E-Banking </p>
     </div>
 
-    <div class="login-form-wrapper">
-      <div class="login-box bento-card">
-        <div class="login-header">
-          <h2>Đăng nhập</h2>
-          <p>Chào mừng bạn quay trở lại!</p>
+    <div class="login-box bento-card">
+      <form th:action="@{/login}" method="post" class="login-form" autocomplete="off">
+        <div class="input-group">
+          <label for="accountname">Tên tài khoản</label>
+          <input type="text" id="accountname" name="accountname" autocomplete="username" placeholder="Ví dụ: user123" required>
         </div>
 
-        <form th:action="@{/login}" method="post" class="login-form" autocomplete="off">
-          <div class="input-group">
-            <label for="accountname">Tên đăng nhập hoặc SĐT</label>
-            <input type="text" id="accountname" name="accountname" autocomplete="username" placeholder="Nhập tài khoản của bạn" required>
-          </div>
-
-          <div class="input-group">
+        <div class="input-group">
+          <div class="label-row">
             <label for="password">Mật khẩu</label>
-            <div class="password-wrapper">
-              <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
-              <span class="toggle-password" id="togglePasswordBtn" title="Hiển thị mật khẩu">👁️</span>
-            </div>
-          </div>
-
-          <div class="form-actions-row">
-            <label class="checkbox-container">
-              <input type="checkbox" id="remember"> Nhớ tài khoản
-            </label>
             <a href="#" class="forgot-password">Quên mật khẩu?</a>
           </div>
-
-          <button type="submit" class="btn-primary login-btn">Đăng nhập ngay</button>
-
-          <div th:if="${errorMessage}" style="margin-top: 0.9rem; padding: 0.75rem; border-radius: 0.75rem; background: #fee2e2; color: #b91c1c; font-weight: 600;">
-            <span th:text="${errorMessage}"></span>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required>
+            <span class="toggle-password" id="togglePasswordBtn" title="Hiển thị mật khẩu">👁️</span>
           </div>
+        </div>
 
-          <div th:if="${param.logout}" style="margin-top: 0.9rem; padding: 0.75rem; border-radius: 0.75rem; background: #dbeafe; color: #1d4ed8; font-weight: 600;">
-            Bạn đã đăng xuất thành công.
-          </div>
-        </form>
+        <div class="form-actions-row" style="margin-bottom: 1.5rem;">
+          <label class="checkbox-container">
+            <input type="checkbox" id="remember" name="remember"> Nhớ tài khoản
+          </label>
+        </div>
 
-      </div>
+        <button type="submit" class="btn-primary login-btn">Đăng nhập</button>
+
+        <div th:if="${errorMessage}" style="margin-top: 1rem; padding: 0.75rem; border-radius: 0.5rem; background: #fee2e2; color: #b91c1c; font-size: 0.875rem;">
+          <span th:text="${errorMessage}"></span>
+        </div>
+        <div th:if="${param.logout}" style="margin-top: 1rem; padding: 0.75rem; border-radius: 0.5rem; background: #dbeafe; color: #1d4ed8; font-size: 0.875rem;">
+          Bạn đã đăng xuất thành công.
+        </div>
+
+      </form>
     </div>
-  </div>
 
-  <script>
+  <div class="login-footer">
+    Chưa có tài khoản? <a href="#">Tạo tài khoản tại đây</a>
+  </div>
+</div>
+
+<script>
     document.addEventListener("DOMContentLoaded", function() {
       const togglePasswordBtn = document.getElementById("togglePasswordBtn");
       const passwordInput = document.getElementById("password");

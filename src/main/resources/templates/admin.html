@@ -12,89 +12,124 @@
   <div class="dashboard-layout">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <h2 class="logo-text">E-Bank Admin</h2>
+        <a th:href="@{/admin}" style="text-decoration: none; display: block; cursor: pointer;">
+          <div class="logo-wrapper">
+            <div class="logo-icon-small">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+            </div>
+            <h2 class="logo-text">Admin</h2>
+          </div>
+        </a>
       </div>
       <ul class="nav-links">
-        <li><a th:href="@{/admin}" class="active">Quản lý Khách hàng</a></li>
-        <li><a href="#">Quản lý Giao dịch</a></li>
-        <li><a href="#">Quản lý Tài khoản</a></li>
+        <li>
+          <a th:href="@{/admin}" class="active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Quản lý Khách hàng
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            Quản lý Giao dịch
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Quản lý Tài khoản
+          </a>
+        </li>
       </ul>
       <div class="sidebar-footer">
-        <a href="#" class="logout-link" id="logoutLink">Đăng xuất</a>
+        <a href="#" class="logout-link" id="logoutLink">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Đăng xuất
+        </a>
       </div>
     </aside>
 
     <main class="main-content">
       <header class="topbar">
-        <div class="search-box"></div>
+        <div class="search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" placeholder="Tìm kiếm nhanh...">
+        </div>
         <div class="user-profile">
           <span class="user-name" th:text="${username}">Quản trị viên</span>
           <div class="avatar" style="background-color: #ef4444;">AD</div>
         </div>
       </header>
 
-      <div class="admin-container">
-        <div th:if="${successMessage}" style="background-color: #d1fae5; color: #047857; padding: 1rem; border-radius: var(--radius-button); margin-bottom: var(--spacing-md); font-weight: 600; box-shadow: var(--shadow-card);">
-            <span th:text="${successMessage}"></span>
-        </div>
-        
-        <div class="page-header">
-          <h2>Danh sách Khách hàng</h2>
-          <button class="btn-primary" id="btnOpenAddForm">+ Thêm khách hàng</button>
-        </div>
-
-        <form th:action="@{/admin}" method="get" class="filter-bar bento-card">
-          <input type="text" name="keyword" class="filter-input" placeholder="Tìm tên, SĐT, Username..." th:value="${keyword}">
+      <div class="content-scroll-area">
+        <div class="admin-container">
           
-          <select class="filter-select">
-            <option value="all">Tất cả trạng thái</option>
-            <option value="active">Đang hoạt động</option>
-            <option value="locked">Bị khóa</option>
-          </select>
+          <div th:if="${successMessage}" class="alert alert-success">
+              <span th:text="${successMessage}"></span>
+          </div>
           
-          <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem;">Lọc / Tìm kiếm</button>
-        </form>
+          <div class="page-header">
+            <h2>Danh sách Khách hàng</h2>
+            <button class="btn-primary" id="btnOpenAddForm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Thêm khách hàng
+            </button>
+          </div>
 
-        <div class="table-container bento-card">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Họ và Tên</th>
-                <th>Số điện thoại</th>
-                <th>Tổng số dư (VND)</th>
-                <th>Trạng thái</th>
-                <th style="text-align: center;">Thao tác</th>
-              </tr>
-            </thead>
-            
-            <tbody>
-              <tr th:each="acc : ${accounts}">
-                <td th:text="'#KH' + ${#numbers.formatInteger(acc.id, 3)}">#KH001</td>
-                <td th:text="${acc.username}">Nguyễn Văn A</td>
-                <td th:text="${acc.phoneNumber}">0123456789</td>
-                <td class="amount-positive" th:text="${acc.balance != null ? #numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT') : '0'}">125,500,000</td>
-                <td><span class="badge badge-active">Hoạt động</span></td>
-                <td class="action-cell" style="display: flex; gap: 0.5rem; justify-content: center;">
-                  <button class="btn-icon">👁️</button>
-                  <button type="button" class="btn-icon" title="Chỉnh sửa tài khoản"
-                    th:attr="onclick=|openEditModal('${acc.id}', '${acc.accountName}', '${acc.username}', '${acc.phoneNumber}', '${acc.balance}', '${acc.phoneNumber}')|">
-                    ✏️
-                  </button>
-                  <form th:action="@{/admin/delete-customer/{id}(id=${acc.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không? Mọi dữ liệu sẽ bị mất!');">
-                    <button type="submit" class="btn-icon" style="color: var(--color-danger);" title="Xóa tài khoản">🗑️</button>
-                  </form>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <form th:action="@{/admin}" method="get" class="filter-bar admin-bento-card">
+            <input type="text" name="keyword" class="filter-input" placeholder="Tìm tên, SĐT, Username..." th:value="${keyword}">
+            <select class="filter-select">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="active">Đang hoạt động</option>
+              <option value="locked">Bị khóa</option>
+            </select>
+            <button type="submit" class="btn-primary" style="padding: 0.65rem 1.25rem;">Lọc / Tìm kiếm</button>
+          </form>
 
-          <div class="pagination">
-            <button class="page-btn disabled">Trước</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
-            <button class="page-btn">Sau</button>
+          <div class="table-container admin-bento-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Họ và Tên</th>
+                  <th>Số điện thoại</th>
+                  <th>Tổng số dư (VND)</th>
+                  <th>Trạng thái</th>
+                  <th style="text-align: center;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="acc : ${accounts}">
+                  <td th:text="'#KH' + ${#numbers.formatInteger(acc.id, 3)}">#KH001</td>
+                  <td th:text="${acc.username}">Nguyễn Văn A</td>
+                  <td th:text="${acc.phoneNumber}">0123456789</td>
+                  <td class="amount-highlight" th:text="${acc.balance != null ? #numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT') : '0'}">125,500,000</td>
+                  <td><span class="badge badge-active">Hoạt động</span></td>
+                  <td class="action-cell">
+                    <button class="btn-icon" title="Xem chi tiết">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                    <button type="button" class="btn-icon" title="Chỉnh sửa tài khoản"
+                      th:attr="onclick=|openEditModal('${acc.id}', '${acc.accountName}', '${acc.username}', '${acc.phoneNumber}', '${acc.balance}', '${acc.phoneNumber}')|">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <form th:action="@{/admin/delete-customer/{id}(id=${acc.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không? Mọi dữ liệu sẽ bị mất!');">
+                      <button type="submit" class="btn-icon btn-icon-danger" title="Xóa tài khoản">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="pagination">
+              <button class="page-btn disabled">Trước</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">Sau</button>
+            </div>
           </div>
         </div>
       </div>
@@ -102,108 +137,99 @@
   </div>
 
   <div class="modal-overlay" id="addCustomerModal">
-    <div class="modal-box bento-card" style="max-width: 500px; text-align: left;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h3 style="margin: 0;">Thêm Khách Hàng Mới</h3>
-        <button id="btnCloseAddForm" style="background: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">✕</button>
+    <div class="modal-box admin-bento-card" style="max-width: 500px; text-align: left;">
+      <div class="modal-header">
+        <h3>Thêm Khách Hàng Mới</h3>
+        <button id="btnCloseAddForm" class="btn-close-modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
         
-      <form th:action="@{/admin/add-customer}" th:object="${newAccount}" method="post" style="display: grid; gap: 1rem;">
+      <form th:action="@{/admin/add-customer}" th:object="${newAccount}" method="post" class="dashboard-form">
         <div class="input-group">
           <label>Tên đăng nhập (Username):</label>
           <input type="text" th:field="*{accountName}" required placeholder="VD: nguyenvanb">
         </div>
-
         <div class="input-group">
           <label>Họ và Tên đầy đủ:</label>
           <input type="text" th:field="*{username}" required placeholder="VD: Nguyễn Văn B">
         </div>
-
         <div class="input-group">
           <label>Số điện thoại:</label>
           <input type="text" th:field="*{phoneNumber}" required 
-                  placeholder="VD: 0987654321"
-                  maxlength="10" 
-                  pattern="[0-9]{10}" 
+                  placeholder="VD: 0987654321" maxlength="10" pattern="[0-9]{10}" 
                   title="Số điện thoại phải bao gồm đúng 10 chữ số"
                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
-
         <div class="input-group">
           <label>Mật khẩu khởi tạo:</label>
-          <div style="position: relative; display: flex; align-items: center;">
-            <input type="password" th:field="*{password}" required placeholder="Nhập mật khẩu" style="width: 100%; padding-right: 40px;">
-            <button type="button" id="btnTogglePassword" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-muted);" title="Hiện/Ẩn mật khẩu">
-            👁️
+          <div class="password-wrapper">
+            <input type="password" th:field="*{password}" required placeholder="Nhập mật khẩu">
+            <button type="button" id="btnTogglePassword" class="toggle-password-btn" title="Hiện/Ẩn mật khẩu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
           </div>
         </div>
-
         <div class="input-group">
           <label>Số dư ban đầu (VND):</label>
-          <input type="text" th:field="*{balance}" required placeholder="0.00" 
-            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+          <input type="text" th:field="*{balance}" required placeholder="0" 
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
-
-        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.5rem;">Xác nhận thêm</button>
+        <button type="submit" class="btn-primary w-100">Xác nhận thêm</button>
       </form>
     </div>
   </div>
 
   <div class="modal-overlay" id="editCustomerModal">
-    <div class="modal-box bento-card" style="max-width: 500px; text-align: left;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h3 style="margin: 0;">Chỉnh Sửa Khách Hàng</h3>
-        <button id="btnCloseEditForm" type="button" style="background: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">✕</button>
+    <div class="modal-box admin-bento-card" style="max-width: 500px; text-align: left;">
+      <div class="modal-header">
+        <h3>Chỉnh Sửa Khách Hàng</h3>
+        <button id="btnCloseEditForm" class="btn-close-modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
         
-      <form th:action="@{/admin/update-customer}" method="post" style="display: grid; gap: 1rem;">
+      <form th:action="@{/admin/update-customer}" method="post" class="dashboard-form">
         <input type="hidden" id="editId" name="id">
-
         <div class="input-group">
           <label>Tên đăng nhập (Không thể sửa):</label>
-          <input type="text" id="editAccountName" name="accountName" readonly style="background-color: #e2e8f0; cursor: not-allowed;">
+          <input type="text" id="editAccountName" name="accountName" readonly class="input-readonly">
         </div>
-
         <div class="input-group">
           <label>Họ và Tên đầy đủ:</label>
           <input type="text" id="editUsername" name="username" required>
         </div>
-
         <div class="input-group">
           <label>Số điện thoại:</label>
           <input type="text" id="editPhoneNumber" name="phoneNumber" required 
-                  maxlength="10" 
-                  pattern="[0-9]{10}" 
-                  title="Số điện thoại phải bao gồm đúng 10 chữ số"
+                  maxlength="10" pattern="[0-9]{10}" title="Số điện thoại phải bao gồm đúng 10 chữ số"
                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
-
         <div class="input-group">
           <label>Số dư (VND):</label>
-          <input type="text" id="editBalance" name="balance" required placeholder="0.00" 
-            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+          <input type="text" id="editBalance" name="balance" required placeholder="0" 
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
-
-        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.5rem;">Cập nhật thông tin</button>
+        <button type="submit" class="btn-primary w-100">Cập nhật thông tin</button>
       </form>
     </div>
   </div>
 
   <div class="modal-overlay" id="logoutModal">
-    <div class="modal-box bento-card">
-      <div class="modal-icon">⚠️</div>
-      <h3>Xác nhận đăng xuất</h3>
-      <p>Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc này không?</p>
+    <div class="modal-box admin-bento-card">
+      <div class="modal-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </div>
+      <h3 style="margin-bottom: 0.5rem;">Xác nhận đăng xuất</h3>
+      <p style="color: #64748b; margin-bottom: 1.5rem;">Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc này không?</p>
       <div class="modal-actions">
-        <button class="btn-secondary" id="btnCancelLogout">Không</button>
-        <button class="btn-primary" id="btnConfirmLogout" style="background-color: var(--color-danger);">Đăng xuất</button>
+        <button class="btn-secondary" id="btnCancelLogout">Hủy bỏ</button>
+        <button class="btn-danger" id="btnConfirmLogout">Đăng xuất</button>
       </div>
     </div>
   </div>
 
   <script>
-    //logout modal
     const logoutLink = document.getElementById('logoutLink');
     const modal = document.getElementById('logoutModal');
     const btnCancel = document.getElementById('btnCancelLogout');
@@ -213,66 +239,42 @@
       e.preventDefault();
       modal.classList.add('active');
     });
+    btnCancel.addEventListener('click', () => modal.classList.remove('active'));
+    btnConfirm.addEventListener('click', () => window.location.href = '/logout');
 
-    btnCancel.addEventListener('click', function () {
-      modal.classList.remove('active');
-    });
-
-    btnConfirm.addEventListener('click', function () {
-      window.location.href = '/logout';
-    });
-
-    //add customer modal
     const btnOpenAddForm = document.getElementById('btnOpenAddForm');
     const btnCloseAddForm = document.getElementById('btnCloseAddForm');
     const addCustomerModal = document.getElementById('addCustomerModal');
 
-    btnOpenAddForm.addEventListener('click', function () {
-      addCustomerModal.classList.add('active');
+    btnOpenAddForm.addEventListener('click', () => addCustomerModal.classList.add('active'));
+    btnCloseAddForm.addEventListener('click', () => addCustomerModal.classList.remove('active'));
+    addCustomerModal.addEventListener('click', (e) => {
+      if (e.target === addCustomerModal) addCustomerModal.classList.remove('active');
     });
 
-    btnCloseAddForm.addEventListener('click', function () {
-      addCustomerModal.classList.remove('active');
-    });
-
-    addCustomerModal.addEventListener('click', function (e) {
-      if (e.target === addCustomerModal) {
-        addCustomerModal.classList.remove('active');
-      }
-    });
-
-    //edit customer modal
     const editCustomerModal = document.getElementById('editCustomerModal');
     const btnCloseEditForm = document.getElementById('btnCloseEditForm');
 
-    function openEditModal(id, accountName, username,phoneNumber, balance) {
+    function openEditModal(id, accountName, username, phoneNumber, balance) {
       document.getElementById('editId').value = id;
       document.getElementById('editAccountName').value = accountName;
       document.getElementById('editUsername').value = username;
       document.getElementById('editPhoneNumber').value = phoneNumber;
       document.getElementById('editBalance').value = balance;
-
       editCustomerModal.classList.add('active');
     }
 
-    btnCloseEditForm.addEventListener('click', function () {
-      editCustomerModal.classList.remove('active');
-    });
-
-    editCustomerModal.addEventListener('click', function (e) {
-      if (e.target === editCustomerModal) {
-        editCustomerModal.classList.remove('active');
-      }
+    btnCloseEditForm.addEventListener('click', () => editCustomerModal.classList.remove('active'));
+    editCustomerModal.addEventListener('click', (e) => {
+      if (e.target === editCustomerModal) editCustomerModal.classList.remove('active');
     });
     
-    //form password toggle
     const btnTogglePassword = document.getElementById('btnTogglePassword');
     const addPasswordInput = document.getElementById('password');
 
     btnTogglePassword.addEventListener('click', function () {
       const type = addPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       addPasswordInput.setAttribute('type', type);
-      this.textContent = type === 'password' ? '👁️' : '🙈';
     });
   </script>
 </body>

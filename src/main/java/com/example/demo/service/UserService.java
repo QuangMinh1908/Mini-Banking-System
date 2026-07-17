@@ -14,19 +14,24 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> searchCustomers(String keyword) {
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            return userRepository.searchCustomers(keyword.trim());
-        }
+public List<User> searchUsers(Long id, String name, String phone) {
+    boolean isIdEmpty = (id == null);
+    boolean isNameEmpty = (name == null || name.trim().isEmpty());
+    boolean isPhoneEmpty = (phone == null || phone.trim().isEmpty());
+
+    if (isIdEmpty && isNameEmpty && isPhoneEmpty) {
         return userRepository.findByRoleNot("admin");
     }
+    
+    return userRepository.searchUsers(id, name, phone);    
+}
 
-    public void createCustomer(User user) {
+    public void createUser(User user) {
         user.setRole("user"); 
         userRepository.save(user);
     }
 
-    public void updateCustomer(User updatedUser) {
+    public void updateUser(User updatedUser) {
         User existingUser = userRepository.findById(updatedUser.getId()).orElse(null);
         if (existingUser != null) {
             existingUser.setFullName(updatedUser.getFullName());
@@ -35,7 +40,7 @@ public class UserService {
         }
     }
 
-    public void deleteCustomer(Long id) {
+    public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 }

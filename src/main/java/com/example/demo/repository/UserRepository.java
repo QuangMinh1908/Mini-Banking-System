@@ -9,12 +9,13 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     // fix username thành chữ thường, thêm các field khác
-        @Query("SELECT u FROM User u WHERE (LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "OR u.phoneNumber LIKE CONCAT('%', :keyword, '%') " +
-           "OR CAST(u.id AS string) LIKE CONCAT('%', :keyword, '%')) " +
-           "AND LOWER(u.role) != 'admin'")
-    List<User> searchCustomers(@Param("keyword") String keyword);
+    @Query("SELECT u FROM User u WHERE u.role != 'admin' AND " +
+           "(:id IS NULL OR u.id = :id) AND " +
+           "(:name IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
+           "(:phone IS NULL OR u.phoneNumber LIKE CONCAT('%', :phone, '%'))")
+    List<User> searchUsers(@Param("id") Long id, 
+                                       @Param("name") String name, 
+                                       @Param("phone") String phone);
 
     List<User> findByRoleNot(String role);
     Optional<User> findByUsername(String username);

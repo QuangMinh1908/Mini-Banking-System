@@ -237,3 +237,88 @@
 }
 .toggle-password-btn:hover { color: #0f172a; }
 .input-readonly { background-color: #f1f5f9 !important; cursor: not-allowed; color: #64748b !important; }
+
+/* thanh tìm kiếm */
+.search-wrapper {
+    position: relative;
+    flex-grow: 1; 
+}
+
+.main-search-input {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    outline: none;
+}
+
+.advanced-popup {
+    display: none; 
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    z-index: 1000;
+    margin-top: 5px;
+}
+
+.search-wrapper.active .advanced-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.advanced-popup input {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    outline: none;
+}
+
+.advanced-popup input:focus {
+    border-color: #3b82f6;
+}
+
+.main-search-input {
+  padding-right: 150px;
+}
+
+.search-tags-container {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 6px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.search-tag {
+    background-color: #eff6ff;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid #bfdbfe;
+}
+
+.search-tag-ellipsis {
+    background-color: #f1f5f9;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 12px;
+}

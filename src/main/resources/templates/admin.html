@@ -103,54 +103,73 @@
             <button type="submit" class="btn-primary" style="padding: 0.65rem 1.25rem;">Lọc / Tìm kiếm</button>
           </form>
 
-          <div class="table-container admin-bento-card">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Họ và Tên</th>
-                  <th>Số điện thoại</th>
-                  <th>Trạng thái</th>
-                  <th style="text-align: center;">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="user : ${users}">
-                  <td th:text="'#KH' + ${#numbers.formatInteger(user.id, 3)}">#KH001</td>
-                  <td th:text="${user.fullName}">Nguyễn Văn A</td>
-                  <td th:text="${user.phoneNumber}">0123456789</td>
-                  <td><span class="badge badge-active">Hoạt động</span></td>
-                  <td class="action-cell">
-                    <button class="btn-icon" title="Xem chi tiết">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
-                    <!-- Đã sửa lại thứ tự truyền biến vào hàm openEditModal -->
-                    <button type="button" class="btn-icon" title="Chỉnh sửa tài khoản"
-                      th:attr="onclick=|openEditModal('${user.id}', '${user.username}', '${user.fullName}', '${user.phoneNumber}')|">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    </button>
-                    <form th:action="@{/admin/delete-user/{id}(id=${user.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không? Mọi dữ liệu sẽ bị mất!');">
-                      <button type="submit" class="btn-icon btn-icon-danger" title="Xóa tài khoản">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          <div class="table-container admin-bento-card flex-table-card">
+            <div class="table-scroll-area">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Họ và Tên</th>
+                    <th>Số điện thoại</th>
+                    <th>Trạng thái</th>
+                    <th style="text-align: center;">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="user : ${userPage.content}">
+                    <td th:text="'#KH' + ${#numbers.formatInteger(user.id, 3)}">#KH001</td>
+                    <td th:text="${user.fullName}">Nguyễn Văn A</td>
+                    <td th:text="${user.phoneNumber}">0123456789</td>
+                    <td><span class="badge badge-active">Hoạt động</span></td>
+                    <td class="action-cell">
+                      <button class="btn-icon" title="Xem chi tiết">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                       </button>
-                    </form>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                      <button type="button" class="btn-icon" title="Chỉnh sửa tài khoản"
+                        th:attr="onclick=|openEditModal('${user.id}', '${user.username}', '${user.fullName}', '${user.phoneNumber}')|">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <form th:action="@{/admin/delete-user/{id}(id=${user.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không? Mọi dữ liệu sẽ bị mất!');">
+                        <button type="submit" class="btn-icon btn-icon-danger" title="Xóa tài khoản">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  <tr th:if="${userPage.empty}">
+                    <td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">
+                      Không tìm thấy khách hàng nào.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-            <div class="pagination">
-              <button class="page-btn disabled">Trước</button>
-              <button class="page-btn active">1</button>
-              <button class="page-btn">2</button>
-              <button class="page-btn">3</button>
-              <button class="page-btn">Sau</button>
+            <div class="pagination" th:if="${userPage.totalPages > 0}">
+              <!-- Nút "Trước" -->
+              <a class="page-btn" 
+                th:if="${not userPage.first}"
+                th:href="@{/admin(page=${userPage.number - 1}, size=${userPage.size}, searchId=${searchId}, searchName=${searchName}, searchPhone=${searchPhone})}">
+                Trước
+              </a>
+              <span class="page-btn disabled" th:if="${userPage.first}">Trước</span>
+              <!-- Các nút số (1, 2, 3...) -->
+              <a class="page-btn" 
+                th:each="i : ${#numbers.sequence(0, userPage.totalPages - 1)}"
+                th:classappend="${userPage.number == i} ? 'active' : ''"
+                th:href="@{/admin(page=${i}, size=${userPage.size}, searchId=${searchId}, searchName=${searchName}, searchPhone=${searchPhone})}"
+                th:text="${i + 1}">1
+              </a>
+
+              <!-- Nút "Sau" -->
+              <a class="page-btn" 
+                th:if="${not userPage.last}"
+                th:href="@{/admin(page=${userPage.number + 1}, size=${userPage.size}, searchId=${searchId}, searchName=${searchName}, searchPhone=${searchPhone})}">
+                Sau
+              </a>
+              <span class="page-btn disabled" th:if="${userPage.last}">Sau</span>
             </div>
           </div>
-        </div>
-      </div>
-    </main>
-  </div>
 
   <div class="modal-overlay" id="addUserModal">
     <div class="modal-box admin-bento-card" style="max-width: 500px; text-align: left;">
@@ -258,39 +277,54 @@
 
       const searchId = urlParams.get('searchId');
       if (searchId && searchId.trim() !== '') {
-        const formattedId = '#KH' + searchId.padStart(3, '0');
-        activeTags.push(formattedId);
+        activeTags.push({ text: '#KH' + searchId.padStart(3, '0'), inputName: 'searchId' });
       }
 
       const searchName = urlParams.get('searchName');
       if (searchName && searchName.trim() !== '') {
-        activeTags.push(searchName.trim());
+        activeTags.push({ text: searchName.trim(), inputName: 'searchName' });
       }
 
       const searchPhone = urlParams.get('searchPhone');
       if (searchPhone && searchPhone.trim() !== '') {
-        activeTags.push(searchPhone.trim());
+        activeTags.push({ text: searchPhone.trim(), inputName: 'searchPhone' });
       }
 
       if (activeTags.length > 0) {
         tagsContainer.innerHTML = '';
         const maxTags = 3;
 
-        activeTags.forEach((tagText, index) => {
+        activeTags.forEach((tag, index) => {
           if (index < maxTags) {
             const tagElement = document.createElement('span');
             tagElement.className = 'search-tag';
-            tagElement.textContent = tagText;
+            
+            const tagText = document.createElement('span');
+            tagText.textContent = tag.text;
+            tagElement.appendChild(tagText);
+
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'tag-close-btn';
+            closeBtn.innerHTML = '&times;';
+            
+            closeBtn.onclick = function(e) {
+                e.preventDefault(); 
+                document.querySelector(`input[name="${tag.inputName}"]`).value = '';
+                document.querySelector('form.filter-bar').submit();
+            };
+            
+            tagElement.appendChild(closeBtn);
             tagsContainer.appendChild(tagElement);
           }
         });
 
         if (activeTags.length > maxTags) {
-                const dotsElement = document.createElement('span');
-                dotsElement.className = 'search-tag-ellipsis';
-                dotsElement.textContent = '...';
-                tagsContainer.appendChild(dotsElement);
-            }
+            const dotsElement = document.createElement('span');
+            dotsElement.className = 'search-tag-ellipsis';
+            dotsElement.textContent = '...';
+            tagsContainer.appendChild(dotsElement);
+        }
       }
     });
 

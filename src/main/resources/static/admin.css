@@ -1,7 +1,7 @@
 .admin-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .page-header {
@@ -22,6 +22,14 @@
   border-radius: 1.25rem;
   padding: 1.5rem;
   box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.05), 0 2px 4px -1px rgba(37, 99, 235, 0.03);
+}
+
+.table-scroll-area thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #f8fafc;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* ==========================================================================
@@ -77,7 +85,6 @@
   min-width: 800px;
   background-color: #ffffff;
   border-radius: 0.75rem;
-  overflow: hidden;
 }
 
 .data-table th, .data-table td {
@@ -104,6 +111,48 @@
 
 .data-table tbody tr:hover {
   background-color: #f1f5f9;
+}
+
+.flex-table-card {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 300px); 
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.table-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin; 
+    scrollbar-color: transparent transparent; 
+    transition: scrollbar-color 0.3s ease; 
+}
+
+.table-scroll-area:hover {
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.table-scroll-area::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.table-scroll-area::-webkit-scrollbar-track {
+    background-color: transparent; 
+}
+
+.table-scroll-area::-webkit-scrollbar-thumb {
+    background-color: transparent; 
+    border-radius: 10px;
+}
+
+.table-scroll-area:hover::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+}
+
+.table-scroll-area::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8; 
 }
 
 /* ==========================================================================
@@ -161,12 +210,13 @@
 }
 
 .pagination {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background-color: #ffffff;
-  border-top: 1px solid #e2e8f0;
+    margin: 0;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
 }
 
 .page-btn {
@@ -308,10 +358,17 @@
     padding: 4px 8px;
     border-radius: 12px;
     white-space: nowrap;
-    max-width: 80px;
+    max-width: 120px;
+    border: 1px solid #bfdbfe;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+}
+
+.search-tag span:first-child {
     overflow: hidden;
     text-overflow: ellipsis;
-    border: 1px solid #bfdbfe;
 }
 
 .search-tag-ellipsis {
@@ -321,4 +378,24 @@
     font-weight: bold;
     padding: 4px 8px;
     border-radius: 12px;
+}
+
+.tag-close-btn {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.tag-close-btn:hover {
+    color: #1e3a8a;
+    transform: scale(1.1);
 }

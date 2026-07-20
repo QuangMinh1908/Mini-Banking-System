@@ -1,0 +1,22 @@
+1. Tạo tầng DTO -> bảo vệ dữ liệu gốc và tối ưu hiệu năng
+Tại một class trung gian chỉ chứa các dữ liệu cần thể hiện (Họ Tên, ID, SĐT)
+
+2. Nâng cấp truy vấn Repository -> chỉ trả về 1 phần dữ liệu cần thiết thay vì toàn bộ
+Thay đổi trả về của hàm tìm kiếm (List) sang đối tượng phân trang (Page), bổ sung tham số Pageable để đồng bộ với JPA
+Kế thừa thêm JPASpecificationExecutor để truyền các khối điều kiện vào db
+
+3.Thay thế lệnh kiểm tra if-else ở Service
+Bổ sung tham số đầu vào cho số trang(page) và kích thước(size), kết hợp với Specifications để lọc dữ liệu (mặc định loại bỏ tài khoản có role admin)
+Kiểm tra các tham số đầu vào (Họ Tên, ID, SĐT) nhúng các điều kiện có vào, bỏ trống thì skip
+Đẩy bộ lọc hoàn chỉnh cùng yêu cầu phân trang xuống Repository để lấy dữ liệu gốc
+Đẩy dữ liệu gốc sang DTO để đảm bảo an toàn trước khi chuyển cho controller
+
+4. Controller -> mở rộng để quản lý trạng thái phân trang
+Thêm tham số @RequestParam để nhận giá trị PAGE và SIZE từ địa chỉ URL
+Tiếp nhận dữ liệu an toàn từ Service và chuyển xuống Model của View
+Giữ các từ khóa tìm kiếm và đính kèm theo dữ liệu để khi chuyển trang ko bị reset
+
+5. View chuyển đổi file .html từ trạng thái tĩnh thành động
+Sửa đổi vòng lặp <tbody> để đọc dữ liệu chuyển từ Controller
+Sử dụng cú pháp Thymeleaf để tự động vẽ ra số lượng nút nút bấm tương ứng với tổng số trang trả về
+Tạo liên kết tại mỗi nút bấm trang, tự động tạo đường dẫn URL có số trang mới và các tham số tìm kiếm cũ

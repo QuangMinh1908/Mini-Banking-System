@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
+import com.example.demo.config.UserListDTO;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -82,21 +83,28 @@ public class HelloController {
         }
 
     @GetMapping("/admin")
-    public String admin(HttpSession session, Model model,
+        public String admin(HttpSession session, Model model,
                         @RequestParam(required = false) Long searchId,
                         @RequestParam(required = false) String searchName,
-                        @RequestParam(required = false) String searchPhone) {
+                        @RequestParam(required = false) String searchPhone,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size) {
 
-        String role = (String) session.getAttribute("role");
-        if (!"admin".equals(role)) {
-            return "user".equals(role) ? "redirect:/dashboard" : "redirect:/login";
-        }
+            String role = (String) session.getAttribute("role");
+            if (!"admin".equals(role)) {
+                return "user".equals(role) ? "redirect:/dashboard" : "redirect:/login";
+            }
 
-        List<User> users = userService.searchUsers(searchId, searchName, searchPhone);        
+            Page<UserListDTO> userPage = userService.searchUsers(searchId, searchName, searchPhone, page, size);
 
-        model.addAttribute("users", users);
-        model.addAttribute("newUser", new User());
-        return "admin";
+            model.addAttribute("userPage", userPage); 
+            model.addAttribute("newUser", new User());
+
+            model.addAttribute("searchId", searchId);
+            model.addAttribute("searchName", searchName);
+            model.addAttribute("searchPhone", searchPhone);
+            
+            return "admin";
     }
 
     @GetMapping("/logout")

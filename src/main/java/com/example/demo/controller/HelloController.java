@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -81,16 +82,20 @@ public class HelloController {
         }
 
     @GetMapping("/admin")
-    public String admin(HttpSession session, Model model, @RequestParam(name = "keyword", required = false) String keyword) {
+    public String admin(HttpSession session, Model model,
+                        @RequestParam(required = false) Long searchId,
+                        @RequestParam(required = false) String searchName,
+                        @RequestParam(required = false) String searchPhone) {
+
         String role = (String) session.getAttribute("role");
         if (!"admin".equals(role)) {
             return "user".equals(role) ? "redirect:/dashboard" : "redirect:/login";
         }
 
-        List<User> users = userService.searchCustomers(keyword);
+        List<User> users = userService.searchUsers(searchId, searchName, searchPhone);        
+
         model.addAttribute("users", users);
         model.addAttribute("newUser", new User());
-        model.addAttribute("keyword", keyword);
         return "admin";
     }
 
@@ -105,21 +110,35 @@ public class HelloController {
         return "success";
     }
 
-    @PostMapping("/admin/add-customer")
-    public String addCustomer(@ModelAttribute("newUser") User newUser) {
-        userService.createCustomer(newUser);
+    @PostMapping("/admin/add-user")
+    public String addUser(@ModelAttribute("newUser") User newUser, RedirectAttributes redirectAttributes) {
+        try {
+            newUser.setRole("user");
+            userService.createUser(newUser);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã thêm khách hàng thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: Không thể thêm khách hàng!");
+        }
         return "redirect:/admin";
     }
 
-    @PostMapping("/admin/update-customer")
-    public String updateCustomer(@ModelAttribute User updatedUser) {
-        userService.updateCustomer(updatedUser);
+    @PostMapping("/admin/update-user")
+    public String updateUser(@ModelAttribute User updatedUser, RedirectAttributes redirectAttributes) {
+        userService.updateUser(updatedUser);
+        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thông tin thành công!");
         return "redirect:/admin";
     }
 
-    @PostMapping("/admin/delete-customer/{id}")
-    public String deleteCustomer(@PathVariable Long id) {
-        userService.deleteCustomer(id);
+@PostMapping("/admin/delete-user/{id}")
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteUser(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa khách hàng thành công!");
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa! Khách hàng này đã phát sinh giao dịch trên hệ thống.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi không xác định khi xóa khách hàng.");
+        }
         return "redirect:/admin";
     }
 }

@@ -6,6 +6,7 @@ import com.example.demo.service.UserService;
 import com.example.demo.config.UserListDTO;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -119,7 +120,7 @@ public class HelloController {
     }
 
     @PostMapping("/admin/add-user")
-    public String addUser(@ModelAttribute("newUser") User newUser, RedirectAttributes redirectAttributes) {
+    public String addUser(@ModelAttribute("newUser") User newUser, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         try {
             newUser.setRole("user");
             userService.createUser(newUser);
@@ -127,18 +128,20 @@ public class HelloController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: Không thể thêm khách hàng!");
         }
-        return "redirect:/admin";
+        String referer = request.getHeader("Referer");
+        return "redirect:" + (referer != null ? referer : "/admin");
     }
 
     @PostMapping("/admin/update-user")
-    public String updateUser(@ModelAttribute User updatedUser, RedirectAttributes redirectAttributes) {
+    public String updateUser(@ModelAttribute User updatedUser, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         userService.updateUser(updatedUser);
         redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thông tin thành công!");
-        return "redirect:/admin";
+        String referer = request.getHeader("Referer");
+        return "redirect:" + (referer != null ? referer : "/admin");
     }
 
-@PostMapping("/admin/delete-user/{id}")
-    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    @PostMapping("/admin/delete-user/{id}")
+    public String deleteUser(@PathVariable Long id, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         try {
             userService.deleteUser(id);
             redirectAttributes.addFlashAttribute("successMessage", "Đã xóa khách hàng thành công!");
@@ -147,6 +150,7 @@ public class HelloController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi không xác định khi xóa khách hàng.");
         }
-        return "redirect:/admin";
+        String referer = request.getHeader("Referer");
+        return "redirect:" + (referer != null ? referer : "/admin");
     }
 }

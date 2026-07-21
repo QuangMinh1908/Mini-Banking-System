@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+  <!-- MẢNH GHÉP 1: POP-UP XÁC NHẬN CHUNG -->
+  <div th:fragment="confirmModal" class="modal-overlay" id="globalConfirmModal">
+    <div class="modal-box admin-bento-card">
+      <div class="modal-icon" id="globalModalIcon"></div>
+      <h3 style="margin-bottom: 0.5rem;" id="globalModalTitle">Tiêu đề</h3>
+      <p style="color: #64748b; margin-bottom: 1.5rem;" id="globalModalMessage">Nội dung thông báo</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnGlobalCancel">Hủy bỏ</button>
+        <button class="btn-danger" id="btnGlobalConfirm">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

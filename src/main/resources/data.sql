@@ -38,20 +38,99 @@ INSERT INTO users (id, username, password, full_name, phone_number, role) VALUES
 (6, 'han', 'Han456@', 'Đỗ Văn Hấn', '0956789012', 'user'),
 (7, 'nam', 'Nam789@', 'Phạm Văn Nam', '0965432109', 'user'),
 (8, 'hoa', 'Hoa987@', 'Trần Thị Hoa', '0976543210', 'user'),
-(9, 'tuan', 'Tuan654@', 'Nguyễn Văn Tuấn', '0987654321', 'user'),
-(10, 'hien', 'Hien321@', 'Lê Thị Hiền', '0998765432', 'user');;
+(9, 'tuan', 'Tuan654@', 'Nguyễn Văn Tuấn', '0908070605', 'user'),
+(10, 'hien', 'Hien321@', 'Lê Thị Hiền', '0998765432', 'user'),
+(11, 'khachhang11', '123456', 'Khách hàng mẫu số 11', '0980000011', 'user'),
+(12, 'khachhang12', '123456', 'Khách hàng mẫu số 12', '0980000012', 'user'),
+(13, 'khachhang13', '123456', 'Khách hàng mẫu số 13', '0980000013', 'user'),
+(14, 'khachhang14', '123456', 'Khách hàng mẫu số 14', '0980000014', 'user'),
+(15, 'khachhang15', '123456', 'Khách hàng mẫu số 15', '0980000015', 'user'),
+(16, 'khachhang16', '123456', 'Khách hàng mẫu số 16', '0980000016', 'user'),
+(17, 'khachhang17', '123456', 'Khách hàng mẫu số 17', '0980000017', 'user'),
+(18, 'khachhang18', '123456', 'Khách hàng mẫu số 18', '0980000018', 'user'),
+(19, 'khachhang19', '123456', 'Khách hàng mẫu số 19', '0980000019', 'user'),
+(20, 'khachhang20', '123456', 'Khách hàng mẫu số 20', '0980000020', 'user'),
+(21, 'khachhang21', '123456', 'Khách hàng mẫu số 21', '0980000021', 'user'),
+(22, 'khachhang22', '123456', 'Khách hàng mẫu số 22', '0980000022', 'user'),
+(23, 'khachhang23', '123456', 'Khách hàng mẫu số 23', '0980000023', 'user'),
+(24, 'khachhang24', '123456', 'Khách hàng mẫu số 24', '0980000024', 'user'),
+(25, 'khachhang25', '123456', 'Khách hàng mẫu số 25', '0980000025', 'user'),
+(26, 'khachhang26', '123456', 'Khách hàng mẫu số 26', '0980000026', 'user'),
+(27, 'khachhang27', '123456', 'Khách hàng mẫu số 27', '0980000027', 'user'),
+(28, 'khachhang28', '123456', 'Khách hàng mẫu số 28', '0980000028', 'user'),
+(29, 'khachhang29', '123456', 'Khách hàng mẫu số 29', '0980000029', 'user'),
+(30, 'khachhang30', '123456', 'Khách hàng mẫu số 30', '0980000030', 'user'),
+(31, 'khachhang31', '123456', 'Khách hàng mẫu số 31', '0980000031', 'user'),
+(32, 'khachhang32', '123456', 'Khách hàng mẫu số 32', '0980000032', 'user'),
+(33, 'khachhang33', '123456', 'Khách hàng mẫu số 33', '0980000033', 'user'),
+(34, 'khachhang34', '123456', 'Khách hàng mẫu số 34', '0980000034', 'user'),
+(35, 'khachhang35', '123456', 'Khách hàng mẫu số 35', '0980000035', 'user'),
+(36, 'khachhang36', '123456', 'Khách hàng mẫu số 36', '0980000036', 'user'),
+(37, 'khachhang37', '123456', 'Khách hàng mẫu số 37', '0980000037', 'user'),
+(38, 'khachhang38', '123456', 'Khách hàng mẫu số 38', '0980000038', 'user'),
+(39, 'khachhang39', '123456', 'Khách hàng mẫu số 39', '0980000039', 'user'),
+(40, 'khachhang40', '123456', 'Khách hàng mẫu số 40', '0980000040', 'user'),
+(41, 'khachhang41', '123456', 'Khách hàng mẫu số 41', '0980000041', 'user'),
+(42, 'khachhang42', '123456', 'Khách hàng mẫu số 42', '0980000042', 'user'),
+(43, 'khachhang43', '123456', 'Khách hàng mẫu số 43', '0980000043', 'user'),
+(44, 'khachhang44', '123456', 'Khách hàng mẫu số 44', '0980000044', 'user'),
+(45, 'khachhang45', '123456', 'Khách hàng mẫu số 45', '0980000045', 'user'),
+(46, 'khachhang46', '123456', 'Khách hàng mẫu số 46', '0980000046', 'user'),
+(47, 'khachhang47', '123456', 'Khách hàng mẫu số 47', '0980000047', 'user'),
+(48, 'khachhang48', '123456', 'Khách hàng mẫu số 48', '0980000048', 'user'),
+(49, 'khachhang49', '123456', 'Khách hàng mẫu số 49', '0980000049', 'user'),
+(50, 'khachhang50', '123456', 'Khách hàng mẫu số 50', '0980000050', 'user');;
 
-INSERT INTO accounts (id, account_number, balance, user_id) VALUES
-(1, 'KH001', 5000000, 1),
-(2, 'KH002', 0, 2),
-(3, 'KH003', 25000000, 3),
-(4, 'KH004', 340000, 4),
-(5, 'KH005', 8000, 5),
-(6, 'KH006', 85000000000, 6),
-(7, 'KH007', 1234567890, 7),
-(8, 'KH008', 50000000, 8),
-(9, 'KH009', 7500000, 9),
-(10, 'KH010', 12000000, 10);;
+INSERT INTO accounts (account_number, balance, date_open, user_id) VALUES
+(1, 5000000, '2026-07-17', 1),
+(2, 0, '2026-07-17', 2),
+(3, 25000000, '2026-07-17', 3),
+(4, 340000, '2026-07-17', 4),
+(5, 8000, '2026-07-17', 5),
+(6, 85000000000, '2026-07-17', 6),
+(7, 1234567890, '2026-07-17', 7),
+(8, 5000000, '2026-07-17', 8),
+(9, 7500000, '2026-07-17', 9),
+(10, 12000000, '2026-07-17', 10),
+(12, 0, '2026-07-17', 12),
+(13, 0, '2026-07-17', 13),
+(14, 0, '2026-07-17', 14),
+(15, 0, '2026-07-17', 15),
+(16, 0, '2026-07-17', 16),
+(17, 0, '2026-07-17', 17),
+(18, 0, '2026-07-17', 18),
+(19, 0, '2026-07-17', 19),
+(20, 0, '2026-07-17', 20),
+(21, 0, '2026-07-17', 21),
+(22, 0, '2026-07-17', 22),
+(23, 0, '2026-07-17', 23),
+(24, 0, '2026-07-17', 24),
+(25, 0, '2026-07-17', 25),
+(26, 0, '2026-07-17', 26),
+(27, 0, '2026-07-17', 27),
+(28, 0, '2026-07-17', 28),
+(29, 0, '2026-07-17', 29),
+(30, 0, '2026-07-17', 30),
+(31, 0, '2026-07-17', 31),
+(32, 0, '2026-07-17', 32),
+(33, 0, '2026-07-17', 33),
+(34, 0, '2026-07-17', 34),
+(35, 0, '2026-07-17', 35),
+(36, 0, '2026-07-17', 36),
+(37, 0, '2026-07-17', 37),
+(38, 0, '2026-07-17', 38),
+(39, 0, '2026-07-17', 39),
+(40, 0, '2026-07-17', 40),
+(41, 0, '2026-07-17', 41),
+(42, 0, '2026-07-17', 42),
+(43, 0, '2026-07-17', 43),
+(44, 0, '2026-07-17', 44),
+(45, 0, '2026-07-17', 45),
+(46, 0, '2026-07-17', 46),
+(47, 0, '2026-07-17', 47),
+(48, 0, '2026-07-17', 48),
+(49, 0, '2026-07-17', 49),
+(50, 0, '2026-07-17', 50);;
 
 INSERT INTO transactions (transaction_id, type, amount, description, transaction_date, to_account_id, from_account_id) VALUES
 ('TXN-20260708-001', 'DEPOSIT', 2000000.00, 'Nạp tiền mặt tại quầy', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 1, NULL);;
@@ -59,8 +138,8 @@ INSERT INTO transactions (transaction_id, type, amount, description, transaction
 INSERT INTO transactions (transaction_id, type, amount, description, transaction_date, to_account_id, from_account_id) VALUES
 ('TXN-20260708-002', 'WITHDRAW', 500000.00, 'Rút tiền qua ATM', CURRENT_TIMESTAMP - INTERVAL '2' DAY, NULL, 1);;
 
-ALTER TABLE users ALTER COLUMN id RESTART WITH 11;;
-ALTER TABLE accounts ALTER COLUMN id RESTART WITH 11;;
+ALTER TABLE users ALTER COLUMN id RESTART WITH 51;;
+ALTER TABLE accounts ALTER COLUMN id RESTART WITH 51;;
 ALTER TABLE transactions ALTER COLUMN id RESTART WITH 3;;
 
 -- hàm Trigger để tự động tạo tài khoản khi người dùng mới được thêm vào
@@ -79,3 +158,6 @@ CREATE TRIGGER trigger_auto_create_account
 AFTER INSERT ON users
 FOR EACH ROW
 EXECUTE FUNCTION auto_create_account();;
+
+CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone_number);;
+CREATE INDEX IF NOT EXISTS idx_users_fullname ON users(full_name);;

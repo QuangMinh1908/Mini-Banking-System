@@ -7,6 +7,8 @@
   <link rel="stylesheet" th:href="@{/style.css}">
   <link rel="stylesheet" th:href="@{/dashboard.css}">
   <link rel="stylesheet" th:href="@{/admin.css}">
+
+  <script th:src="@{/scripts.js}" defer></script>
 </head>
 <body>
   <div class="dashboard-layout">
@@ -69,6 +71,20 @@
             <h2>Danh sách Tài khoản Khách hàng</h2>
           </div>
 
+          <form th:action="@{/admin/account}" method="get" class="filter-bar admin-bento-card" style="overflow: visible;">
+            <div class="search-wrapper" id="searchContainer">
+              <input type="text" name="searchFullName" id="mainSearchInput" class="main-search-input" 
+                     placeholder="Tìm kiếm theo Tên chủ tài khoản..." autocomplete="off" th:value="${param.searchFullName}">
+              
+              <div class="search-tags-container" id="activeSearchTags"></div>
+
+              <div class="advanced-popup">
+                  <input type="text" name="searchAccNum" placeholder="Nhập Số tài khoản..." th:value="${param.searchAccNum}">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" style="padding: 0.65rem 1.25rem;">Lọc / Tìm kiếm</button>
+          </form>
+
           <div class="table-container admin-bento-card flex-table-card">
             <div class="table-scroll-area">
               <table class="data-table">
@@ -76,31 +92,50 @@
                   <tr>
                     <th>Số Tài Khoản</th>
                     <th>Tên Chủ Tài Khoản</th>
-                    <th>Username</th>
                     <th>Ngày Mở</th>
                     <th style="text-align: right;">Số Dư (VND)</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr th:each="account : ${accounts}">
+                  <tr th:each="account : ${accountPage.content}">
                     <td><strong th:text="${account.accountNumber}" style="color: #2563eb;">0123456789</strong></td>
                     <td th:text="${account.user.fullName}">Nguyễn Văn A</td>
-                    <td th:text="${account.user.username}">nguyenvana</td>
-                    <!-- Xử lý hiển thị ngày giờ chuẩn xác -->
-                    <td th:text="${#temporals.format(account.dateOpen, 'dd/MM/yyyy HH:mm')}">21/07/2026</td>
-                    <!-- Xử lý hiển thị BigDecimal định dạng tiền tệ -->
+                    <td th:text="${#temporals.format(account.dateOpen, 'dd/MM/yyyy')}">21/07/2026</td>
                     <td style="text-align: right; font-weight: 500; color: #059669;" 
                         th:text="${#numbers.formatDecimal(account.balance, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
                       1,000,000 ₫
                     </td>
                   </tr>
-                  <tr th:if="${#lists.isEmpty(accounts)}">
-                    <td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">
-                      Hệ thống chưa có tài khoản nào.
+                  <tr th:if="${accountPage.empty}">
+                    <td colspan="4" style="text-align: center; padding: 2rem; color: #64748b;">
+                      Không tìm thấy tài khoản nào khớp với bộ lọc.
                     </td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+            
+            <div class="pagination" th:if="${accountPage.totalPages > 0}">
+                <a class="page-btn" 
+                   th:if="${not accountPage.first}"
+                   th:href="@{/admin/account(page=${accountPage.number - 1}, size=${accountPage.size}, searchAccNum=${searchAccNum}, searchFullName=${searchFullName})}">
+                   Trước
+                </a>
+                <span class="page-btn disabled" th:if="${accountPage.first}">Trước</span>
+
+                <a class="page-btn" 
+                   th:each="i : ${#numbers.sequence(0, accountPage.totalPages - 1)}"
+                   th:classappend="${accountPage.number == i} ? 'active' : ''"
+                   th:href="@{/admin/account(page=${i}, size=${accountPage.size}, searchAccNum=${searchAccNum}, searchUsername=${searchUsername}, searchFullName=${searchFullName})}"
+                   th:text="${i + 1}">1
+                </a>
+
+                <a class="page-btn" 
+                   th:if="${not accountPage.last}"
+                   th:href="@{/admin/account(page=${accountPage.number + 1}, size=${accountPage.size}, searchAccNum=${searchAccNum}, searchFullName=${searchFullName})}">
+                   Sau
+                </a>
+                <span class="page-btn disabled" th:if="${accountPage.last}">Sau</span>
             </div>
           </div>
         </div>
@@ -109,35 +144,84 @@
   </div>
 
   <!-- Pop-up Xác nhận đăng xuất -->
-  <div class="modal-overlay" id="logoutModal">
-    <div class="modal-box admin-bento-card">
-      <div class="modal-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-      </div>
-      <h3 style="margin-bottom: 0.5rem;">Xác nhận đăng xuất</h3>
-      <p style="color: #64748b; margin-bottom: 1.5rem;">Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc này không?</p>
-      <div class="modal-actions">
-        <button class="btn-secondary" id="btnCancelLogout">Hủy bỏ</button>
-        <button class="btn-danger" id="btnConfirmLogout">Đăng xuất</button>
-      </div>
-    </div>
-  </div>
+  <div th:replace="~{fragments :: confirmModal}"></div>
 
   <script>
-    // Xử lý Pop-up Đăng xuất
-    const logoutLink = document.getElementById('logoutLink');
-    const modal = document.getElementById('logoutModal');
-    const btnCancel = document.getElementById('btnCancelLogout');
-    const btnConfirm = document.getElementById('btnConfirmLogout');
+    // Xử lý Pop-up Tìm kiếm nâng cao
+    const searchContainer = document.getElementById('searchContainer');
+    const mainSearchInput = document.getElementById('mainSearchInput');
 
-    if (logoutLink) {
-        logoutLink.addEventListener('click', function (e) {
-          e.preventDefault();
-          modal.classList.add('active');
+    if (mainSearchInput) {
+        mainSearchInput.addEventListener('focus', function() {
+            searchContainer.classList.add('active');
         });
     }
-    if (btnCancel) btnCancel.addEventListener('click', () => modal.classList.remove('active'));
-    if (btnConfirm) btnConfirm.addEventListener('click', () => window.location.href = '/logout');
+
+    document.addEventListener('click', function(event) {
+        if (searchContainer && !searchContainer.contains(event.target)) {
+            searchContainer.classList.remove('active');
+        }
+    });
+
+    // Xử lý tạo và xóa Tag tìm kiếm
+    document.addEventListener("DOMContentLoaded", function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tagsContainer = document.getElementById('activeSearchTags');
+      
+      let activeTags = [];
+
+      const searchAccNum = urlParams.get('searchAccNum');
+      if (searchAccNum && searchAccNum.trim() !== '') {
+        activeTags.push({ text: searchAccNum.trim(), inputName: 'searchAccNum' });
+      }
+
+      const searchFullName = urlParams.get('searchFullName');
+      if (searchFullName && searchFullName.trim() !== '') {
+        activeTags.push({ text: searchFullName.trim(), inputName: 'searchFullName' });
+      }
+
+      const searchUsername = urlParams.get('searchUsername');
+      if (searchUsername && searchUsername.trim() !== '') {
+        activeTags.push({ text: searchUsername.trim(), inputName: 'searchUsername' });
+      }
+
+      if (activeTags.length > 0 && tagsContainer) {
+        tagsContainer.innerHTML = '';
+        const maxTags = 3;
+
+        activeTags.forEach((tag, index) => {
+          if (index < maxTags) {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'search-tag';
+            
+            const tagText = document.createElement('span');
+            tagText.textContent = tag.text;
+            tagElement.appendChild(tagText);
+
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'tag-close-btn';
+            closeBtn.innerHTML = '&times;';
+            
+            closeBtn.onclick = function(e) {
+                e.preventDefault(); 
+                document.querySelector(`input[name="${tag.inputName}"]`).value = '';
+                document.querySelector('form.filter-bar').submit();
+            };
+            
+            tagElement.appendChild(closeBtn);
+            tagsContainer.appendChild(tagElement);
+          }
+        });
+
+        if (activeTags.length > maxTags) {
+            const dotsElement = document.createElement('span');
+            dotsElement.className = 'search-tag-ellipsis';
+            dotsElement.textContent = '...';
+            tagsContainer.appendChild(dotsElement);
+        }
+      }
+    });
   </script>
 </body>
 </html>

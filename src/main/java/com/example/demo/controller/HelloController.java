@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
+import com.example.demo.model.Account;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.AccountRepository;
 import com.example.demo.service.UserService;
 import com.example.demo.config.UserListDTO;
 
@@ -20,17 +22,20 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;
+import java.util.List;
 
 @Controller
 public class HelloController {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public HelloController(UserRepository userRepository, UserService userService) {
+    public HelloController(UserRepository userRepository, UserService userService, AccountRepository accountRepository) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.accountRepository = accountRepository;
     }
 
     @GetMapping("/")
@@ -106,6 +111,21 @@ public class HelloController {
             model.addAttribute("searchPhone", searchPhone);
             
             return "admin";
+    }
+
+    @GetMapping("/admin/account")
+    public String adminAccount(HttpSession session, Model model) {
+        String role = (String) session.getAttribute("role");
+        if (!"admin".equals(role)) {
+            return "user".equals(role) ? "redirect:/dashboard" : "redirect:/login";
+        }
+
+        List<Account> accounts = accountRepository.findAll();
+        
+        model.addAttribute("accounts", accounts);
+        model.addAttribute("username", session.getAttribute("username"));
+        
+        return "admin-account";
     }
 
     @GetMapping("/logout")

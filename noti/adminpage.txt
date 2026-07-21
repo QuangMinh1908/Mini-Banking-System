@@ -1,0 +1,5 @@
+1. bỏ thao tác xóa user, liên kết khi nhấn vào user thì hiển thị các thông tin chi tiết của user và các account của user đó
+2. khóa khả năng xem số dư của admin(yêu cầu role cao hơn, hiện tại thì tạm khóa với role admin)
+3. thay đổi khả năng chỉnh sửa, chỉ được tạo request thay đổi thông tin gửi lên hệ thống để xin xét duyệt(yêu cầu role cao hơn)
+4. sử dụng lại thông báo của đăng xuất để dùng cho các thông báo khác (có thể tạo 1 mẫu thông bảo để dùng đa nhiệm)
+5. thêm mới một số thuộc tính của user đồng thời tạo thêm các trang pop-up thông tin cho userlist và accountlist

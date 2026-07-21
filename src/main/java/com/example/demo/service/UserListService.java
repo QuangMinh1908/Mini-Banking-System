@@ -16,15 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserListService {
 
     private final UserRepository userRepository;
 
-    UserService(UserRepository userRepository) {
+    UserListService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-public Page<UserListDTO> searchUsers(Long id, String name, String phone, int page, int size) {
+    public Page<UserListDTO> searchUsers(Long id, String name, String phone, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 
         Specification<User> spec = (root, query, cb) -> {
@@ -67,9 +67,5 @@ public Page<UserListDTO> searchUsers(Long id, String name, String phone, int pag
             existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
             userRepository.save(existingUser);
         }
-    }
-
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
     }
 }

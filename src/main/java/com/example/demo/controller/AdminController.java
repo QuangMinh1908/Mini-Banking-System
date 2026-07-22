@@ -5,7 +5,8 @@ import com.example.demo.model.Account;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.service.UserListService;
 import com.example.demo.service.AccountListService;
-import com.example.demo.config.UserListDTO;
+import com.example.demo.config.security.UserListDTO;
+import com.example.demo.config.security.UserDetailDTO;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,6 +68,7 @@ public class AdminController {
             userService.createUser(newUser);
             redirectAttributes.addFlashAttribute("successMessage", "Đã thêm khách hàng thành công!");
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: Không thể thêm khách hàng!");
         }
         String referer = request.getHeader("Referer");
@@ -72,8 +77,11 @@ public class AdminController {
 
     @PostMapping("/admin/update-user")
     public String updateUser(@ModelAttribute User updatedUser, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        userService.updateUser(updatedUser);
-        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thông tin thành công!");
+        
+        userService.createUpdateRequest(updatedUser);
+        
+        redirectAttributes.addFlashAttribute("successMessage", "Yêu cầu thay đổi thông tin đã được gửi lên hệ thống và đang chờ xét duyệt!");
+        
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/admin");
     }
@@ -105,5 +113,18 @@ public class AdminController {
         model.addAttribute("username", session.getAttribute("username"));
 
         return "admin-account";
+    }
+
+    // API: LẤY CHI TIẾT USER (DÙNG CHO POP-UP)
+    // ==========================================
+    @GetMapping("/admin/api/user/{id}")
+    @ResponseBody
+    public ResponseEntity<UserDetailDTO> getUserDetailsApi(@PathVariable Long id) {
+        UserDetailDTO userDetailDTO = userService.getUserDetailById(id);
+                if (userDetailDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        return ResponseEntity.ok(userDetailDTO);
     }
 }

@@ -93,7 +93,6 @@
                     <th>Số Tài Khoản</th>
                     <th>Tên Chủ Tài Khoản</th>
                     <th>Ngày Mở</th>
-                    <th style="text-align: right;">Số Dư (VND)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -101,13 +100,9 @@
                     <td><strong th:text="${account.accountNumber}" style="color: #2563eb;">0123456789</strong></td>
                     <td th:text="${account.user.fullName}">Nguyễn Văn A</td>
                     <td th:text="${#temporals.format(account.dateOpen, 'dd/MM/yyyy')}">21/07/2026</td>
-                    <td style="text-align: right; font-weight: 500; color: #059669;" 
-                        th:text="${#numbers.formatDecimal(account.balance, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
-                      1,000,000 ₫
-                    </td>
                   </tr>
                   <tr th:if="${accountPage.empty}">
-                    <td colspan="4" style="text-align: center; padding: 2rem; color: #64748b;">
+                    <td colspan="3" style="text-align: center; padding: 2rem; color: #64748b;">
                       Không tìm thấy tài khoản nào khớp với bộ lọc.
                     </td>
                   </tr>

@@ -1,8 +1,13 @@
 package com.example.demo.service;
 
+import com.example.demo.config.security.UserListDTO;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.config.UserListDTO;
+import com.example.demo.config.security.UserDetailDTO; 
+import com.example.demo.config.security.AccountDetailDTO;
+import org.springframework.transaction.annotation.Transactional;
+import com.example.demo.model.UserUpdateRequest;
+import com.example.demo.repository.UserUpdateRequestRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,14 +19,17 @@ import jakarta.persistence.criteria.Predicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors; 
 
 @Service
 public class UserListService {
 
     private final UserRepository userRepository;
+    private final UserUpdateRequestRepository requestRepository;
 
-    UserListService(UserRepository userRepository) {
+    UserListService(UserRepository userRepository, UserUpdateRequestRepository userUpdateRequestRepository) {
         this.userRepository = userRepository;
+        this.requestRepository = userUpdateRequestRepository;
     }
 
     public Page<UserListDTO> searchUsers(Long id, String name, String phone, int page, int size) {
@@ -60,12 +68,40 @@ public class UserListService {
         userRepository.save(user);
     }
 
-    public void updateUser(User updatedUser) {
+    public void createUpdateRequest(User updatedUser) {
         User existingUser = userRepository.findById(updatedUser.getId()).orElse(null);
         if (existingUser != null) {
-            existingUser.setFullName(updatedUser.getFullName());
-            existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
-            userRepository.save(existingUser);
+            UserUpdateRequest request = new UserUpdateRequest();
+            request.setUser(existingUser);
+            request.setNewFullName(updatedUser.getFullName());
+            request.setNewPhoneNumber(updatedUser.getPhoneNumber());
+            
+            requestRepository.save(request);
         }
+    }
+
+    // Detail user and accounts
+    @Transactional(readOnly = true)
+    public UserDetailDTO getUserDetailById(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return null;
+        }
+
+        List<AccountDetailDTO> accountDTOs = user.getAccounts().stream()
+                .map(acc -> new AccountDetailDTO(acc.getAccountNumber(), acc.getDateOpen()))
+                .collect(Collectors.toList());
+
+        return new UserDetailDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getFullName(),
+                user.getPhoneNumber(),
+                user.getEmail(),
+                user.getAddress(),
+                user.getGender(),
+                user.getCreatedAt(),
+                accountDTOs
+        );
     }
 }

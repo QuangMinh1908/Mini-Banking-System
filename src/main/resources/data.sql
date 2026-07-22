@@ -143,12 +143,11 @@ ALTER TABLE accounts ALTER COLUMN id RESTART WITH 51;;
 ALTER TABLE transactions ALTER COLUMN id RESTART WITH 3;;
 
 -- hàm Trigger để tự động tạo tài khoản khi người dùng mới được thêm vào
-CREATE OR REPLACE FUNCTION auto_create_account()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION auto_create_account() RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.role = 'user' THEN
-        INSERT INTO accounts (account_number, balance, user_id)
-        VALUES ('KH' || LPAD(NEW.id::TEXT, 3, '0'), 0.00, NEW.id);
+        INSERT INTO accounts (account_number, balance, date_open, user_id)
+        VALUES ('KH' || LPAD(NEW.id::TEXT, 3, '0'), 0.00, CURRENT_TIMESTAMP, NEW.id);
     END IF;
     RETURN NEW;
 END;

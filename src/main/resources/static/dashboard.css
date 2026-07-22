@@ -106,7 +106,7 @@
   background-color: #ffffff;
   padding: 1rem 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   border-bottom: 1px solid #e2e8f0;
 }

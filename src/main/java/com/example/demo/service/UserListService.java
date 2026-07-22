@@ -63,11 +63,6 @@ public class UserListService {
         ));
     }
 
-    public void createUser(User user) {
-        user.setRole("user"); 
-        userRepository.save(user);
-    }
-
     public void createUpdateRequest(User updatedUser) {
         User existingUser = userRepository.findById(updatedUser.getId()).orElse(null);
         if (existingUser != null) {
@@ -75,7 +70,10 @@ public class UserListService {
             request.setUser(existingUser);
             request.setNewFullName(updatedUser.getFullName());
             request.setNewPhoneNumber(updatedUser.getPhoneNumber());
-            
+            request.setNewEmail(updatedUser.getEmail());
+            request.setNewAddress(updatedUser.getAddress());
+            request.setNewGender(updatedUser.getGender());
+
             requestRepository.save(request);
         }
     }

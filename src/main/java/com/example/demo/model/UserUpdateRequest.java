@@ -17,6 +17,9 @@ public class UserUpdateRequest {
 
     private String newFullName;
     private String newPhoneNumber;
+    private String newEmail;
+    private String newAddress;
+    private String newGender;
 
     // Trạng thái của request: PENDING, APPROVED, REJECTED
     private String status;
@@ -41,6 +44,15 @@ public class UserUpdateRequest {
 
     public String getNewPhoneNumber() { return newPhoneNumber; }
     public void setNewPhoneNumber(String newPhoneNumber) { this.newPhoneNumber = newPhoneNumber; }
+
+    public String getNewEmail() { return newEmail; }
+    public void setNewEmail(String newEmail) { this.newEmail = newEmail; }
+
+    public String getNewAddress() { return newAddress; }
+    public void setNewAddress(String newAddress) { this.newAddress = newAddress; }
+
+    public String getNewGender() { return newGender; }
+    public void setNewGender(String newGender) { this.newGender = newGender; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

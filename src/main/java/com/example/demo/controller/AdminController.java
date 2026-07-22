@@ -6,7 +6,10 @@ import com.example.demo.repository.AccountRepository;
 import com.example.demo.service.UserListService;
 import com.example.demo.service.AccountListService;
 import com.example.demo.config.security.UserListDTO;
+import com.example.demo.config.security.UserUpdateRequestDTO;
 import com.example.demo.config.security.UserDetailDTO;
+import com.example.demo.repository.UserUpdateRequestRepository;
+import com.example.demo.model.UserUpdateRequest;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,10 +34,12 @@ public class AdminController {
 
     private final UserListService userService;
     private final AccountRepository accountRepository;
+    private final UserUpdateRequestRepository requestRepository;
 
-    public AdminController(UserListService userService, AccountRepository accountRepository) {
+    public AdminController(UserListService userService, AccountRepository accountRepository, UserUpdateRequestRepository requestRepository) {
         this.userService = userService;
         this.accountRepository = accountRepository;
+        this.requestRepository = requestRepository;
     }
 
     // ==========================================
@@ -52,27 +57,11 @@ public class AdminController {
         Page<UserListDTO> userPage = userService.searchUsers(searchId, searchName, searchPhone, page, size);
 
         model.addAttribute("userPage", userPage); 
-        model.addAttribute("newUser", new User());
-
         model.addAttribute("searchId", searchId);
         model.addAttribute("searchName", searchName);
         model.addAttribute("searchPhone", searchPhone);
         
         return "admin";
-    }
-
-    @PostMapping("/admin/add-user")
-    public String addUser(@ModelAttribute("newUser") User newUser, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        try {
-            newUser.setRole("user");
-            userService.createUser(newUser);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã thêm khách hàng thành công!");
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: Không thể thêm khách hàng!");
-        }
-        String referer = request.getHeader("Referer");
-        return "redirect:" + (referer != null ? referer : "/admin");
     }
 
     @PostMapping("/admin/update-user")
@@ -124,7 +113,31 @@ public class AdminController {
                 if (userDetailDTO == null) {
             return ResponseEntity.notFound().build();
         }
-        
         return ResponseEntity.ok(userDetailDTO);
+    }
+
+    // API: LẤY DANH SÁCH YÊU CẦU CHỈNH SỬA
+    // ==========================================
+    @GetMapping("/admin/api/requests")
+    @ResponseBody
+    public ResponseEntity<Page<UserUpdateRequestDTO>> getRequestsApi(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by("requestDate").descending());
+        Page<UserUpdateRequest> requests = requestRepository.findAll(pageable);
+        
+        Page<UserUpdateRequestDTO> dtoPage = requests.map(req -> new UserUpdateRequestDTO(
+                req.getId(),
+                req.getUser().getUsername(),
+                req.getStatus(),
+                req.getRequestDate(),
+                req.getNewFullName(),
+                req.getNewPhoneNumber(),
+                req.getNewEmail(),
+                req.getNewAddress(),
+                req.getNewGender()
+        ));
+        return ResponseEntity.ok(dtoPage);
     }
 }

@@ -399,3 +399,10 @@
     color: #1e3a8a;
     transform: scale(1.1);
 }
+
+/* HIỆU ỨNG (ANIMATIONS) */
+@keyframes spin { 
+    100% { 
+        transform: rotate(360deg); 
+    } 
+}

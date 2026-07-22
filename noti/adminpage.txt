@@ -1,5 +1,15 @@
-1. bỏ thao tác xóa user, liên kết khi nhấn vào user thì hiển thị các thông tin chi tiết của user và các account của user đó
-2. khóa khả năng xem số dư của admin(yêu cầu role cao hơn, hiện tại thì tạm khóa với role admin)
-3. thay đổi khả năng chỉnh sửa, chỉ được tạo request thay đổi thông tin gửi lên hệ thống để xin xét duyệt(yêu cầu role cao hơn)
-4. sử dụng lại thông báo của đăng xuất để dùng cho các thông báo khác (có thể tạo 1 mẫu thông bảo để dùng đa nhiệm)
-5. thêm mới một số thuộc tính của user đồng thời tạo thêm các trang pop-up thông tin cho userlist và accountlist
+1. Admin click vào một tài khoản hiển thị ở pop-up chi tiết khách hàng, kích hoạt việc chuyển hướng sang trang "Quản lý Tài khoản".
+Trên thanh địa chỉ (URL) sẽ mang theo hai hành trang:
+- Số tài khoản cần tra cứu.
+- Một "tín hiệu nhận diện" (ví dụ: cờ ref=user) để báo rằng Admin đang đi từ luồng Khách hàng sang.
+
+2. Controller của trang Quản lý Tài khoản sẽ tóm lấy Số tài khoản từ URL. Nó tự động nạp tham số này vào bộ lọc cơ sở dữ liệu.
+Khi trang Quản lý Tài khoản tải xong, thay vì hiển thị toàn bộ tài khoản của hệ thống, nó sẽ chỉ hiển thị duy nhất một dòng dữ
+liệu của đúng Số tài khoản mà Admin vừa click.
+
+3. Hiển thị Nút "Quay lại": Giao diện sẽ kiểm tra thanh địa chỉ. Khi thấy "tín hiệu nhận diện" (ref=user), hệ thống sẽ cho xuất
+hiện một nút "Quay lại" nổi bật ở góc trên trang, trường hợp nếu nhấn vào tài khoản ở trang quản lý tài khoản thì ko hiện.
+
+4. Trở về trạng thái cũ: Khi Admin xem xong thông tin tài khoản và bấm nút "Quay lại", hệ thống sẽ không dùng đường link URL cứng
+để về trang Khách hàng. Thay vào đó, nó sử dụng bộ nhớ lịch sử của trình duyệt (History API). Nếu bấm nút tắt thì chỉ cần tắt
+pop-up.

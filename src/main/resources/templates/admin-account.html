@@ -31,8 +31,7 @@
           </a>
         </li>
         <li>
-          <!-- Trạng thái active chuyển xuống mục Tài khoản -->
-          <a th:href="@{/admin/accounts}" class="active">
+          <a th:href="@{/admin/account}" class="active">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             Quản lý Tài khoản
           </a>
@@ -54,12 +53,8 @@
 
     <main class="main-content">
       <header class="topbar">
-        <div class="search-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" placeholder="Tìm kiếm nhanh...">
-        </div>
         <div class="user-profile">
-          <span class="user-name" th:text="${username}">Quản trị viên</span>
+          <span class="user-name"> Quản trị viên </span>
           <div class="avatar" style="background-color: #ef4444;">AD</div>
         </div>
       </header>
@@ -68,8 +63,8 @@
         <div class="admin-container">
           
           <div class="page-header" style="display: flex; align-items: center; gap: 1rem;">
-            <button th:if="${param.ref != null and #strings.equals(param.ref, 'user_detail')}" 
-                    onclick="window.history.back()" 
+            <button th:if="${param.ref != null and #strings.equals(param.ref, 'user')}" 
+                    id="mainBackBtn" 
                     class="btn-secondary" 
                     style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -103,16 +98,25 @@
                     <th>Số Tài Khoản</th>
                     <th>Tên Chủ Tài Khoản</th>
                     <th>Ngày Mở</th>
+                    <th style="text-align: center;">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr th:each="account : ${accountPage.content}">
+                  <tr th:each="account : ${accountPage.content}" 
+                      th:attr="onclick=|viewAccountDetails('${account.accountNumber}')|" 
+                      style="cursor: pointer; transition: background-color 0.2s;">
                     <td><strong th:text="${account.accountNumber}" style="color: #2563eb;">0123456789</strong></td>
                     <td th:text="${account.user.fullName}">Nguyễn Văn A</td>
                     <td th:text="${#temporals.format(account.dateOpen, 'dd/MM/yyyy')}">21/07/2026</td>
+                    <td class="action-cell">
+                      <button type="button" class="btn-icon" title="Xem chi tiết" 
+                              th:attr="onclick=|event.stopPropagation(); viewAccountDetails('${account.accountNumber}')|">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      </button>
+                    </td>
                   </tr>
                   <tr th:if="${accountPage.empty}">
-                    <td colspan="3" style="text-align: center; padding: 2rem; color: #64748b;">
+                    <td colspan="4" style="text-align: center; padding: 2rem; color: #64748b;">
                       Không tìm thấy tài khoản nào khớp với bộ lọc.
                     </td>
                   </tr>
@@ -146,6 +150,44 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Modal Chi tiết Tài khoản -->
+  <div class="modal-overlay" id="accountDetailsModal">
+    <div class="modal-box admin-bento-card modal-account-detail">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <button id="modalBtnBack" class="btn-secondary modal-back-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Quay lại
+          </button>
+          <h3>Thông tin Tài Khoản</h3>
+        </div>
+        <button id="btnCloseAccDetails" class="btn-close-modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    
+      <div class="dashboard-form acc-detail-wrapper">
+        
+        <div class="acc-header-info">
+           <div class="acc-avatar" id="accOwnerAvatar">U</div>
+           <h4 class="acc-name" id="accOwnerName">Đang tải...</h4>
+           <span class="acc-id" id="accOwnerId">ID: Đang tải...</span>
+        </div>
+
+        <hr class="acc-divider">
+
+        <p class="acc-info-row"><strong>Số Tài Khoản:</strong> <span id="accDetailNumber" class="acc-number-highlight">Đang tải...</span></p>
+        <p class="acc-info-row"><strong>Ngày Mở:</strong> <span id="accDetailDate">Đang tải...</span></p>
+        <p class="acc-info-row"><strong>Số Điện Thoại:</strong> <span id="accOwnerPhone">Đang tải...</span></p>
+        <p class="acc-info-row"><strong>Email:</strong> <span id="accOwnerEmail">Đang tải...</span></p>
+        
+      </div>
+    </div>
   </div>
 
   <!-- Pop-up Xác nhận đăng xuất -->

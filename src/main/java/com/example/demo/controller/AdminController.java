@@ -10,6 +10,7 @@ import com.example.demo.config.security.UserUpdateRequestDTO;
 import com.example.demo.config.security.UserDetailDTO;
 import com.example.demo.repository.UserUpdateRequestRepository;
 import com.example.demo.model.UserUpdateRequest;
+import com.example.demo.config.security.AccountDetailDTO;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
@@ -92,7 +93,7 @@ public class AdminController {
                 .and(AccountListService.hasAccountNumber(searchAccNum))
                 .and(AccountListService.hasFullName(searchFullName));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Account> accountPage = accountRepository.findAll(spec, pageable);
         
         model.addAttribute("accountPage", accountPage);
@@ -124,7 +125,7 @@ public class AdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
         
-        Pageable pageable = PageRequest.of(page, size, Sort.by("requestDate").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("requestDate").ascending());
         Page<UserUpdateRequest> requests = requestRepository.findAll(pageable);
         
         Page<UserUpdateRequestDTO> dtoPage = requests.map(req -> new UserUpdateRequestDTO(
@@ -139,5 +140,30 @@ public class AdminController {
                 req.getNewGender()
         ));
         return ResponseEntity.ok(dtoPage);
+    }
+
+    // API: LẤY CHI TIẾT TÀI KHOẢN
+    // ===========================
+    @GetMapping("/admin/api/account/details/{accountNumber}")
+    @ResponseBody
+    public ResponseEntity<AccountDetailDTO> getAccountBasicInfoApi(@PathVariable String accountNumber) {
+        Account account = accountRepository.findByAccountNumber(accountNumber);
+        
+        if (account == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        User user = account.getUser();
+        
+        AccountDetailDTO dto = new AccountDetailDTO(
+                account.getAccountNumber(),
+                account.getDateOpen(),
+                user.getId(),
+                user.getFullName(),
+                user.getPhoneNumber(),
+                user.getEmail()
+        );
+        
+        return ResponseEntity.ok(dto);
     }
 }

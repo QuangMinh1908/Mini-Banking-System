@@ -12,12 +12,12 @@ public class UserDetailDTO {
     private String address;
     private String gender;
     private LocalDateTime createdAt;
-    private List<AccountDetailDTO> accounts;
+    private List<AccountInfoDTO> accounts;
 
     public UserDetailDTO(Long id, String username, String fullName, String phoneNumber, 
                          String email, String address, 
                          String gender, LocalDateTime createdAt,
-                         List<AccountDetailDTO> accounts) {
+                         List<AccountInfoDTO> accounts) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
@@ -54,6 +54,6 @@ public class UserDetailDTO {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public List<AccountDetailDTO> getAccounts() { return accounts; }
-    public void setAccounts(List<AccountDetailDTO> accounts) { this.accounts = accounts; }
+    public List<AccountInfoDTO> getAccounts() { return accounts; }
+    public void setAccounts(List<AccountInfoDTO> accounts) { this.accounts = accounts; }
 }

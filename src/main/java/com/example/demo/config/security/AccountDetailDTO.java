@@ -5,16 +5,25 @@ import java.time.LocalDateTime;
 public class AccountDetailDTO {
     private String accountNumber;
     private LocalDateTime dateOpen;
+    private Long ownerId;
+    private String ownerName;
+    private String ownerPhone;
+    private String ownerEmail;
 
-    public AccountDetailDTO(String accountNumber, LocalDateTime dateOpen) {
+    public AccountDetailDTO(String accountNumber, LocalDateTime dateOpen, Long ownerId, 
+                               String ownerName, String ownerPhone, String ownerEmail) {
         this.accountNumber = accountNumber;
         this.dateOpen = dateOpen;
+        this.ownerId = ownerId;
+        this.ownerName = ownerName;
+        this.ownerPhone = ownerPhone;
+        this.ownerEmail = ownerEmail;
     }
 
-    // Getters and Setters
     public String getAccountNumber() { return accountNumber; }
-    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
-    
     public LocalDateTime getDateOpen() { return dateOpen; }
-    public void setDateOpen(LocalDateTime dateOpen) { this.dateOpen = dateOpen; }
+    public Long getOwnerId() { return ownerId; }
+    public String getOwnerName() { return ownerName; }
+    public String getOwnerPhone() { return ownerPhone; }
+    public String getOwnerEmail() { return ownerEmail; }
 }

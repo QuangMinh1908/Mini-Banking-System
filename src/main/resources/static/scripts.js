@@ -102,13 +102,12 @@ function viewUserDetails(userId) {
                     const date = new Date(acc.dateOpen);
                     const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
                     
-                    const row = `<tr>
+                    const row = `<tr onclick="window.location.href='/admin/account?searchAccNum=${acc.accountNumber}&ref=user&userId=${userId}'" style="cursor: pointer;">
                         <td>
-                            <a href="/admin/account?searchAccNum=${acc.accountNumber}&ref=user_detail" 
-                            style="color: #2563eb; font-weight: 600; text-decoration: underline; cursor: pointer;"
-                            title="Đến trang quản lý tài khoản này">
-                            ${acc.accountNumber}
-                            </a>
+                            <span style="color: #2563eb; font-weight: 600; text-decoration: underline;" 
+                                    title="Đến trang quản lý tài khoản này">
+                                ${acc.accountNumber}
+                            </span>
                         </td>
                         <td>${formattedDate}</td>
                     </tr>`;
@@ -213,8 +212,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// TÍNH NĂNG XEM YÊU CẦU & CUỘN VÔ HẠN (INFINITE SCROLL)
-// ==========================================
+// TÍNH NĂNG XEM YÊU CẦU & CUỘN VÔ HẠN
+// ===================================
 const requestsModal = document.getElementById('requestsModal');
 const btnOpenRequests = document.getElementById('btnOpenRequests');
 const btnCloseRequests = document.getElementById('btnCloseRequests');
@@ -305,3 +304,135 @@ if (requestListContainer) {
         }
     });
 }
+
+// ==========================================
+// XỬ LÝ POP-UP CHI TIẾT TÀI KHOẢN
+// ==========================================
+const accountDetailsModal = document.getElementById('accountDetailsModal');
+const btnCloseAccDetails = document.getElementById('btnCloseAccDetails');
+
+if (btnCloseAccDetails) {
+    btnCloseAccDetails.addEventListener('click', () => {
+        if (accountDetailsModal) accountDetailsModal.classList.remove('active');
+    });
+}
+if (accountDetailsModal) {
+    accountDetailsModal.addEventListener('click', (e) => {
+        if (e.target === accountDetailsModal) accountDetailsModal.classList.remove('active');
+    });
+}
+
+function viewAccountDetails(accountNumber) {
+    if (!accountDetailsModal) return;
+    
+    document.getElementById('accOwnerName').textContent = 'Đang tải...';
+    document.getElementById('accOwnerAvatar').textContent = '?';
+    document.getElementById('accOwnerId').textContent = 'ID: ...';
+    document.getElementById('accDetailNumber').textContent = accountNumber;
+    document.getElementById('accDetailDate').textContent = 'Đang tải...';
+    document.getElementById('accOwnerPhone').textContent = 'Đang tải...';
+    document.getElementById('accOwnerEmail').textContent = 'Đang tải...';
+
+    accountDetailsModal.classList.add('active');
+
+    fetch(`/admin/api/account/details/${accountNumber}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Không tìm thấy dữ liệu');
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('accOwnerName').textContent = data.ownerName;
+            document.getElementById('accOwnerAvatar').textContent = data.ownerName ? data.ownerName.charAt(0).toUpperCase() : 'U';
+            document.getElementById('accOwnerId').textContent = 'ID Khách hàng: #KH' + data.ownerId.toString().padStart(3, '0');
+            
+            document.getElementById('accDetailNumber').textContent = data.accountNumber;
+            
+            if (data.dateOpen) {
+                const date = new Date(data.dateOpen);
+                document.getElementById('accDetailDate').textContent = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+            }
+            
+            document.getElementById('accOwnerPhone').textContent = data.ownerPhone || 'Chưa cập nhật';
+            document.getElementById('accOwnerEmail').textContent = data.ownerEmail || 'Chưa cập nhật';
+        })
+        .catch(error => {
+            console.error('Lỗi API:', error);
+            document.getElementById('accOwnerName').textContent = 'Lỗi tải dữ liệu';
+        });
+}
+
+// ==========================================
+// TỰ ĐỘNG MỞ POP-UP KHI CHUYỂN TỪ TRANG KHÁCH HÀNG
+// ==========================================
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+    const searchAccNum = urlParams.get('searchAccNum');
+
+    if (ref === 'user' && searchAccNum) {
+        setTimeout(() => {
+            if (typeof viewAccountDetails === 'function') {
+                viewAccountDetails(searchAccNum.trim());
+            }
+        }, 150); 
+    }
+});
+
+// ==========================================
+// XỬ LÝ NÚT QUAY LẠI BÊN TRONG POP-UP CHI TIẾT TÀI KHOẢN
+// ==========================================
+document.addEventListener("DOMContentLoaded", function() {
+    const modalBtnBack = document.getElementById('modalBtnBack');
+    if (modalBtnBack) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref');
+        const userId = urlParams.get('userId');
+
+        if (ref === 'user' && userId) {
+            modalBtnBack.style.display = 'inline-flex';
+            
+            modalBtnBack.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = `/admin?openUserId=${userId}`;
+            });
+        } else {
+            modalBtnBack.style.display = 'none';
+        }
+    }
+});
+
+// ==========================================
+// TỰ ĐỘNG MỞ LẠI POP-UP CHI TIẾT KHÁCH HÀNG KHI QUAY VỀ TỪ TRANG TÀI KHOẢN
+// ==========================================
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const openUserId = urlParams.get('openUserId');
+
+    if (openUserId) {
+        setTimeout(() => {
+            if (typeof viewUserDetails === 'function') {
+                viewUserDetails(openUserId);
+            }
+        }, 150);
+    }
+});
+
+// ==========================================
+// XỬ LÝ NÚT QUAY LẠI Ở NGOÀI GIAO DIỆN TRANG TÀI KHOẢN
+// ==========================================
+document.addEventListener("DOMContentLoaded", function() {
+    const mainBackBtn = document.getElementById('mainBackBtn');
+    if (mainBackBtn) {
+        mainBackBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userId');
+
+            if (userId) {
+                window.location.href = `/admin?openUserId=${userId}`;
+            } else {
+                window.location.href = '/admin';
+            }
+        });
+    }
+});

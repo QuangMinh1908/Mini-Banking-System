@@ -4,7 +4,8 @@ import com.example.demo.config.security.UserListDTO;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.config.security.UserDetailDTO; 
-import com.example.demo.config.security.AccountDetailDTO;
+import com.example.demo.config.security.AccountInfoDTO;
+
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.model.UserUpdateRequest;
 import com.example.demo.repository.UserUpdateRequestRepository;
@@ -86,8 +87,8 @@ public class UserListService {
             return null;
         }
 
-        List<AccountDetailDTO> accountDTOs = user.getAccounts().stream()
-                .map(acc -> new AccountDetailDTO(acc.getAccountNumber(), acc.getDateOpen()))
+        List<AccountInfoDTO> accountDTOs = user.getAccounts().stream()
+                .map(acc -> new AccountInfoDTO(acc.getAccountNumber(), acc.getDateOpen()))
                 .collect(Collectors.toList());
 
         return new UserDetailDTO(

@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.model.Account;
 import com.example.demo.repository.AccountRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserListService;
 import com.example.demo.service.AccountListService;
 import com.example.demo.config.security.UserListDTO;
@@ -11,6 +12,7 @@ import com.example.demo.config.security.UserDetailDTO;
 import com.example.demo.repository.UserUpdateRequestRepository;
 import com.example.demo.model.UserUpdateRequest;
 import com.example.demo.config.security.AccountDetailDTO;
+import com.example.demo.util.AccountUtils;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +31,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.dao.DataIntegrityViolationException;
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 
 @Controller
 public class AdminController {
@@ -36,17 +43,19 @@ public class AdminController {
     private final UserListService userService;
     private final AccountRepository accountRepository;
     private final UserUpdateRequestRepository requestRepository;
+    private final UserRepository userRepository;
 
-    public AdminController(UserListService userService, AccountRepository accountRepository, UserUpdateRequestRepository requestRepository) {
+    public AdminController(UserListService userService, AccountRepository accountRepository,
+                            UserUpdateRequestRepository requestRepository, UserRepository userRepository) {
         this.userService = userService;
         this.accountRepository = accountRepository;
         this.requestRepository = requestRepository;
+        this.userRepository = userRepository;
     }
 
     // ==========================================
     // 1. QUẢN LÝ KHÁCH HÀNG (USERS)
     // ==========================================
-    
     @GetMapping("/admin")
     public String admin(HttpSession session, Model model,
                         @RequestParam(required = false) Long searchId,
@@ -165,5 +174,80 @@ public class AdminController {
         );
         
         return ResponseEntity.ok(dto);
+    }
+
+    // API: TẠO TÀI KHOẢN MỚI CHO KHÁCH HÀNG
+    // ==========================================
+    @PostMapping("/admin/api/user/{userId}/create-account")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> createAccountForUser(@PathVariable Long userId) {
+        Map<String, String> response = new HashMap<>();
+        
+        // 1. Kiểm tra xem user có tồn tại không
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            response.put("error", "Không tìm thấy khách hàng trong hệ thống!");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        User user = userOpt.get();
+        boolean isSaved = false;
+        Account newAccount = new Account();
+
+        // 2. Vòng lặp Hybrid: Sinh số Luhn -> Lưu DB -> Bắt lỗi trùng lặp
+        do {
+            String newAccNum = AccountUtils.generateLuhnAccountNumber();
+            newAccount.setAccountNumber(newAccNum);
+            newAccount.setUser(user);
+            newAccount.setBalance(BigDecimal.ZERO); 
+            
+            try {
+                accountRepository.save(newAccount);
+                isSaved = true;
+                
+            } catch (DataIntegrityViolationException e) {
+                System.out.println("⚠️ Cảnh báo: Trùng số tài khoản " + newAccNum + ", hệ thống đang tự động tạo lại số mới...");
+            }
+        } while (!isSaved);
+
+        response.put("success", "Đã mở thành công tài khoản: " + newAccount.getAccountNumber());
+        response.put("accountNumber", newAccount.getAccountNumber());
+        return ResponseEntity.ok(response);
+    }
+
+    // API: TÌM KIẾM NHANH KHÁCH HÀNG CHO FORM TẠI ACCOUNT
+    // ==================================================
+    @GetMapping("/admin/api/user/search")
+    @ResponseBody
+    public ResponseEntity<?> searchUserForWizard(@RequestParam String keyword) {
+        keyword = keyword.trim();
+        Page<UserListDTO> users;
+        
+        // 1. Kiểm tra nếu từ khóa là số (ID hoặc Số điện thoại)
+        if (keyword.matches("\\d+")) {
+            try {
+                // Thử tìm theo ID khách hàng trước
+                Long id = Long.parseLong(keyword);
+                users = userService.searchUsers(id, null, null, 0, 1);
+                if (users.hasContent()) {
+                    return ResponseEntity.ok(users.getContent().get(0));
+                }
+            } catch (NumberFormatException ignored) {}
+            
+            // Nếu không tìm thấy ID, tiếp tục tìm theo Số điện thoại
+            users = userService.searchUsers(null, null, keyword, 0, 1);
+        } else {
+            // 2. Nếu từ khóa là chữ, tìm theo Họ tên
+            users = userService.searchUsers(null, keyword, null, 0, 1);
+        }
+
+        // 3. Trả về kết quả
+        if (users.hasContent()) {
+            return ResponseEntity.ok(users.getContent().get(0)); // Trả về khách hàng đầu tiên khớp
+        } else {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Không tìm thấy khách hàng");
+            return ResponseEntity.status(404).body(errorResponse);
+        }
     }
 }

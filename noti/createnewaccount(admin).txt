@@ -1,0 +1,24 @@
+1. Luồng trải nghiệm người dùng (UX/UI Flow)
+Vị trí: Ngay bên trong Pop-up "Chi tiết Khách hàng" (userDetailsModal), cạnh phần danh sách tài khoản sẽ có thêm một nút
+"Mở tài khoản mới".
+Thao tác: Khi Admin bấm nút này, hệ thống sẽ hiển thị một Pop-up xác nhận (dùng chung hàm showConfirmModal đã có sẵn)
+để tránh việc bấm nhầm.
+Kết quả: Sau khi Admin xác nhận, hệ thống gọi API xuống Backend, tạo tài khoản thành công, trả về thông báo và tự động 
+làm mới lại danh sách tài khoản ngay trong Pop-up mà không cần tải lại toàn bộ trang web.
+
+2. Thuật toán sinh số tài khoản
+Số tài khoản sẽ mang định dạng tiêu chuẩn gồm 10 chữ số.
+Cấu trúc: [Mã tiền tố mặc định (VD: 88)] + [7 số ngẫu nhiên] + [1 số Checksum].
+nghĩa số Checksum: Được tính toán bằng thuật toán Modulus 10 (Luhn). Con số cuối cùng này giúp hệ thống xác thực nhanh
+tính hợp lệ của toàn bộ chuỗi số mà không cần query xuống Database (rất hữu ích cho các tính năng chuyển khoản sau này).
+
+3. Cơ chế đảm bảo tính Duy nhất & Hiệu năng cao
+Mở rộng không gian số: Với 7 số ngẫu nhiên ở giữa, hệ thống có không gian lên tới 10 triệu số khả dụng cho một mã tiền tố,
+giúp tỷ lệ random trùng lặp (Collision rate) ở mức cực kỳ thấp.
+Cơ chế try-catch thay vì existsBy:
+- Backend sẽ sinh số và lập tức gọi lệnh repository.save().
+- Tuyệt đối không dùng lệnh truy vấn kiểm tra tồn tại (SELECT) trước khi lưu, giúp tiết kiệm 50% số lượng truy vấn xuống Database.
+Phòng chống Đụng độ (Race Condition): Giao phó hoàn toàn việc "gác cổng" cho PostgreSQL thông qua ràng buộc @Column(unique = true).
+Nếu có 2 luồng cùng lưu 1 số vào đúng 1 mili-giây, DB sẽ khóa lại và quăng ra lỗi DataIntegrityViolationException.
+Vòng lặp tự phục hồi: Khối try-catch sẽ bắt lỗi văng ra từ DB. Nếu bắt được lỗi trùng, biến cờ isSaved vẫn giữ nguyên trạng thái
+false, vòng lặp do-while sẽ tự động quay lại bước 1, sinh một số mới hoàn toàn và lưu lại cho đến khi thành công.

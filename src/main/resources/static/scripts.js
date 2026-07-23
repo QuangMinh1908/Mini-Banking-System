@@ -71,6 +71,13 @@ function viewUserDetails(userId) {
     
     userDetailsModal.classList.add('active');
 
+    const btnCreateAccount = document.getElementById('btnCreateAccount');
+    if (btnCreateAccount) {
+        btnCreateAccount.onclick = function() {
+            createNewAccount(userId);
+        };
+    }
+
     fetch(`/admin/api/user/${userId}`)
         .then(response => {
             if (!response.ok) throw new Error('Không tìm thấy dữ liệu');
@@ -93,6 +100,14 @@ function viewUserDetails(userId) {
             }
 
             document.getElementById('detailAddress').textContent = data.address || 'Chưa cập nhật';
+
+            const btnCreateAccount = document.getElementById('btnCreateAccount');
+            if (btnCreateAccount) {
+                btnCreateAccount.onclick = function() {
+                    const phone = data.phoneNumber || 'Không có SĐT';
+                    openCreateAccountWizardWithUser(userId, data.fullName, phone);
+                };
+            }
 
             const tbody = document.getElementById('detailAccountsBody');
             tbody.innerHTML = '';
@@ -156,6 +171,7 @@ if (editUserModal) {
     });
 }
 
+let originalUserData = {};
 function openEditModal(userId) {
     if (!editUserModal) return;
 
@@ -175,6 +191,14 @@ function openEditModal(userId) {
             return response.json();
         })
         .then(data => {
+            originalUserData = {
+                fullName: data.fullName || '',
+                phoneNumber: data.phoneNumber || '',
+                email: data.email || '',
+                address: data.address || '',
+                gender: data.gender || ''
+            };
+
             document.getElementById('editUserName').value = data.username || '';
             document.getElementById('editFullName').value = data.fullName || '';
             document.getElementById('editPhoneNumber').value = data.phoneNumber || '';
@@ -194,16 +218,45 @@ document.addEventListener("DOMContentLoaded", function() {
     const editUserModal = document.getElementById('editUserModal');
     if (editUserModal) {
         const editForm = editUserModal.querySelector('form');
-        
+
         if (editForm) {
             editForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                const currentFullName = document.getElementById('editFullName');
+                const currentPhone = document.getElementById('editPhoneNumber');
+                const currentEmail = document.getElementById('editEmail');
+                const currentAddress = document.getElementById('editAddress');
+                const currentGender = document.getElementById('editGender');
+
+                const hasChanges = 
+                    currentFullName.value.trim() !== originalUserData.fullName ||
+                    currentPhone.value.trim() !== originalUserData.phoneNumber ||
+                    currentEmail.value.trim() !== originalUserData.email ||
+                    currentAddress.value.trim() !== originalUserData.address ||
+                    currentGender.value !== originalUserData.gender;
+
+                if (!hasChanges) {
+                    showConfirmModal(
+                        'Không có thay đổi',
+                        'Bạn chưa thay đổi bất kỳ thông tin nào so với dữ liệu gốc của khách hàng.',
+                        'info',
+                        function() {}
+                    );
+                    return; 
+                }
                 
                 showConfirmModal(
                     'Xác nhận gửi yêu cầu',
                     'Bạn có chắc chắn muốn tạo yêu cầu thay đổi thông tin khách hàng này để chờ cấp trên xét duyệt không?',
                     'info', 
                     function() {
+                        if (currentFullName.value.trim() === originalUserData.fullName) currentFullName.value = '';
+                        if (currentPhone.value.trim() === originalUserData.phoneNumber) currentPhone.value = '';
+                        if (currentEmail.value.trim() === originalUserData.email) currentEmail.value = '';
+                        if (currentAddress.value.trim() === originalUserData.address) currentAddress.value = '';
+                        if (currentGender.value === originalUserData.gender) currentGender.value = '';
+
                         editForm.submit();
                     }
                 );
@@ -436,3 +489,233 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+// ======================
+// MỞ TÀI KHOẢN NGÂN HÀNG
+// ======================
+const wizardModal = document.getElementById('createAccountWizardModal');
+const confirmOverlay = document.getElementById('wizardConfirmOverlay');
+
+// Các bước (Steps)
+const step1 = document.getElementById('wizard-step-1');
+const step2 = document.getElementById('wizard-step-2');
+const step3 = document.getElementById('wizard-step-3');
+const ind1 = document.getElementById('step1-indicator');
+const ind2 = document.getElementById('step2-indicator');
+const ind3 = document.getElementById('step3-indicator');
+
+// Nút điều hướng
+const btnNextToStep2 = document.getElementById('btnNextToStep2');
+const btnBackToStep1 = document.getElementById('btnBackToStep1');
+const btnShowConfirm = document.getElementById('btnShowConfirm');
+const btnFinishWizard = document.getElementById('btnFinishWizard');
+
+// Nút ở Overlay Xác nhận
+const btnCloseConfirmOverlay = document.getElementById('btnCloseConfirmOverlay');
+const btnCancelWizardAll = document.getElementById('btnCancelWizardAll');
+const btnConfirmCreateAPI = document.getElementById('btnConfirmCreateAPI');
+
+// Hàm Reset toàn bộ Wizard về trạng thái mặc định
+function resetWizard() {
+    step1.style.display = 'block';
+    step2.style.display = 'none';
+    step3.style.display = 'none';
+    confirmOverlay.style.display = 'none';
+    
+    ind1.classList.add('active');
+    ind2.classList.remove('active');
+    ind3.classList.remove('active');
+
+    document.getElementById('wizardSearchInput').value = '';
+    document.getElementById('wizardSelectedUserBox').style.display = 'none';
+    document.getElementById('wizardSearchContainer').style.display = 'block';
+    document.getElementById('wizardUserId').value = '';
+    
+    btnNextToStep2.disabled = true;
+    btnNextToStep2.style.opacity = '0.5';
+    btnNextToStep2.style.cursor = 'not-allowed';
+}
+
+// 1. MỞ WIZARD TỪ TRANG CHÍNH (Chưa có User)
+function openCreateAccountWizard() {
+    resetWizard();
+    wizardModal.classList.add('active');
+}
+
+// 2. MỞ WIZARD TỪ TRONG CHI TIẾT KHÁCH HÀNG (Đã có sẵn User)
+function openCreateAccountWizardWithUser(userId, fullName, phone) {
+    resetWizard();
+    selectUserForWizard(userId, fullName, phone); // Auto-fill luôn
+    document.getElementById('wizardSearchContainer').style.display = 'none'; // Ẩn ô tìm kiếm
+    wizardModal.classList.add('active');
+}
+
+// Đóng Wizard (Dấu X trên cùng hoặc Hủy bỏ)
+function closeWizard() {
+    wizardModal.classList.remove('active');
+    confirmOverlay.style.display = 'none';
+}
+if(document.getElementById('btnCloseWizard')) document.getElementById('btnCloseWizard').onclick = closeWizard;
+if(btnCancelWizardAll) btnCancelWizardAll.onclick = closeWizard;
+
+// Chọn User (Mock chức năng search - Gán dữ liệu vào UI)
+function selectUserForWizard(id, name, phone) {
+    document.getElementById('wizardUserId').value = id;
+    document.getElementById('wizardUserName').textContent = name;
+    document.getElementById('wizardUserPhone').textContent = phone;
+    document.getElementById('confirmOverlayName').textContent = name; // Truyền sẵn vào màn hình xác nhận
+    
+    document.getElementById('wizardSelectedUserBox').style.display = 'block';
+    
+    // Mở khóa nút Tiếp tục
+    btnNextToStep2.disabled = false;
+    btnNextToStep2.style.opacity = '1';
+    btnNextToStep2.style.cursor = 'pointer';
+}
+
+// ====================================================
+// TÌM KIẾM KHÁCH HÀNG (TỰ ĐỘNG SAU 2S HOẶC NHẤN ENTER)
+// ====================================================
+const searchInput = document.getElementById('wizardSearchInput');
+if (searchInput) {
+    let searchTimeout = null;
+
+    const executeSearch = () => {
+        const keyword = searchInput.value.trim();
+        if (!keyword) return;
+
+        const originalPlaceholder = searchInput.placeholder;
+        searchInput.placeholder = 'Đang tìm kiếm dữ liệu...';
+        searchInput.disabled = true;
+
+        fetch(`/admin/api/user/search?keyword=${encodeURIComponent(keyword)}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Không tìm thấy khách hàng!');
+                return res.json();
+            })
+            .then(realUser => {
+                const phone = realUser.phoneNumber || 'Không có SĐT';
+                const name = realUser.fullName || realUser.username || 'Chưa cập nhật';
+                
+                selectUserForWizard(realUser.id, name, phone);
+            })
+            .catch(err => {
+                alert("⚠️ Không tìm thấy khách hàng nào khớp với từ khóa: " + keyword);
+            })
+            .finally(() => {
+                searchInput.placeholder = originalPlaceholder;
+                searchInput.disabled = false;
+                searchInput.focus();
+            });
+    };
+
+    searchInput.addEventListener('input', function() {
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+
+        if (!searchInput.value.trim()) return;
+
+        searchTimeout = setTimeout(() => {
+            executeSearch();
+        }, 2000);
+    });
+
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            executeSearch();
+        }
+    });
+}
+
+// ĐIỀU HƯỚNG WIZARD
+if(btnNextToStep2) {
+    btnNextToStep2.onclick = () => {
+        step1.style.display = 'none';
+        step2.style.display = 'block';
+        ind1.classList.remove('active');
+        ind2.classList.add('active');
+    };
+}
+
+if(btnBackToStep1) {
+    btnBackToStep1.onclick = () => {
+        step2.style.display = 'none';
+        step1.style.display = 'block';
+        ind2.classList.remove('active');
+        ind1.classList.add('active');
+    };
+}
+
+// Hiện Overlay Xác Nhận
+if(btnShowConfirm) {
+    btnShowConfirm.onclick = () => {
+        confirmOverlay.style.display = 'flex'; // Hiện overlay đè lên Step 2
+    };
+}
+
+// Tắt Overlay (Dấu X) -> Quay lại form Bước 2 nguyên vẹn
+if(btnCloseConfirmOverlay) {
+    btnCloseConfirmOverlay.onclick = () => {
+        confirmOverlay.style.display = 'none';
+    };
+}
+
+// ĐỒNG Ý -> BẮN API TẠO TÀI KHOẢN
+if(btnConfirmCreateAPI) {
+    btnConfirmCreateAPI.onclick = () => {
+        const userId = document.getElementById('wizardUserId').value;
+        const btnOriginalText = btnConfirmCreateAPI.innerHTML;
+        btnConfirmCreateAPI.innerHTML = 'Đang xử lý...'; // Loading state
+        btnConfirmCreateAPI.disabled = true;
+
+        fetch(`/admin/api/user/${userId}/create-account`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Thành công -> Chuyển sang Bước 3
+                confirmOverlay.style.display = 'none';
+                step2.style.display = 'none';
+                step3.style.display = 'block';
+                ind2.classList.remove('active');
+                ind3.classList.add('active');
+
+                // Đổ dữ liệu ID mới sinh ra màn hình thành công
+                document.getElementById('successAccNum').textContent = data.accountNumber;
+            } else {
+                alert('Lỗi: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi khi mở tài khoản:', error);
+            alert('Không thể kết nối đến máy chủ.');
+        })
+        .finally(() => {
+            btnConfirmCreateAPI.innerHTML = btnOriginalText;
+            btnConfirmCreateAPI.disabled = false;
+        });
+    };
+}
+
+// Nút Hoàn tất (Đóng Wizard và Load lại dữ liệu nếu cần)
+if(btnFinishWizard) {
+    btnFinishWizard.onclick = () => {
+        closeWizard();
+        const userId = document.getElementById('wizardUserId').value;
+        // Nếu Modal chi tiết user đang mở, tải lại bảng tài khoản
+        if (document.getElementById('userDetailsModal').classList.contains('active')) {
+            viewUserDetails(userId);
+        } else {
+            window.location.reload(); // Hoặc reload lại trang nếu đang đứng ở danh sách
+        }
+    };
+}

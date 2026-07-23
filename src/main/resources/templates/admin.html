@@ -69,12 +69,20 @@
             <span th:text="${errorMessage}"></span>
           </div>
           
-          <div class="page-header">
+          <div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">
             <h2>Danh sách Khách hàng</h2>
-            <button class="btn-primary" id="btnOpenRequests" style="background-color: #f59e0b; border-color: #f59e0b;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem; vertical-align: middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              Danh sách Yêu cầu
-            </button>
+  
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn-primary" onclick="openCreateAccountWizard()" style="background-color: #2563eb; display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Mở tài khoản mới
+                </button>
+
+              <button class="btn-primary" id="btnOpenRequests" style="background-color: #f59e0b; border-color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Danh sách Yêu cầu
+              </button>
+            </div>
           </div>
 
           <!-- FORM TÌM KIẾM -->
@@ -186,7 +194,6 @@
         <div class="input-group">
           <label>Họ tên:</label>
           <input type="text" id="editFullName" name="fullName" 
-                 required 
                  minlength="3" 
                  maxlength="100" 
                  title="Họ tên phải có ít nhất 3 ký tự"
@@ -196,7 +203,6 @@
         <div class="input-group">
           <label>Số điện thoại:</label>
           <input type="text" id="editPhoneNumber" name="phoneNumber" 
-                 required 
                  maxlength="10" 
                  minlength="10"
                  pattern="^0[0-9]{9}$"
@@ -208,7 +214,6 @@
         <div class="input-group">
           <label>Email:</label>
           <input type="email" id="editEmail" name="email" 
-                 required
                  pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
                  title="Vui lòng nhập đúng định dạng email (VD: abc@gmail.com)"
                  placeholder="VD: email@gmail.com">
@@ -217,7 +222,6 @@
         <div class="input-group">
           <label>Địa chỉ:</label>
           <input type="text" id="editAddress" name="address" 
-                 required 
                  minlength="5" 
                  title="Vui lòng nhập địa chỉ cụ thể (ít nhất 5 ký tự)"
                  placeholder="VD: Quận 1, TP.HCM">
@@ -225,7 +229,7 @@
         
         <div class="input-group">
           <label>Giới tính:</label>
-          <select id="editGender" name="gender" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none; background-color: #f8fafc;">
+          <select id="editGender" name="gender"style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none; background-color: #f8fafc;">
             <option value="">-- Chọn giới tính --</option>
             <option value="Nam">Nam</option>
             <option value="Nữ">Nữ</option>
@@ -292,6 +296,114 @@
       <div id="loadingRequests" style="text-align: center; padding: 1rem; color: #64748b; font-size: 0.9rem; display: none;">
          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
          <br>Đang tải thêm...
+      </div>
+    </div>
+  </div>
+
+  // MỞ TÀI KHOẢN NGÂN HÀNG
+  <div class="modal-overlay" id="createAccountWizardModal">
+    <div class="modal-box admin-bento-card" style="max-width: 600px; text-align: left; position: relative; overflow: hidden;">
+      
+      <div class="modal-header">
+        <h3>Mở Tài Khoản Mới</h3>
+        <button id="btnCloseWizard" class="btn-close-modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      
+      <!-- Thanh tiến trình -->
+      <div class="wizard-progress">
+        <div class="progress-step active" id="step1-indicator">1. Khách hàng</div>
+        <div class="progress-step" id="step2-indicator">2. Chi tiết & Cấu hình</div>
+        <div class="progress-step" id="step3-indicator">3. Hoàn tất</div>
+      </div>
+
+      <!-- BƯỚC 1: CHỌN KHÁCH HÀNG -->
+      <div class="wizard-step" id="wizard-step-1">
+        <div class="dashboard-form">
+          <div class="input-group" id="wizardSearchContainer">
+            <label>Tìm kiếm Khách hàng:</label>
+            <input type="text" id="wizardSearchInput" placeholder="Nhập ID, SĐT hoặc Tên khách hàng (Demo: Nhấn Enter để chọn mẫu)">
+          </div>
+
+          <!-- Hiển thị khi đã chọn được khách hàng -->
+          <div id="wizardSelectedUserBox" style="display: none; padding: 1.25rem; border: 1px solid #bfdbfe; border-radius: 8px; background: #eff6ff;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: #2563eb; text-transform: uppercase; letter-spacing: 0.05em;">Khách hàng đã chọn</span>
+                    <h4 id="wizardUserName" style="margin: 0.5rem 0 0.25rem; color: #0f172a; font-size: 1.15rem;">-</h4>
+                    <p id="wizardUserPhone" style="margin: 0; color: #64748b; font-size: 0.9rem;">-</p>
+                    <input type="hidden" id="wizardUserId">
+                </div>
+                <button type="button" id="btnReselectUser" class="btn-icon" title="Chọn khách hàng khác" style="color: #64748b;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+                </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions" style="justify-content: flex-end; margin-top: 2rem;">
+          <button class="btn-primary" id="btnNextToStep2" disabled style="opacity: 0.5; cursor: not-allowed;">Tiếp tục &rarr;</button>
+        </div>
+      </div>
+
+      <!-- BƯỚC 2: CẤU HÌNH TÀI KHOẢN -->
+      <div class="wizard-step" id="wizard-step-2" style="display: none;">
+        <div class="dashboard-form">
+          <div class="input-group">
+            <label>Loại tài khoản (Dự kiến mở rộng):</label>
+            <select id="wizardAccType">
+              <option value="PAYMENT">Tài khoản Thanh toán Nội địa (VND)</option>
+              <option value="SAVING">Tài khoản Tiết kiệm</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Hạn mức giao dịch / ngày (Dự kiến mở rộng):</label>
+            <select id="wizardLimit">
+              <option value="50M">Cơ bản: 50.000.000 VND</option>
+              <option value="500M">Nâng cao: 500.000.000 VND</option>
+              <option value="UNLIMITED">Không giới hạn</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions" style="justify-content: space-between; margin-top: 2rem;">
+          <button class="btn-secondary" id="btnBackToStep1">&larr; Quay lại</button>
+          <button class="btn-primary" id="btnShowConfirm">Tiếp tục &rarr;</button>
+        </div>
+      </div>
+
+      <!-- BƯỚC 3: THÀNH CÔNG -->
+      <div class="wizard-step" id="wizard-step-3" style="display: none; text-align: center;">
+        <div style="color: #10b981; margin-bottom: 1rem;">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <h3 style="color: #0f172a; margin-bottom: 0.5rem;">Cấp Phát Thành Công!</h3>
+        <p style="color: #64748b; margin-bottom: 1.5rem;">Số tài khoản đã được tự động sinh và lưu vào hệ thống.</p>
+        
+        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px dashed #cbd5e1; text-align: center; margin-bottom: 2rem;">
+          <p style="margin-bottom: 0.25rem; font-size: 0.9rem; color: #64748b;">Số tài khoản mới</p>
+          <div id="successAccNum" style="color: #2563eb; font-size: 2rem; font-weight: 700; letter-spacing: 2px;">-</div>
+        </div>
+        <button class="btn-primary" id="btnFinishWizard" style="width: 100%;">Hoàn tất & Đóng</button>
+      </div>
+
+      <!-- OVERLAY XÁC NHẬN (Nằm đè lên form Bước 2) -->
+      <div id="wizardConfirmOverlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(2px); z-index: 10; align-items: center; justify-content: center;">
+        <div style="background: #ffffff; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; text-align: center; width: 85%; position: relative;">
+          <!-- Nút TẮT: Chỉ tắt thông báo, quay về Bước 2 -->
+          <button id="btnCloseConfirmOverlay" style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; color: #94a3b8; padding: 5px;">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          
+          <h4 style="margin: 0 0 0.75rem 0; color: #0f172a; font-size: 1.1rem;">Xác nhận tạo tài khoản?</h4>
+          <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">Hệ thống sẽ thực thi thuật toán sinh số tài khoản ngẫu nhiên (Duy nhất) cho khách hàng <strong id="confirmOverlayName" style="color:#0f172a;">-</strong>.</p>
+          
+          <div style="display: flex; gap: 0.75rem;">
+              <!-- Nút HỦY: Đóng hoàn toàn cả Form Wizard -->
+              <button class="btn-secondary" id="btnCancelWizardAll" style="flex: 1;">Hủy (Đóng Form)</button>
+              <!-- Nút ĐỒNG Ý: Bắn API -->
+              <button class="btn-primary" id="btnConfirmCreateAPI" style="flex: 1;">Đồng ý Tạo</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -45,7 +45,10 @@ public class UserListService {
                 predicates.add(cb.equal(root.get("id"), id));
             }
             if (name != null && !name.trim().isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("fullName")), "%" + name.toLowerCase() + "%"));
+                String searchPattern = "%" + name.toLowerCase() + "%";
+                Predicate fullNameMatch = cb.like(cb.lower(root.get("fullName")), searchPattern);
+                Predicate usernameMatch = cb.like(cb.lower(root.get("username")), searchPattern);
+                predicates.add(cb.or(fullNameMatch, usernameMatch)); 
             }
             if (phone != null && !phone.trim().isEmpty()) {
                 predicates.add(cb.like(root.get("phoneNumber"), "%" + phone + "%"));

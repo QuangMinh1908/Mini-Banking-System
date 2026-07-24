@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Quản lý Tài khoản</title>
-  <link rel="stylesheet" th:href="@{/style.css}">
-  <link rel="stylesheet" th:href="@{/dashboard.css}">
-  <link rel="stylesheet" th:href="@{/admin.css}">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
 
-  <script th:src="@{/scripts.js}" defer></script>
+  <script th:src="@{/js/common.js}" defer></script>
+  <script th:src="@{/js/admin-account.js}" defer></script>
 </head>
 <body>
   <div class="dashboard-layout">
@@ -181,6 +182,10 @@
 
         <hr class="acc-divider">
 
+        <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem; font-size: 0.9rem;">
+            <div style="margin-bottom: 0.25rem;"><strong>Loại tài khoản:</strong> <span id="accDetailType" style="color: #2563eb; font-weight: 600;">Đang tải...</span></div>
+            <div><strong>Hạn mức GD:</strong> <span id="accDetailLimit">Đang tải...</span></div>
+        </div>
         <p class="acc-info-row"><strong>Số Tài Khoản:</strong> <span id="accDetailNumber" class="acc-number-highlight">Đang tải...</span></p>
         <p class="acc-info-row"><strong>Ngày Mở:</strong> <span id="accDetailDate">Đang tải...</span></p>
         <p class="acc-info-row"><strong>Số Điện Thoại:</strong> <span id="accOwnerPhone">Đang tải...</span></p>

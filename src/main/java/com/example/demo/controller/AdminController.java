@@ -21,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -170,7 +171,9 @@ public class AdminController {
                 user.getId(),
                 user.getFullName(),
                 user.getPhoneNumber(),
-                user.getEmail()
+                user.getEmail(),
+                account.getAccountType(),
+                account.getTransactionLimit()
         );
         
         return ResponseEntity.ok(dto);
@@ -180,8 +183,12 @@ public class AdminController {
     // ==========================================
     @PostMapping("/admin/api/user/{userId}/create-account")
     @ResponseBody
-    public ResponseEntity<Map<String, String>> createAccountForUser(@PathVariable Long userId) {
+    public ResponseEntity<Map<String, String>> createAccountForUser(@PathVariable Long userId,
+                                                                    @RequestBody Map<String, String> payload) {
         Map<String, String> response = new HashMap<>();
+
+        String accountType = payload.getOrDefault("accountType", "PAYMENT");
+        String transactionLimit = payload.getOrDefault("transactionLimit", "50M");
         
         // 1. Kiểm tra xem user có tồn tại không
         Optional<User> userOpt = userRepository.findById(userId);
@@ -199,7 +206,9 @@ public class AdminController {
             String newAccNum = AccountUtils.generateLuhnAccountNumber();
             newAccount.setAccountNumber(newAccNum);
             newAccount.setUser(user);
-            newAccount.setBalance(BigDecimal.ZERO); 
+            newAccount.setBalance(BigDecimal.ZERO);
+            newAccount.setAccountType(accountType);
+            newAccount.setTransactionLimit(transactionLimit);
             
             try {
                 accountRepository.save(newAccount);
@@ -215,7 +224,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    // API: TÌM KIẾM NHANH KHÁCH HÀNG CHO FORM TẠI ACCOUNT
+    // API: TÌM KIẾM NHANH KHÁCH HÀNG CHO FORM TẠO ACCOUNT (DROPDOWN)
     // ==================================================
     @GetMapping("/admin/api/user/search")
     @ResponseBody
@@ -226,24 +235,22 @@ public class AdminController {
         // 1. Kiểm tra nếu từ khóa là số (ID hoặc Số điện thoại)
         if (keyword.matches("\\d+")) {
             try {
-                // Thử tìm theo ID khách hàng trước
                 Long id = Long.parseLong(keyword);
-                users = userService.searchUsers(id, null, null, 0, 1);
-                if (users.hasContent()) {
-                    return ResponseEntity.ok(users.getContent().get(0));
+                users = userService.searchUsers(id, null, null, 0, 5); // Lấy tối đa 5 người
+                if (users.isEmpty()) {
+                    users = userService.searchUsers(null, null, keyword, 0, 5);
                 }
-            } catch (NumberFormatException ignored) {}
-            
-            // Nếu không tìm thấy ID, tiếp tục tìm theo Số điện thoại
-            users = userService.searchUsers(null, null, keyword, 0, 1);
+            } catch (NumberFormatException e) {
+                users = userService.searchUsers(null, null, keyword, 0, 5);
+            }
         } else {
-            // 2. Nếu từ khóa là chữ, tìm theo Họ tên
-            users = userService.searchUsers(null, keyword, null, 0, 1);
+            // 2. Nếu từ khóa là chữ, tìm theo Họ tên / Username
+            users = userService.searchUsers(null, keyword, null, 0, 5);
         }
 
-        // 3. Trả về kết quả
+        // 3. Trả về MỘT DANH SÁCH (List)
         if (users.hasContent()) {
-            return ResponseEntity.ok(users.getContent().get(0)); // Trả về khách hàng đầu tiên khớp
+            return ResponseEntity.ok(users.getContent()); 
         } else {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Không tìm thấy khách hàng");

@@ -34,6 +34,12 @@ public class Account {
 
     @OneToMany(mappedBy = "toAccount", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> receivedTransactions;
+    
+    @Column(name = "account_type")
+    private String accountType = "PAYMENT";
+
+    @Column(name = "transaction_limit")
+    private String transactionLimit = "50M";
 
     // tự động gán ngày mở tài khoản khi tạo mới
     @PrePersist
@@ -64,4 +70,10 @@ public class Account {
 
     public List<Transaction> getReceivedTransactions() { return receivedTransactions; }
     public void setReceivedTransactions(List<Transaction> receivedTransactions) { this.receivedTransactions = receivedTransactions; }
+
+    public String getAccountType() { return accountType; }
+    public void setAccountType(String accountType) { this.accountType = accountType; }
+
+    public String getTransactionLimit() { return transactionLimit; }
+    public void setTransactionLimit(String transactionLimit) { this.transactionLimit = transactionLimit; }
 }

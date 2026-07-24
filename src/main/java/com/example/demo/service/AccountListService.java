@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Account;
+
 import org.springframework.data.jpa.domain.Specification;
 
 public class AccountListService {

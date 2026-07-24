@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bảng Điều Khiển Server-side</title>
-    <link rel="stylesheet" th:href="@{/style.css}">
-    <link rel="stylesheet" th:href="@{/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -50,10 +50,6 @@
 
         <main class="main-content">
             <header class="topbar">
-                <div class="search-box">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" placeholder="Tìm kiếm giao dịch...">
-                </div>
                 <div class="user-profile">
                     <span class="user-name" th:text="${username}">Tên người dùng</span>
                     <div class="avatar" th:text="${#strings.substring(username, 0, 1)}">M</div>

@@ -1,38 +1,33 @@
-package com.example.demo.model;
+package com.example.demo.config.security;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserDetailDTO {
     private Long id;
-
-    @Column(unique = true, nullable = false)
     private String username;
-    private String password;
     private String fullName;
     private String phoneNumber;
-    private String role;
     private String email;
     private String address;
     private String gender;
-
-    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+    private List<AccountInfoDTO> accounts;
 
-    @PrePersist
-    protected void onCreateUser() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
+    public UserDetailDTO(Long id, String username, String fullName, String phoneNumber, 
+                         String email, String address, 
+                         String gender, LocalDateTime createdAt,
+                         List<AccountInfoDTO> accounts) {
+        this.id = id;
+        this.username = username;
+        this.fullName = fullName;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.address = address;
+        this.gender = gender;
+        this.createdAt = createdAt;
+        this.accounts = accounts;
     }
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Account> accounts;
 
     // --- Getters và Setters ---
     public Long getId() { return id; }
@@ -41,17 +36,11 @@ public class User {
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -65,6 +54,6 @@ public class User {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public List<Account> getAccounts() { return accounts; }
-    public void setAccounts(List<Account> accounts) { this.accounts = accounts; }
+    public List<AccountInfoDTO> getAccounts() { return accounts; }
+    public void setAccounts(List<AccountInfoDTO> accounts) { this.accounts = accounts; }
 }

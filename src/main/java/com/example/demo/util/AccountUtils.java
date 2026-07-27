@@ -3,6 +3,11 @@ package com.example.demo.util;
 import java.util.Random;
 
 public class AccountUtils {
+    /**
+     * Sinh số tài khoản ngẫu nhiên gồm 10 chữ số chuẩn thuật toán Luhn (Modulus 10)
+     * Cấu trúc: [Prefix] + [7 số ngẫu nhiên] + [1 số checksum]
+     * Prefix: 88 (PAYMENT) hoặc 99 (SAVING)
+     */
     public static String generateLuhnAccountNumber(String prefix) {
         Random random = new Random();
         

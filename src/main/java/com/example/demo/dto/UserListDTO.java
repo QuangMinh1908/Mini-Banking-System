@@ -1,4 +1,4 @@
-package com.example.demo.config.security;
+package com.example.demo.dto;
 
 public class UserListDTO {
     private Long id;

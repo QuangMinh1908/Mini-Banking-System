@@ -78,18 +78,6 @@
   </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const togglePasswordBtn = document.getElementById("togglePasswordBtn");
-      const passwordInput = document.getElementById("password");
-
-      togglePasswordBtn.addEventListener("click", function () {
-        const isPassword = passwordInput.getAttribute("type") === "password";
-        passwordInput.setAttribute("type", isPassword ? "text" : "password");
-        this.textContent = isPassword ? "🙈" : "👁️";
-        this.title = isPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu";
-      });
-    });
-  </script>
+<script th:src="@{/js/login.js}" defer></script>
 </body>
 </html>

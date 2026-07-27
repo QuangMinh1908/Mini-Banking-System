@@ -288,15 +288,27 @@ if (btnConfirmCreateAPI) {
         const accType = document.getElementById('wizardAccType').value;
         const limit = document.getElementById('wizardLimit').value;
 
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
         fetch(`/admin/api/user/${userId}/create-account`, { 
             method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
             body: JSON.stringify({ 
                 accountType: accType, 
                 transactionLimit: limit 
             })
         })
-        .then(res => res.json())
+        .then(async res => {
+            if (res.status === 429) {
+                alert("Bạn bấm quá nhanh! Vui lòng thao tác chậm lại.");
+                throw new Error("Spam Click Blocked");
+            }
+            return res.json();
+        })
         .then(data => {
             if (data.success) {
                 confirmOverlay.style.display = 'none'; step2.style.display = 'none'; step3.style.display = 'block'; ind2.classList.remove('active'); ind3.classList.add('active');
@@ -317,4 +329,31 @@ document.getElementById('btnFinishWizard')?.addEventListener('click', (e) => {
 document.addEventListener("DOMContentLoaded", function() {
     const openUserId = new URLSearchParams(window.location.search).get('openUserId');
     if (openUserId) setTimeout(() => { if (typeof viewUserDetails === 'function') viewUserDetails(openUserId); }, 150);
+});
+
+// 5. MỞ RỘNG SEARCH NÂNG CAO VÀ LOAD TAGS
+const searchContainer = document.getElementById('searchContainer');
+document.getElementById('mainSearchInput')?.addEventListener('focus', () => searchContainer.classList.add('active'));
+document.addEventListener('click', (e) => { 
+    if (searchContainer && !searchContainer.contains(e.target)) {
+        searchContainer.classList.remove('active'); 
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let activeTags = [];
+    
+    const searchId = urlParams.get('searchId');
+    if (searchId && searchId.trim() !== '') activeTags.push({ text: '#KH' + searchId.padStart(3, '0'), inputName: 'searchId' });
+    
+    const searchName = urlParams.get('searchName');
+    if (searchName && searchName.trim() !== '') activeTags.push({ text: searchName.trim(), inputName: 'searchName' });
+    
+    const searchPhone = urlParams.get('searchPhone');
+    if (searchPhone && searchPhone.trim() !== '') activeTags.push({ text: searchPhone.trim(), inputName: 'searchPhone' });
+    
+    if (typeof renderSearchTags === 'function') {
+        renderSearchTags(activeTags);
+    }
 });

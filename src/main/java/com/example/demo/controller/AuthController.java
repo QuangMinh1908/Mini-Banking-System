@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -39,23 +40,22 @@ public class AuthController {
 
     @PostMapping("/login")
     public String handleLogin(@RequestParam("username") String username,
-                              @RequestParam("password") String password,
-                              HttpSession session,
-                              RedirectAttributes redirectAttributes,
-                              Model model) {
+                            @RequestParam("password") String password,
+                            HttpServletRequest request, 
+                            RedirectAttributes redirectAttributes,
+                            Model model) {
         Optional<User> userOpt = userRepository.findByUsername(username);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            boolean isPasswordMatch = false;
-
-            if (user.getPassword().startsWith("$2a$")) {
-                isPasswordMatch = passwordEncoder.matches(password, user.getPassword());
-            } else {
-                isPasswordMatch = user.getPassword().equals(password);
-            }
+        
+            // 1. CHỈ SỬ DỤNG BCRYPT
+            if (passwordEncoder.matches(password, user.getPassword())) {
             
-            if (isPasswordMatch) {
+                // 2. TÁI TẠO SESSION ID ĐỂ CHỐNG SESSION FIXATION
+                request.changeSessionId();
+                HttpSession session = request.getSession();
+            
                 session.setAttribute("role", user.getRole());
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("userId", user.getId());
@@ -69,8 +69,9 @@ public class AuthController {
                 }
             }
         }
-        
-        model.addAttribute("errorMessage", "❌ Tên tài khoản hoặc mật khẩu không đúng. Vui lòng thử lại.");
+    
+        // Chỉ báo lỗi chung chung để chống lại hành vi dò quét tài khoản (User Enumeration).
+        model.addAttribute("errorMessage", "❌ Tên đăng nhập hoặc mật khẩu không chính xác.");
         return "login";
     }
 

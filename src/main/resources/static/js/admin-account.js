@@ -105,3 +105,27 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+// MỞ RỘNG SEARCH NÂNG CAO VÀ LOAD TAGS
+const searchContainer = document.getElementById('searchContainer');
+document.getElementById('mainSearchInput')?.addEventListener('focus', () => searchContainer.classList.add('active'));
+document.addEventListener('click', (e) => { 
+    if (searchContainer && !searchContainer.contains(e.target)) {
+        searchContainer.classList.remove('active'); 
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let activeTags = [];
+    
+    const searchAccNum = urlParams.get('searchAccNum');
+    if (searchAccNum && searchAccNum.trim() !== '') activeTags.push({ text: searchAccNum.trim(), inputName: 'searchAccNum' });
+    
+    const searchFullName = urlParams.get('searchFullName');
+    if (searchFullName && searchFullName.trim() !== '') activeTags.push({ text: searchFullName.trim(), inputName: 'searchFullName' });
+    
+    if (typeof renderSearchTags === 'function') {
+        renderSearchTags(activeTags);
+    }
+});

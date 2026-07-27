@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.example.demo.model.enums.AccountType;
+
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,8 +37,9 @@ public class Account {
     @OneToMany(mappedBy = "toAccount", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> receivedTransactions;
     
+    @Enumerated(EnumType.STRING)
     @Column(name = "account_type")
-    private String accountType = "PAYMENT";
+    private AccountType accountType = AccountType.PAYMENT;
 
     @Column(name = "transaction_limit")
     private String transactionLimit = "50M";
@@ -71,8 +74,8 @@ public class Account {
     public List<Transaction> getReceivedTransactions() { return receivedTransactions; }
     public void setReceivedTransactions(List<Transaction> receivedTransactions) { this.receivedTransactions = receivedTransactions; }
 
-    public String getAccountType() { return accountType; }
-    public void setAccountType(String accountType) { this.accountType = accountType; }
+    public AccountType getAccountType() { return accountType; }
+    public void setAccountType(AccountType accountType) { this.accountType = accountType; }
 
     public String getTransactionLimit() { return transactionLimit; }
     public void setTransactionLimit(String transactionLimit) { this.transactionLimit = transactionLimit; }

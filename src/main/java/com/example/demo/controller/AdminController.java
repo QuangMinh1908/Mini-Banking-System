@@ -6,13 +6,13 @@ import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserListService;
 import com.example.demo.service.AccountListService;
-import com.example.demo.config.security.UserListDTO;
-import com.example.demo.config.security.UserUpdateRequestDTO;
-import com.example.demo.config.security.UserDetailDTO;
+import com.example.demo.dto.AccountDetailDTO;
+import com.example.demo.dto.UserDetailDTO;
+import com.example.demo.dto.UserListDTO;
+import com.example.demo.dto.UserUpdateRequestDTO;
 import com.example.demo.repository.UserUpdateRequestRepository;
 import com.example.demo.model.UserUpdateRequest;
-import com.example.demo.config.security.AccountDetailDTO;
-import com.example.demo.util.AccountUtils;
+import com.example.demo.service.AccountService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,9 +32,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.dao.DataIntegrityViolationException;
-import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -44,14 +41,15 @@ public class AdminController {
     private final UserListService userService;
     private final AccountRepository accountRepository;
     private final UserUpdateRequestRepository requestRepository;
-    private final UserRepository userRepository;
+    private final AccountService accountService;
 
     public AdminController(UserListService userService, AccountRepository accountRepository,
-                            UserUpdateRequestRepository requestRepository, UserRepository userRepository) {
+                            UserUpdateRequestRepository requestRepository, UserRepository userRepository,
+                            AccountService accountService) {
         this.userService = userService;
         this.accountRepository = accountRepository;
         this.requestRepository = requestRepository;
-        this.userRepository = userRepository;
+        this.accountService = accountService;
     }
 
     // ==========================================
@@ -172,15 +170,14 @@ public class AdminController {
                 user.getFullName(),
                 user.getPhoneNumber(),
                 user.getEmail(),
-                account.getAccountType(),
+                account.getAccountType().name(),
                 account.getTransactionLimit()
         );
         
         return ResponseEntity.ok(dto);
     }
 
-    // API: TẠO TÀI KHOẢN MỚI CHO KHÁCH HÀNG
-    // ==========================================
+    // API: Tạo tài khoản
     @PostMapping("/admin/api/user/{userId}/create-account")
     @ResponseBody
     public ResponseEntity<Map<String, String>> createAccountForUser(@PathVariable Long userId,
@@ -189,41 +186,17 @@ public class AdminController {
         String accountType = payload.getOrDefault("accountType", "PAYMENT");
         String transactionLimit = payload.getOrDefault("transactionLimit", "50M");
         
-        // 1. Kiểm tra xem user có tồn tại không
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isEmpty()) {
-            response.put("error", "Không tìm thấy khách hàng trong hệ thống!");
+        try {
+            Account newAccount = accountService.createNewAccountForUser(userId, accountType, transactionLimit);
+            
+            response.put("success", "Cấp thành công tài khoản: " + newAccount.getAccountNumber());
+            response.put("accountNumber", newAccount.getAccountNumber());
+            return ResponseEntity.ok(response);
+            
+        } catch (RuntimeException e) {
+            response.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
-        
-        User user = userOpt.get();
-        boolean isSaved = false;
-        Account newAccount = new Account();
-
-        String prefix = "SAVING".equals(accountType) ? "99" : "88";
-        
-        // 2. Vòng lặp Hybrid: Sinh số Luhn -> Lưu DB -> Bắt lỗi trùng lặp
-        do {
-            String newAccNum = AccountUtils.generateLuhnAccountNumber(prefix);
-            
-            newAccount.setAccountNumber(newAccNum);
-            newAccount.setUser(user);
-            newAccount.setBalance(BigDecimal.ZERO);
-            newAccount.setAccountType(accountType);
-            newAccount.setTransactionLimit(transactionLimit);
-            
-            try {
-                accountRepository.save(newAccount);
-                isSaved = true;
-                
-            } catch (DataIntegrityViolationException e) {
-                System.out.println("Cảnh báo: Trùng số tài khoản " + newAccNum + ", hệ thống đang tạo số mới...");
-            }
-        } while (!isSaved);
-
-        response.put("success", "Cấp thành công tài khoản: " + newAccount.getAccountNumber());
-        response.put("accountNumber", newAccount.getAccountNumber());
-        return ResponseEntity.ok(response);
     }
 
     // API: TÌM KIẾM NHANH KHÁCH HÀNG CHO FORM TẠO ACCOUNT (DROPDOWN)

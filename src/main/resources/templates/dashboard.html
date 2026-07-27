@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Bảng Điều Khiển Server-side</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
@@ -89,7 +91,6 @@
                         </div>
                     </th:block>
 
-                    <!-- Khối "Giao dịch mới nhất" (bạn giữ nguyên nội dung cũ ở đoạn này) -->
                     <div class="bento-card">
                     </div>
 
@@ -97,36 +98,30 @@
                     <div class="bento-card card-transactions">
                         <div class="card-header-flex">
                             <h3>Lịch sử giao dịch</h3>
-                            <span style="font-size: 0.85rem; color: #64748b;" th:if="${hasTransactions}" th:text="'Trang ' + (${txPage.number} + 1) + ' / ' + ${txPage.totalPages}"></span>
                         </div>
-        
-                        <ul class="transaction-list" th:if="${hasTransactions}">
-                            <!-- Lặp qua txPage.content -->
-                            <li class="transaction-item" th:each="tx : ${txPage.content}">
-                                <div class="tx-info">
-                                    <strong th:text="${tx.type == 'DEPOSIT' ? 'Nạp tiền' : (tx.type == 'WITHDRAW' ? 'Rút tiền' : 'Chuyển khoản')}"></strong>
-                                    <span th:text="${tx.transactionId}"></span>
-                                </div>
-                                <div th:class="'tx-amount ' + ${tx.type == 'DEPOSIT' ? 'amount-positive' : 'amount-negative'}" 
-                                    th:text="${tx.type == 'DEPOSIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></div>
-                            </li>
+
+                        <ul class="transaction-list" id="transactionList" th:if="${hasTransactions}">
+                            <th:block th:fragment="txItems">
+                                <li class="transaction-item" th:each="tx : ${transactions}"
+                                    th:attr="data-id=${tx.id}, data-date=${tx.transactionDate}">
+                                    <div class="tx-info">
+                                        <strong th:text="${tx.type.name() == 'DEPOSIT' ? 'Nạp tiền' : (tx.type.name() == 'WITHDRAW' ? 'Rút tiền' : 'Chuyển khoản')}"></strong>
+                                        <span th:text="${tx.transactionId}"></span>
+                                    </div>
+                                    <div th:class="'tx-amount ' + ${tx.type.name() == 'DEPOSIT' ? 'amount-positive' : 'amount-negative'}"
+                                    th:text="${tx.type.name() == 'DEPOSIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></div>
+                                </li>
+                            </th:block>
                         </ul>
-        
+    
+                        <!-- Loader cho Infinite Scroll -->
+                        <div id="loadingIndicator" style="display: none; text-align: center; padding: 1.5rem; color: #64748b; font-size: 0.9rem;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                            <br>Đang tải thêm...
+                        </div>
+
                         <div class="empty-state" th:unless="${hasTransactions}">
                             <p>Danh sách giao dịch sẽ hiện ở đây khi có dữ liệu.</p>
-                        </div>
-
-                        <!-- HTML Thanh điều hướng phân trang (Tái sử dụng class từ admin.css) -->
-                        <div class="pagination" th:if="${txPage.totalPages > 1}" style="margin-top: 1.5rem; justify-content: center; gap: 0.5rem; border-top: none;">
-                            <a class="page-btn" 
-                                th:if="${!txPage.first}" 
-                                th:href="@{/dashboard(page=${txPage.number - 1})}">Trang trước</a>
-                            <span class="page-btn disabled" th:if="${txPage.first}">Trang trước</span>
-
-                            <a class="page-btn" 
-                                th:if="${!txPage.last}" 
-                                th:href="@{/dashboard(page=${txPage.number + 1})}">Trang sau</a>
-                            <span class="page-btn disabled" th:if="${txPage.last}">Trang sau</span>
                         </div>
                     </div>
                 </section>
@@ -149,24 +144,7 @@
         </div>
     </div>
 
-    <script>
-        const logoutLink = document.getElementById('logoutLink');
-        const modal = document.getElementById('logoutModal');
-        const btnCancel = document.getElementById('btnCancelLogout');
-        const btnConfirm = document.getElementById('btnConfirmLogout');
-
-        logoutLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            modal.classList.add('active');
-        });
-
-        btnCancel.addEventListener('click', function () {
-            modal.classList.remove('active');
-        });
-
-        btnConfirm.addEventListener('click', function () {
-            window.location.href = '/logout';
-        });
-    </script>
+<script th:src="@{/js/common.js}" defer></script>
+<script th:src="@{/js/dashboard.js}" defer></script>
 </body>
 </html>

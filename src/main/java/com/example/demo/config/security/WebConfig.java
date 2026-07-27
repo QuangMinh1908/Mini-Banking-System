@@ -8,15 +8,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final AdminInterceptor adminInterceptor;
+    private final UserInterceptor userInterceptor;
+    private final RateLimitInterceptor rateLimitInterceptor;
 
-    public WebConfig(AdminInterceptor adminInterceptor) {
+    public WebConfig(AdminInterceptor adminInterceptor, UserInterceptor userInterceptor, RateLimitInterceptor rateLimitInterceptor) {
         this.adminInterceptor = adminInterceptor;
+        this.userInterceptor = userInterceptor;
+        this.rateLimitInterceptor = rateLimitInterceptor;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // Áp dụng trạm gác cho mọi đường dẫn bắt đầu bằng /admin
+        
+        registry.addInterceptor(rateLimitInterceptor)
+                .addPathPatterns("/**");
+
         registry.addInterceptor(adminInterceptor)
                 .addPathPatterns("/admin/**");
+                          
+        registry.addInterceptor(userInterceptor)
+                .addPathPatterns("/dashboard/**");
     }
 }

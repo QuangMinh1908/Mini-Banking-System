@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.example.demo.model.enums.TransactionType;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
@@ -14,7 +16,8 @@ public class Transaction {
     @Column(name = "transaction_id", unique = true)
     private String transactionId;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
 
     @ManyToOne
     @JoinColumn(name = "from_account_id")
@@ -45,11 +48,11 @@ public class Transaction {
         this.transactionId = transactionId;
     }
 
-    public String getType() {
+    public TransactionType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(TransactionType type) {
         this.type = type;
     }
 

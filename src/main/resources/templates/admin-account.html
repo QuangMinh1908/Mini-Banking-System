@@ -219,26 +219,5 @@
 
   <!-- Pop-up Xác nhận đăng xuất -->
   <div th:replace="~{fragments :: confirmModal}"></div>
-
-  <script>
-    // 1. Mở rộng Search nâng cao
-    const searchContainer = document.getElementById('searchContainer');
-    document.getElementById('mainSearchInput')?.addEventListener('focus', () => searchContainer.classList.add('active'));
-    document.addEventListener('click', (e) => { if (searchContainer && !searchContainer.contains(e.target)) searchContainer.classList.remove('active'); });
-
-    // 2. Load Tag Tìm kiếm
-    document.addEventListener("DOMContentLoaded", function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      let activeTags = [];
-      
-      const searchAccNum = urlParams.get('searchAccNum');
-      if (searchAccNum && searchAccNum.trim() !== '') activeTags.push({ text: searchAccNum.trim(), inputName: 'searchAccNum' });
-      
-      const searchFullName = urlParams.get('searchFullName');
-      if (searchFullName && searchFullName.trim() !== '') activeTags.push({ text: searchFullName.trim(), inputName: 'searchFullName' });
-      
-      renderSearchTags(activeTags);
-    });
-  </script>
 </body>
 </html>

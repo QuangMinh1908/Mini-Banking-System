@@ -1,10 +1,10 @@
 package com.example.demo.service;
 
-import com.example.demo.config.security.UserListDTO;
+import com.example.demo.dto.AccountInfoDTO;
+import com.example.demo.dto.UserDetailDTO;
+import com.example.demo.dto.UserListDTO;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.config.security.UserDetailDTO; 
-import com.example.demo.config.security.AccountInfoDTO;
 
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.model.UserUpdateRequest;

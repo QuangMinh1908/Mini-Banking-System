@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <title>Admin - Quản lý Khách hàng</title>
   <link rel="stylesheet" th:href="@{/css/style.css}">
   <link rel="stylesheet" th:href="@{/css/dashboard.css}">
@@ -433,29 +435,5 @@
   </div>
 
   <div th:replace="~{fragments :: confirmModal}"></div>
-
-  <script>
-    // 1. Mở rộng Search nâng cao
-    const searchContainer = document.getElementById('searchContainer');
-    document.getElementById('mainSearchInput')?.addEventListener('focus', () => searchContainer.classList.add('active'));
-    document.addEventListener('click', (e) => { if (!searchContainer.contains(e.target)) searchContainer.classList.remove('active'); });
-
-    // 2. Load Tag Tìm kiếm
-    document.addEventListener("DOMContentLoaded", function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      let activeTags = [];
-      
-      const searchId = urlParams.get('searchId');
-      if (searchId && searchId.trim() !== '') activeTags.push({ text: '#KH' + searchId.padStart(3, '0'), inputName: 'searchId' });
-      
-      const searchName = urlParams.get('searchName');
-      if (searchName && searchName.trim() !== '') activeTags.push({ text: searchName.trim(), inputName: 'searchName' });
-      
-      const searchPhone = urlParams.get('searchPhone');
-      if (searchPhone && searchPhone.trim() !== '') activeTags.push({ text: searchPhone.trim(), inputName: 'searchPhone' });
-      
-      renderSearchTags(activeTags);
-    });
-  </script>
 </body>
 </html>

@@ -36,4 +36,14 @@ public class AccountListService {
             return criteriaBuilder.equal(root.get("user").get("role"), role);
         };
     }
+
+    // Lọc tài khoản theo ID người dùng sở hữu
+    public static Specification<Account> hasUserId(Long userId) {
+        return (root, query, criteriaBuilder) -> {
+            if (userId == null) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("user").get("id"), userId);
+        };
+    }
 }

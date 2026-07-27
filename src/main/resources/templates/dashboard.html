@@ -69,90 +69,65 @@
                 </div>
 
                 <section class="bento-grid-container">
-                    
-                    <div class="bento-card card-balance">
-                        <div>
-                            <p class="card-label">Số dư hiện tại</p>
-                            <h2 class="amount-text amount-positive" 
-                                th:text="${account != null} ? ${#numbers.formatDecimal(account.balance, 0, 'COMMA', 0, 'POINT')} + ' VND' : '0 VND'">
-                            </h2>
-                            <p class="user-number">TK <span th:text="${#numbers.formatInteger(user.id, 4)}"></span> • <span th:text="${user.fullName}"></span></p>
-                            <div class="action-grid">
-                                <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nạp tiền</div>
-                                <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg> Rút tiền</div>
-                                <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> Chuyển khoản</div>
-                                <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Lịch sử</div>
+    
+                    <!-- 1. VÒNG LẶP IN RA CÁC TÀI KHOẢN TỒN TẠI -->
+                    <th:block th:each="acc : ${accounts}">
+                        <div class="bento-card card-balance">
+                            <div>
+                                <p class="card-label">Số dư hiện tại (<span th:text="${acc.accountType == 'PAYMENT' ? 'Thanh toán' : 'Tiết kiệm'}"></span>)</p>
+                                <h2 class="amount-text amount-positive" 
+                                    th:text="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                                </h2>
+                                <p class="user-number">STK: <span th:text="${acc.accountNumber}"></span> • <span th:text="${user.fullName}"></span></p>
+                                <div class="action-grid">
+                                    <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nạp tiền</div>
+                                    <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg> Rút tiền</div>
+                                    <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> Chuyển khoản</div>
+                                    <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Lịch sử</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </th:block>
 
+                    <!-- Khối "Giao dịch mới nhất" (bạn giữ nguyên nội dung cũ ở đoạn này) -->
                     <div class="bento-card">
-                        <div class="card-header-flex">
-                            <h3>Giao dịch mới nhất</h3>
-                            <span class="badge">Mới</span>
-                        </div>
-                        <div class="latest-tx-box" th:if="${latestTransaction != null}">
-                            <div class="tx-detail-row">
-                                <span>Mã GD:</span> <strong th:text="${latestTransaction.transactionId}"></strong>
-                            </div>
-                            <div class="tx-detail-row">
-                                <span>Loại:</span> 
-                                <strong th:text="${latestTransaction.type == 'DEPOSIT' ? 'Nạp tiền' : (latestTransaction.type == 'WITHDRAW' ? 'Rút tiền' : 'Chuyển khoản')}"></strong>
-                            </div>
-                            <div class="tx-detail-row">
-                                <span>Số tiền:</span> 
-                                <strong class="amount-highlight" th:text="${#numbers.formatDecimal(latestTransaction.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></strong>
-                            </div>
-                        </div>
-                        <div class="empty-state" th:unless="${latestTransaction != null}">
-                            <p>Chưa có giao dịch nào.</p>
-                        </div>
                     </div>
 
+                    <!-- 2. BẢNG GIAO DỊCH KẾT HỢP PHÂN TRANG -->
                     <div class="bento-card card-transactions">
                         <div class="card-header-flex">
                             <h3>Lịch sử giao dịch</h3>
-                            <a href="#" class="view-all-link">Xem tất cả</a>
+                            <span style="font-size: 0.85rem; color: #64748b;" th:if="${hasTransactions}" th:text="'Trang ' + (${txPage.number} + 1) + ' / ' + ${txPage.totalPages}"></span>
                         </div>
+        
                         <ul class="transaction-list" th:if="${hasTransactions}">
-                            <li class="transaction-item" th:each="tx : ${transactionList}">
+                            <!-- Lặp qua txPage.content -->
+                            <li class="transaction-item" th:each="tx : ${txPage.content}">
                                 <div class="tx-info">
                                     <strong th:text="${tx.type == 'DEPOSIT' ? 'Nạp tiền' : (tx.type == 'WITHDRAW' ? 'Rút tiền' : 'Chuyển khoản')}"></strong>
                                     <span th:text="${tx.transactionId}"></span>
                                 </div>
                                 <div th:class="'tx-amount ' + ${tx.type == 'DEPOSIT' ? 'amount-positive' : 'amount-negative'}" 
-                                     th:text="${tx.type == 'DEPOSIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></div>
+                                    th:text="${tx.type == 'DEPOSIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></div>
                             </li>
                         </ul>
+        
                         <div class="empty-state" th:unless="${hasTransactions}">
                             <p>Danh sách giao dịch sẽ hiện ở đây khi có dữ liệu.</p>
                         </div>
-                    </div>
 
-                    <div class="bento-card">
-                        <div class="card-header-flex">
-                            <h3>Tạo giao dịch mới</h3>
-                            <span class="badge server-badge">Server</span>
+                        <!-- HTML Thanh điều hướng phân trang (Tái sử dụng class từ admin.css) -->
+                        <div class="pagination" th:if="${txPage.totalPages > 1}" style="margin-top: 1.5rem; justify-content: center; gap: 0.5rem; border-top: none;">
+                            <a class="page-btn" 
+                                th:if="${!txPage.first}" 
+                                th:href="@{/dashboard(page=${txPage.number - 1})}">Trang trước</a>
+                            <span class="page-btn disabled" th:if="${txPage.first}">Trang trước</span>
+
+                            <a class="page-btn" 
+                                th:if="${!txPage.last}" 
+                                th:href="@{/dashboard(page=${txPage.number + 1})}">Trang sau</a>
+                            <span class="page-btn disabled" th:if="${txPage.last}">Trang sau</span>
                         </div>
-                        <form th:action="@{/dashboard/create-transaction}" th:object="${newTransactionForm}" method="post" class="dashboard-form">
-                            <div class="input-group">
-                                <label>Mã giao dịch</label>
-                                <input type="text" th:field="*{transactionId}" placeholder="Nhập mã GD..." required>
-                            </div>
-                            <div class="input-group">
-                                <label>Loại giao dịch</label>
-                                <select th:field="*{type}">
-                                    <option value="Nạp tiền">Nạp tiền</option>
-                                    <option value="Rút tiền">Rút tiền</option>
-                                    <option value="Chuyển khoản">Chuyển khoản</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <label>Số tiền</label>
-                                <input type="number" th:field="*{amount}" placeholder="0" required>
-                            </div>
-                            <button type="submit" class="btn-primary w-100">Gửi lệnh giao dịch</button>
-                        </form>
                     </div>
                 </section>
             </div>

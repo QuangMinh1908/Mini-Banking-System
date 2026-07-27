@@ -157,13 +157,25 @@
                 Trước
               </a>
               <span class="page-btn disabled" th:if="${userPage.first}">Trước</span>
-              <!-- Các nút số (1, 2, 3...) -->
-              <a class="page-btn" 
-                th:each="i : ${#numbers.sequence(0, userPage.totalPages - 1)}"
-                th:classappend="${userPage.number == i} ? 'active' : ''"
-                th:href="@{/admin(page=${i}, size=${userPage.size}, searchId=${searchId}, searchName=${searchName}, searchPhone=${searchPhone})}"
-                th:text="${i + 1}">1
-              </a>
+
+              <th:block th:each="i : ${#numbers.sequence(0, userPage.totalPages - 1)}">
+                  
+                  <!-- Dấu ... phía trước -->
+                  <span class="page-btn disabled" style="border: none; background: transparent; pointer-events: none;"
+                        th:if="${i == (userPage.number - 3) and i > 0}">...</span>
+
+                  <!-- Nút số -->
+                  <a class="page-btn" 
+                     th:if="${i == 0 or i == (userPage.totalPages - 1) or (i >= userPage.number - 2 and i <= userPage.number + 2)}"
+                     th:classappend="${userPage.number == i} ? 'active' : ''"
+                     th:href="@{/admin(page=${i}, size=${userPage.size}, searchId=${searchId}, searchName=${searchName}, searchPhone=${searchPhone})}"
+                     th:text="${i + 1}">1
+                  </a>
+
+                  <!-- Dấu ... phía sau -->
+                  <span class="page-btn disabled" style="border: none; background: transparent; pointer-events: none;"
+                        th:if="${i == (userPage.number + 3) and i < (userPage.totalPages - 1)}">...</span>
+              </th:block>
 
               <!-- Nút "Sau" -->
               <a class="page-btn" 
@@ -172,6 +184,14 @@
                 Sau
               </a>
               <span class="page-btn disabled" th:if="${userPage.last}">Sau</span>
+              
+              <!-- Nhảy trang-->
+              <div style="display: flex; align-items: center; margin-left: 1rem; gap: 0.5rem; border-left: 2px solid #e2e8f0; padding-left: 1.5rem;" th:if="${userPage.totalPages > 1}">
+                  <span style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Đến trang:</span>
+                  <input type="number" class="jump-page-input" min="1" th:max="${userPage.totalPages}" 
+                         style="width: 55px; padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; outline: none; font-size: 0.9rem;"
+                         placeholder="...">
+              </div>
             </div>
           </div>
 
@@ -415,88 +435,27 @@
   <div th:replace="~{fragments :: confirmModal}"></div>
 
   <script>
-    // Xử lý hiệu ứng Pop-up Tìm kiếm
+    // 1. Mở rộng Search nâng cao
     const searchContainer = document.getElementById('searchContainer');
-    const mainSearchInput = document.getElementById('mainSearchInput');
+    document.getElementById('mainSearchInput')?.addEventListener('focus', () => searchContainer.classList.add('active'));
+    document.addEventListener('click', (e) => { if (!searchContainer.contains(e.target)) searchContainer.classList.remove('active'); });
 
-    mainSearchInput.addEventListener('focus', function() {
-        searchContainer.classList.add('active');
-    });
-
-    document.addEventListener('click', function(event) {
-        if (!searchContainer.contains(event.target)) {
-            searchContainer.classList.remove('active');
-        }
-    });
-
-    // Xử lý hiển thị các thẻ tìm kiếm khi có tham số tìm kiếm
+    // 2. Load Tag Tìm kiếm
     document.addEventListener("DOMContentLoaded", function() {
       const urlParams = new URLSearchParams(window.location.search);
-      const tagsContainer = document.getElementById('activeSearchTags');
       let activeTags = [];
-
+      
       const searchId = urlParams.get('searchId');
-      if (searchId && searchId.trim() !== '') {
-        activeTags.push({ text: '#KH' + searchId.padStart(3, '0'), inputName: 'searchId' });
-      }
-
+      if (searchId && searchId.trim() !== '') activeTags.push({ text: '#KH' + searchId.padStart(3, '0'), inputName: 'searchId' });
+      
       const searchName = urlParams.get('searchName');
-      if (searchName && searchName.trim() !== '') {
-        activeTags.push({ text: searchName.trim(), inputName: 'searchName' });
-      }
-
+      if (searchName && searchName.trim() !== '') activeTags.push({ text: searchName.trim(), inputName: 'searchName' });
+      
       const searchPhone = urlParams.get('searchPhone');
-      if (searchPhone && searchPhone.trim() !== '') {
-        activeTags.push({ text: searchPhone.trim(), inputName: 'searchPhone' });
-      }
-
-      if (activeTags.length > 0) {
-        tagsContainer.innerHTML = '';
-        const maxTags = 3;
-
-        activeTags.forEach((tag, index) => {
-          if (index < maxTags) {
-            const tagElement = document.createElement('span');
-            tagElement.className = 'search-tag';
-            
-            const tagText = document.createElement('span');
-            tagText.textContent = tag.text;
-            tagElement.appendChild(tagText);
-
-            const closeBtn = document.createElement('button');
-            closeBtn.type = 'button';
-            closeBtn.className = 'tag-close-btn';
-            closeBtn.innerHTML = '&times;';
-            
-            closeBtn.onclick = function(e) {
-                e.preventDefault(); 
-                document.querySelector(`input[name="${tag.inputName}"]`).value = '';
-                document.querySelector('form.filter-bar').submit();
-            };
-            
-            tagElement.appendChild(closeBtn);
-            tagsContainer.appendChild(tagElement);
-          }
-        });
-
-        if (activeTags.length > maxTags) {
-            const dotsElement = document.createElement('span');
-            dotsElement.className = 'search-tag-ellipsis';
-            dotsElement.textContent = '...';
-            tagsContainer.appendChild(dotsElement);
-        }
-      }
+      if (searchPhone && searchPhone.trim() !== '') activeTags.push({ text: searchPhone.trim(), inputName: 'searchPhone' });
+      
+      renderSearchTags(activeTags);
     });
-  </script>
-
-  <!-- THÊM MỚI: Pop-up thông báo lỗi -->
-  <script th:inline="javascript">
-      /*<![CDATA[*/
-      var errorMessage = /*[[${errorMessage}]]*/ null;
-      if (errorMessage != null && errorMessage !== '') {
-          alert("⚠️ THÔNG BÁO TỪ HỆ THỐNG:\n\n" + errorMessage);
-      }
-      /*]]>*/
   </script>
 </body>
 </html>

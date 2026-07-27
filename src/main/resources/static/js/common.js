@@ -50,3 +50,75 @@ if (logoutLink) {
         );
     });
 }
+
+// 4. XỬ LÝ NHẢY TRANG
+document.addEventListener("DOMContentLoaded", function() {
+    const jumpInputs = document.querySelectorAll('.jump-page-input');
+    
+    jumpInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                
+                const page = parseInt(this.value);
+                const maxPage = parseInt(this.getAttribute('max'));
+                
+                if (page >= 1 && page <= maxPage) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    urlParams.set('page', page - 1); 
+                    window.location.search = urlParams.toString();
+                } else {
+                    showConfirmModal(
+                        'Lỗi nhập liệu',
+                        `Vui lòng nhập số trang hợp lệ từ <b>1</b> đến <b>${maxPage}</b>.`,
+                        'delete', 
+                        function() {
+                        }
+                    );
+                    this.value = '';
+                }
+            }
+        });
+    });
+});
+
+// 5. TAG TÌM KIẾM 
+function renderSearchTags(activeTags) {
+    const tagsContainer = document.getElementById('activeSearchTags');
+    if (!tagsContainer || activeTags.length === 0) return;
+
+    tagsContainer.innerHTML = '';
+    const maxTags = 3;
+    
+    activeTags.forEach((tag, index) => {
+        if (index < maxTags) {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'search-tag';
+            
+            const tagText = document.createElement('span');
+            tagText.textContent = tag.text;
+            tagElement.appendChild(tagText);
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'tag-close-btn';
+            closeBtn.innerHTML = '&times;';
+            
+            closeBtn.onclick = function(e) {
+                e.preventDefault();
+                document.querySelector(`input[name="${tag.inputName}"]`).value = '';
+                document.querySelector('form.filter-bar').submit();
+            };
+            
+            tagElement.appendChild(closeBtn);
+            tagsContainer.appendChild(tagElement);
+        }
+    });
+    
+    if (activeTags.length > maxTags) {
+        const dotsElement = document.createElement('span');
+        dotsElement.className = 'search-tag-ellipsis';
+        dotsElement.textContent = '...';
+        tagsContainer.appendChild(dotsElement);
+    }
+}

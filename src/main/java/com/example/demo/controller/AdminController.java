@@ -186,7 +186,6 @@ public class AdminController {
     public ResponseEntity<Map<String, String>> createAccountForUser(@PathVariable Long userId,
                                                                     @RequestBody Map<String, String> payload) {
         Map<String, String> response = new HashMap<>();
-
         String accountType = payload.getOrDefault("accountType", "PAYMENT");
         String transactionLimit = payload.getOrDefault("transactionLimit", "50M");
         
@@ -201,9 +200,12 @@ public class AdminController {
         boolean isSaved = false;
         Account newAccount = new Account();
 
+        String prefix = "SAVING".equals(accountType) ? "99" : "88";
+        
         // 2. Vòng lặp Hybrid: Sinh số Luhn -> Lưu DB -> Bắt lỗi trùng lặp
         do {
-            String newAccNum = AccountUtils.generateLuhnAccountNumber();
+            String newAccNum = AccountUtils.generateLuhnAccountNumber(prefix);
+            
             newAccount.setAccountNumber(newAccNum);
             newAccount.setUser(user);
             newAccount.setBalance(BigDecimal.ZERO);
@@ -215,11 +217,11 @@ public class AdminController {
                 isSaved = true;
                 
             } catch (DataIntegrityViolationException e) {
-                System.out.println("⚠️ Cảnh báo: Trùng số tài khoản " + newAccNum + ", hệ thống đang tự động tạo lại số mới...");
+                System.out.println("Cảnh báo: Trùng số tài khoản " + newAccNum + ", hệ thống đang tạo số mới...");
             }
         } while (!isSaved);
 
-        response.put("success", "Đã mở thành công tài khoản: " + newAccount.getAccountNumber());
+        response.put("success", "Cấp thành công tài khoản: " + newAccount.getAccountNumber());
         response.put("accountNumber", newAccount.getAccountNumber());
         return ResponseEntity.ok(response);
     }

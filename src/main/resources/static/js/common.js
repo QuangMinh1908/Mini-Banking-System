@@ -8,7 +8,7 @@ function showConfirmModal(title, message, iconType, confirmCallback) {
     if (!modal) return;
     
     document.getElementById('globalModalTitle').textContent = title;
-    document.getElementById('globalModalMessage').innerHTML = message; // Hỗ trợ hiển thị HTML
+    document.getElementById('globalModalMessage').innerHTML = message;
     
     const iconContainer = document.getElementById('globalModalIcon');
     if (iconType === 'logout' || iconType === 'delete') {
@@ -16,7 +16,7 @@ function showConfirmModal(title, message, iconType, confirmCallback) {
     } else if (iconType === 'info' || iconType === 'edit') {
         iconContainer.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
     }
-
+    
     const oldConfirmBtn = document.getElementById('btnGlobalConfirm');
     const newConfirmBtn = oldConfirmBtn.cloneNode(true);
     oldConfirmBtn.parentNode.replaceChild(newConfirmBtn, oldConfirmBtn);
@@ -37,7 +37,6 @@ if (btnGlobalCancel) {
     });
 }
 
-// 3. Xử lý nút Đăng xuất
 const logoutLink = document.getElementById('logoutLink');
 if (logoutLink) {
     logoutLink.addEventListener('click', function (e) {
@@ -46,12 +45,26 @@ if (logoutLink) {
             'Xác nhận đăng xuất',
             'Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc này không?',
             'logout',
-            function() { window.location.href = '/logout'; }
+            function() { 
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/logout';                
+                const csrfMeta = document.querySelector('meta[name="_csrf"]');
+                if (csrfMeta) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_csrf';
+                    csrfInput.value = csrfMeta.getAttribute('content');
+                    form.appendChild(csrfInput);
+                }
+                document.body.appendChild(form);
+                form.submit(); 
+            }
         );
     });
 }
 
-// 4. XỬ LÝ NHẢY TRANG
+// 4. NHẢY TRANG
 document.addEventListener("DOMContentLoaded", function() {
     const jumpInputs = document.querySelectorAll('.jump-page-input');
     
@@ -59,7 +72,6 @@ document.addEventListener("DOMContentLoaded", function() {
         input.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                
                 const page = parseInt(this.value);
                 const maxPage = parseInt(this.getAttribute('max'));
                 
@@ -70,10 +82,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     showConfirmModal(
                         'Lỗi nhập liệu',
-                        `Vui lòng nhập số trang hợp lệ từ <b>1</b> đến <b>${maxPage}</b>.`,
+                        `Vui lòng nhập trang từ <b>1</b> đến <b>${maxPage}</b>.`,
                         'delete', 
-                        function() {
-                        }
+                        function() {}
                     );
                     this.value = '';
                 }
@@ -82,11 +93,10 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-// 5. TAG TÌM KIẾM 
+// 5. TAG TÌM KIẾM
 function renderSearchTags(activeTags) {
     const tagsContainer = document.getElementById('activeSearchTags');
     if (!tagsContainer || activeTags.length === 0) return;
-
     tagsContainer.innerHTML = '';
     const maxTags = 3;
     

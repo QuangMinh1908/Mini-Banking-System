@@ -85,7 +85,7 @@ public class UserListService {
     // Detail user and accounts
     @Transactional(readOnly = true)
     public UserDetailDTO getUserDetailById(Long id) {
-        User user = userRepository.findById(id).orElse(null);
+        User user = userRepository.findByIdWithAccounts(id).orElse(null);
         if (user == null) {
             return null;
         }

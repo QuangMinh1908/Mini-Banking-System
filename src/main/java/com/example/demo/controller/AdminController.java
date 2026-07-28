@@ -3,53 +3,36 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.model.Account;
 import com.example.demo.repository.AccountRepository;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserListService;
 import com.example.demo.service.AccountListService;
-import com.example.demo.dto.AccountDetailDTO;
-import com.example.demo.dto.UserDetailDTO;
 import com.example.demo.dto.UserListDTO;
-import com.example.demo.dto.UserUpdateRequestDTO;
-import com.example.demo.repository.UserUpdateRequestRepository;
-import com.example.demo.model.UserUpdateRequest;
-import com.example.demo.service.AccountService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import java.util.Map;
-import java.util.HashMap;
+
 
 @Controller
 public class AdminController {
 
     private final UserListService userService;
     private final AccountRepository accountRepository;
-    private final UserUpdateRequestRepository requestRepository;
-    private final AccountService accountService;
 
-    public AdminController(UserListService userService, AccountRepository accountRepository,
-                            UserUpdateRequestRepository requestRepository, UserRepository userRepository,
-                            AccountService accountService) {
+    public AdminController(UserListService userService, AccountRepository accountRepository) {
         this.userService = userService;
         this.accountRepository = accountRepository;
-        this.requestRepository = requestRepository;
-        this.accountService = accountService;
     }
 
     // ==========================================
@@ -111,125 +94,5 @@ public class AdminController {
         model.addAttribute("username", session.getAttribute("username"));
 
         return "admin-account";
-    }
-
-    // API: LẤY CHI TIẾT USER (DÙNG CHO POP-UP)
-    // ==========================================
-    @GetMapping("/admin/api/user/{id}")
-    @ResponseBody
-    public ResponseEntity<UserDetailDTO> getUserDetailsApi(@PathVariable Long id) {
-        UserDetailDTO userDetailDTO = userService.getUserDetailById(id);
-                if (userDetailDTO == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(userDetailDTO);
-    }
-
-    // API: LẤY DANH SÁCH YÊU CẦU CHỈNH SỬA
-    // ==========================================
-    @GetMapping("/admin/api/requests")
-    @ResponseBody
-    public ResponseEntity<Page<UserUpdateRequestDTO>> getRequestsApi(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by("requestDate").ascending());
-        Page<UserUpdateRequest> requests = requestRepository.findAll(pageable);
-        
-        Page<UserUpdateRequestDTO> dtoPage = requests.map(req -> new UserUpdateRequestDTO(
-                req.getId(),
-                req.getUser().getUsername(),
-                req.getStatus(),
-                req.getRequestDate(),
-                req.getNewFullName(),
-                req.getNewPhoneNumber(),
-                req.getNewEmail(),
-                req.getNewAddress(),
-                req.getNewGender()
-        ));
-        return ResponseEntity.ok(dtoPage);
-    }
-
-    // API: LẤY CHI TIẾT TÀI KHOẢN
-    // ===========================
-    @GetMapping("/admin/api/account/details/{accountNumber}")
-    @ResponseBody
-    public ResponseEntity<AccountDetailDTO> getAccountBasicInfoApi(@PathVariable String accountNumber) {
-        Account account = accountRepository.findByAccountNumber(accountNumber);
-        
-        if (account == null) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        User user = account.getUser();
-        
-        AccountDetailDTO dto = new AccountDetailDTO(
-                account.getAccountNumber(),
-                account.getDateOpen(),
-                user.getId(),
-                user.getFullName(),
-                user.getPhoneNumber(),
-                user.getEmail(),
-                account.getAccountType().name(),
-                account.getTransactionLimit()
-        );
-        
-        return ResponseEntity.ok(dto);
-    }
-
-    // API: Tạo tài khoản
-    @PostMapping("/admin/api/user/{userId}/create-account")
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> createAccountForUser(@PathVariable Long userId,
-                                                                    @RequestBody Map<String, String> payload) {
-        Map<String, String> response = new HashMap<>();
-        String accountType = payload.getOrDefault("accountType", "PAYMENT");
-        String transactionLimit = payload.getOrDefault("transactionLimit", "50M");
-        
-        try {
-            Account newAccount = accountService.createNewAccountForUser(userId, accountType, transactionLimit);
-            
-            response.put("success", "Cấp thành công tài khoản: " + newAccount.getAccountNumber());
-            response.put("accountNumber", newAccount.getAccountNumber());
-            return ResponseEntity.ok(response);
-            
-        } catch (RuntimeException e) {
-            response.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-
-    // API: TÌM KIẾM NHANH KHÁCH HÀNG CHO FORM TẠO ACCOUNT (DROPDOWN)
-    // ==================================================
-    @GetMapping("/admin/api/user/search")
-    @ResponseBody
-    public ResponseEntity<?> searchUserForWizard(@RequestParam String keyword) {
-        keyword = keyword.trim();
-        Page<UserListDTO> users;
-        
-        // 1. Kiểm tra nếu từ khóa là số (ID hoặc Số điện thoại)
-        if (keyword.matches("\\d+")) {
-            try {
-                Long id = Long.parseLong(keyword);
-                users = userService.searchUsers(id, null, null, 0, 5); // Lấy tối đa 5 người
-                if (users.isEmpty()) {
-                    users = userService.searchUsers(null, null, keyword, 0, 5);
-                }
-            } catch (NumberFormatException e) {
-                users = userService.searchUsers(null, null, keyword, 0, 5);
-            }
-        } else {
-            // 2. Nếu từ khóa là chữ, tìm theo Họ tên / Username
-            users = userService.searchUsers(null, keyword, null, 0, 5);
-        }
-
-        // 3. Trả về MỘT DANH SÁCH (List)
-        if (users.hasContent()) {
-            return ResponseEntity.ok(users.getContent()); 
-        } else {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Không tìm thấy khách hàng");
-            return ResponseEntity.status(404).body(errorResponse);
-        }
     }
 }

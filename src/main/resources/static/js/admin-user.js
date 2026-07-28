@@ -320,9 +320,13 @@ if (btnConfirmCreateAPI) {
 }
 
 document.getElementById('btnFinishWizard')?.addEventListener('click', (e) => {
-    e.preventDefault(); closeWizard();
-    if (document.getElementById('userDetailsModal').classList.contains('active')) viewUserDetails(document.getElementById('wizardUserId').value);
-    else window.location.reload();
+    e.preventDefault();
+    closeWizard();
+    if (document.getElementById('userDetailsModal').classList.contains('active')) {
+        viewUserDetails(document.getElementById('wizardUserId').value);
+    } else {
+        window.location.reload();
+    }
 });
 
 // Mở lại chi tiết user khi back từ trang Account

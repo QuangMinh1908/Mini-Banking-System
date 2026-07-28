@@ -68,8 +68,8 @@
           <div th:if="${successMessage}" class="alert alert-success">
             <span th:text="${successMessage}"></span>
           </div>
-          <div th:if="${errorMessage}" class="alert alert-danger" style="background-color: #fef2f2; color: #dc2626; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #f87171;">
-            <span th:text="${errorMessage}"></span>
+          <div th:if="${param.error}" style="margin-top: 1rem; padding: 0.75rem; border-radius: 0.5rem; background: #fee2e2; color: #b91c1c; font-size: 0.875rem;">
+            <span>Đăng nhập hoặc mật khẩu không chính xác.</span>
           </div>
           
           <div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">

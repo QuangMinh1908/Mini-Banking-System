@@ -11,9 +11,14 @@ import java.util.List;
 @Table(name = "accounts")
 public class Account {
 
+    // ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    // Optimistic Locking của JPA/Hibernate
+    @Version
+    private Long version;
 
     // Số tài khoản
     @Column(name = "account_number", unique = true, nullable = false)
@@ -56,6 +61,9 @@ public class Account {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
+    
     public String getAccountNumber() { return accountNumber; }
     public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
 

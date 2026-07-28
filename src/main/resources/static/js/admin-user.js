@@ -2,6 +2,18 @@
 // ADMIN-USER.JS - XỬ LÝ LOGIC TRANG QUẢN LÝ KHÁCH HÀNG
 // ==========================================
 
+// chống XSS
+function escapeHTML(str) {
+    if (!str) return '';
+    return str.toString().replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+    }[tag] || tag));
+}
+
 // --- 1. XEM CHI TIẾT KHÁCH HÀNG ---
 const userDetailsModal = document.getElementById('userDetailsModal');
 function viewUserDetails(userId) {
@@ -172,11 +184,11 @@ function loadRequests() {
                     </div>
                     <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">Ngày gửi: ${formattedDate}</p>
                     <div style="font-size: 0.9rem; background: #f8fafc; padding: 0.75rem; border-radius: 6px; border: 1px dashed #cbd5e1;">
-                        <div><strong>Họ tên mới:</strong> ${req.newFullName || '<i>Không đổi</i>'}</div>
-                        <div><strong>SĐT mới:</strong> ${req.newPhoneNumber || '<i>Không đổi</i>'}</div>
-                        <div><strong>Email mới:</strong> ${req.newEmail || '<i>Không đổi</i>'}</div>
-                        <div><strong>Địa chỉ mới:</strong> ${req.newAddress || '<i>Không đổi</i>'}</div>
-                        <div><strong>Giới tính mới:</strong> ${req.newGender || '<i>Không đổi</i>'}</div>
+                        <div><strong>Họ tên mới:</strong> ${req.newFullName ? escapeHTML(req.newFullName) : '<i>Không đổi</i>'}</div>
+                        <div><strong>SĐT mới:</strong> ${req.newPhoneNumber ? escapeHTML(req.newPhoneNumber) : '<i>Không đổi</i>'}</div>
+                        <div><strong>Email mới:</strong> ${req.newEmail ? escapeHTML(req.newEmail) : '<i>Không đổi</i>'}</div>
+                        <div><strong>Địa chỉ mới:</strong> ${req.newAddress ? escapeHTML(req.newAddress) : '<i>Không đổi</i>'}</div>
+                        <div><strong>Giới tính mới:</strong> ${req.newGender ? escapeHTML(req.newGender) : '<i>Không đổi</i>'}</div>
                     </div>`;
                 requestListContainer.appendChild(card);
             });

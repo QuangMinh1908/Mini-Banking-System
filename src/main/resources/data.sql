@@ -1,3 +1,5 @@
+-- Đã mã hóa BCrypt xuống db trên máy, file sql này chỉ dùng để kiểm tra dữ liệu mẫu và chỉnh sửa nếu cần --
+
 -- Dọn dẹp dữ liệu cũ (nếu có) để tránh lỗi trùng lặp ID khi chạy lại script
 TRUNCATE TABLE user_update_requests, transactions, accounts, users RESTART IDENTITY CASCADE;;
 

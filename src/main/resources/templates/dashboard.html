@@ -71,30 +71,43 @@
                 </div>
 
                 <section class="bento-grid-container">
-    
-                    <!-- 1. VÒNG LẶP IN RA CÁC TÀI KHOẢN TỒN TẠI -->
-                    <th:block th:each="acc : ${accounts}">
-                        <div class="bento-card card-balance">
-                            <div>
-                                <p class="card-label">Số dư hiện tại (<span th:text="${acc.accountType == 'PAYMENT' ? 'Thanh toán' : 'Tiết kiệm'}"></span>)</p>
-                                <h2 class="amount-text amount-positive" 
-                                    th:text="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">
-                                </h2>
-                                <p class="user-number">STK: <span th:text="${acc.accountNumber}"></span> • <span th:text="${user.fullName}"></span></p>
-                                <div class="action-grid">
-                                    <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nạp tiền</div>
-                                    <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg> Rút tiền</div>
-                                    <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> Chuyển khoản</div>
-                                    <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Lịch sử</div>
-                                </div>
-                            </div>
+                    <!-- 1. VÒNG LẶP IN RA CÁC TÀI KHOẢN -->
+                    <div class="bento-card" style="grid-column: 1 / -1; padding: 1.5rem;">
+                        <div class="action-grid" style="grid-template-columns: repeat(4, 1fr); max-width: 800px; margin: 0 auto;">
+                            <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nạp tiền</div>
+                            <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg> Rút tiền</div>
+                            <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> Chuyển khoản</div>
+                            <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Lịch sử</div>
                         </div>
-                    </th:block>
-
-                    <div class="bento-card">
                     </div>
 
-                    <!-- 2. BẢNG GIAO DỊCH KẾT HỢP PHÂN TRANG -->
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; grid-column: 1 / -1;">
+                        <th:block th:each="acc : ${accounts}">
+                            <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                        <p class="card-label">Số dư (<span th:text="${acc.accountType == 'PAYMENT' ? 'Thanh toán' : 'Tiết kiệm'}"></span>)</p>
+                                        <span class="badge server-badge" th:text="'Hạn mức: ' + (${acc.transactionLimit == '50M' ? '50.000.000đ' : (acc.transactionLimit == '500M' ? '500.000.000đ' : 'Không giới hạn')})"></span>
+                                    </div>
+                                    <h2 class="amount-text amount-positive"
+                                         th:text="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'" style="font-size: 1.75rem;">
+                                    </h2>
+                                    
+                                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #e2e8f0;">
+                                        <p class="user-number" style="margin-bottom: 0.25rem; font-size: 0.95rem;">
+                                            <strong>STK:</strong> <span th:text="${acc.accountNumber}" style="color: #2563eb; font-weight: 600;"></span>
+                                        </p>
+                                        <p style="margin-bottom: 0; font-size: 0.85rem; color: #64748b; display: flex; justify-content: space-between;">
+                                            <span>Chủ thẻ: <span th:text="${user.fullName}"></span></span>
+                                            <span>Mở ngày: <span th:text="${#temporals.format(acc.dateOpen, 'dd/MM/yyyy')}"></span></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+
+                    <!-- 2. BẢNG GIAO DỊCH KẾP HỢP PHÂN TRANG -->
                     <div class="bento-card card-transactions">
                         <div class="card-header-flex">
                             <h3>Lịch sử giao dịch</h3>
@@ -113,15 +126,14 @@
                                 </li>
                             </th:block>
                         </ul>
-    
-                        <!-- Loader cho Infinite Scroll -->
+                             
                         <div id="loadingIndicator" style="display: none; text-align: center; padding: 1.5rem; color: #64748b; font-size: 0.9rem;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
                             <br>Đang tải thêm...
                         </div>
 
                         <div class="empty-state" th:unless="${hasTransactions}">
-                            <p>Danh sách giao dịch sẽ hiện ở đây khi có dữ liệu.</p>
+                            <p>Danh sách giao dịch sẽ hiển thị khi có dữ liệu.</p>
                         </div>
                     </div>
                 </section>
@@ -129,20 +141,7 @@
         </main>
     </div>
 
-    <!-- Modal Đăng xuất -->
-    <div class="modal-overlay" id="logoutModal">
-        <div class="modal-box bento-card">
-            <div class="modal-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </div>
-            <h3>Xác nhận đăng xuất</h3>
-            <p>Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc này không?</p>
-            <div class="modal-actions">
-                <button class="btn-secondary" id="btnCancelLogout">Hủy bỏ</button>
-                <button class="btn-danger" id="btnConfirmLogout">Đăng xuất</button>
-            </div>
-        </div>
-    </div>
+    <div th:replace="~{fragments :: confirmModal}"></div>
 
 <script th:src="@{/js/common.js}" defer></script>
 <script th:src="@{/js/dashboard.js}" defer></script>

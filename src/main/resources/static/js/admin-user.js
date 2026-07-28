@@ -207,6 +207,20 @@ if (requestListContainer) requestListContainer.addEventListener('scroll', () => 
 
 
 // --- 4. FORM WIZARD MỞ TÀI KHOẢN MỚI ---
+function toggleAccountFields() {
+    const accType = document.getElementById('wizardAccType').value;
+    const paymentGrp = document.getElementById('paymentConfigGroup');
+    const savingGrp = document.getElementById('savingConfigGroup');
+    
+    if (accType === 'SAVING') {
+        paymentGrp.style.display = 'none';
+        savingGrp.style.display = 'grid';
+    } else {
+        paymentGrp.style.display = 'block';
+        savingGrp.style.display = 'none';
+    }
+}
+
 const wizardModal = document.getElementById('createAccountWizardModal');
 const confirmOverlay = document.getElementById('wizardConfirmOverlay');
 const step1 = document.getElementById('wizard-step-1');
@@ -262,19 +276,23 @@ if (searchInput && searchResults) {
 
         fetch(`/admin/api/user/search?keyword=${encodeURIComponent(keyword)}`)
             .then(res => { if (!res.ok) throw new Error('Not Found'); return res.json(); })
-            .then(userList => {
+            .then(response => {
                 searchResults.innerHTML = ''; 
-                if (userList.length === 0) { searchResults.innerHTML = '<div style="padding: 1rem; text-align: center; color: #ef4444;">Không tìm thấy!</div>'; return; }
-                userList.forEach(user => {
+                if (!response.data || response.data.length === 0) { 
+                    searchResults.innerHTML = '<div style="padding: 1rem; text-align: center; color: #ef4444;">Không tìm thấy!</div>'; 
+                    return; 
+                }
+
+                response.data.forEach(user => {
                     const phone = user.phoneNumber || 'Không có SĐT', name = user.fullName || 'Chưa cập nhật', username = user.username || 'N/A';
                     const item = document.createElement('div');
                     item.className = 'wizard-dropdown-item';
-                    item.innerHTML = `<div class="item-title">${name}</div><div class="item-desc">ID: #KH${user.id.toString().padStart(3, '0')} • SĐT: ${phone} • TK: ${username}</div>`;
+                    item.innerHTML = `<div class="item-title">${name}</div><div class="item-desc">ID: #KH${user.id.toString().padStart(3, '0')} - SĐT: ${phone} - TK: ${username}</div>`;
                     item.onclick = function() { selectUserForWizard(user.id, name, phone); searchResults.style.display = 'none'; };
                     searchResults.appendChild(item);
                 });
             })
-            .catch(() => { searchResults.innerHTML = '<div style="padding: 1rem; text-align: center; color: #ef4444;">Lỗi dữ liệu!</div>'; });
+            .catch(() => { searchResults.innerHTML = '<div style="padding: 1rem; text-align: center; color: #ef4444;">Lỗi tra cứu!</div>'; });
     };
 
     searchInput.addEventListener('input', () => { if (searchTimeout) clearTimeout(searchTimeout); if (!searchInput.value.trim()) { searchResults.style.display = 'none'; return; } searchTimeout = setTimeout(executeSearch, 1000); });
@@ -293,41 +311,52 @@ document.getElementById('btnCloseConfirmOverlay')?.addEventListener('click', (e)
 const btnConfirmCreateAPI = document.getElementById('btnConfirmCreateAPI');
 if (btnConfirmCreateAPI) {
     btnConfirmCreateAPI.onclick = (e) => {
-        e.preventDefault();
         const userId = document.getElementById('wizardUserId').value;
         btnConfirmCreateAPI.innerHTML = 'Đang xử lý...'; btnConfirmCreateAPI.disabled = true;
-
+        
+        // Cập nhật lấy thêm term và interest
         const accType = document.getElementById('wizardAccType').value;
         const limit = document.getElementById('wizardLimit').value;
-
+        const term = document.getElementById('wizardTerm').value;
+        const interest = document.getElementById('wizardInterest').value;
+        
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
+        
         fetch(`/admin/api/user/${userId}/create-account`, { 
-            method: 'POST', 
-            headers: { 
-                'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify({ 
-                accountType: accType, 
-                transactionLimit: limit 
-            })
+              method: 'POST', 
+              headers: { 
+                  'Content-Type': 'application/json',
+                 [csrfHeader]: csrfToken
+             },
+             body: JSON.stringify({ 
+                  accountType: accType, 
+                  transactionLimit: limit,
+                  termMonths: term,
+                  interestRate: interest
+              })
         })
         .then(async res => {
             if (res.status === 429) {
-                alert("Bạn bấm quá nhanh! Vui lòng thao tác chậm lại.");
+                alert("Bấm quá nhanh! Vui lòng thao tác chậm lại.");
                 throw new Error("Spam Click Blocked");
             }
             return res.json();
         })
-        .then(data => {
-            if (data.success) {
-                confirmOverlay.style.display = 'none'; step2.style.display = 'none'; step3.style.display = 'block'; ind2.classList.remove('active'); ind3.classList.add('active');
-                document.getElementById('successAccNum').textContent = data.accountNumber;
-            } else alert('Lỗi: ' + data.error);
+        .then(response => {
+            if (response.status === 'SUCCESS') {
+                confirmOverlay.style.display = 'none'; 
+                step2.style.display = 'none'; 
+                step3.style.display = 'block'; 
+                ind2.classList.remove('active'); 
+                ind3.classList.add('active');
+                
+                document.getElementById('successAccNum').textContent = response.data;
+            } else {
+                alert('Lỗi: ' + response.message);
+            }
         })
-        .finally(() => { btnConfirmCreateAPI.innerHTML = 'Đồng ý Tạo'; btnConfirmCreateAPI.disabled = false; });
+        .finally(() => { btnConfirmCreateAPI.innerHTML = 'Tạo'; btnConfirmCreateAPI.disabled = false; });
     };
 }
 

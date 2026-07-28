@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.AccountDetailDTO;
+import com.example.demo.dto.ResponseDTO;
 import com.example.demo.dto.UserDetailDTO;
 import com.example.demo.dto.UserListDTO;
 import com.example.demo.dto.UserUpdateRequestDTO;
@@ -19,8 +20,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/api")
@@ -72,27 +73,35 @@ public class AdminRestController {
         AccountDetailDTO dto = new AccountDetailDTO(
                 account.getAccountNumber(), account.getDateOpen(), user.getId(),
                 user.getFullName(), user.getPhoneNumber(), user.getEmail(),
-                account.getAccountType().name(), account.getTransactionLimit()
+                account.getAccountType().name(), account.getTransactionLimit(),
+                account.getInterestRate(), account.getTermMonths()
         );
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/user/{userId}/create-account")
-    public ResponseEntity<Map<String, String>> createAccountForUser(@PathVariable Long userId,
+    public ResponseEntity<ResponseDTO<String>> createAccountForUser(@PathVariable Long userId,
                                                                     @RequestBody Map<String, String> payload) {
         String accountType = payload.getOrDefault("accountType", "PAYMENT");
         String transactionLimit = payload.getOrDefault("transactionLimit", "50M");
         
-        Account newAccount = accountService.createNewAccountForUser(userId, accountType, transactionLimit);
+        Integer termMonths = null;
+        java.math.BigDecimal interestRate = null;
         
-        Map<String, String> response = new HashMap<>();
-        response.put("success", "Cấp thành công tài khoản: " + newAccount.getAccountNumber());
-        response.put("accountNumber", newAccount.getAccountNumber());
-        return ResponseEntity.ok(response);
+        // Nếu là tài khoản tiết kiệm thì mới lấy kỳ hạn và lãi suất
+        if ("SAVING".equals(accountType)) {
+            termMonths = payload.containsKey("termMonths") ? Integer.parseInt(payload.get("termMonths")) : 0;
+            interestRate = payload.containsKey("interestRate") ? new java.math.BigDecimal(payload.get("interestRate")) : java.math.BigDecimal.ZERO;
+        }
+        
+        // Gọi hàm Service đã được cập nhật
+        Account newAccount = accountService.createNewAccountForUser(userId, accountType, transactionLimit, termMonths, interestRate);
+        
+        return ResponseEntity.ok(ResponseDTO.success("Cấp thành công tài khoản", newAccount.getAccountNumber()));
     }
 
     @GetMapping("/user/search")
-    public ResponseEntity<?> searchUserForWizard(@RequestParam String keyword) {
+    public ResponseEntity<ResponseDTO<List<UserListDTO>>> searchUserForWizard(@RequestParam String keyword) {
         keyword = keyword.trim();
         Page<UserListDTO> users;
         if (keyword.matches("\\d+")) {
@@ -108,11 +117,9 @@ public class AdminRestController {
         }
         
         if (users.hasContent()) {
-            return ResponseEntity.ok(users.getContent());
+            return ResponseEntity.ok(ResponseDTO.success("Thành công", users.getContent()));
         } else {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Không tìm thấy khách hàng");
-            return ResponseEntity.status(404).body(errorResponse);
+            return ResponseEntity.status(404).body(ResponseDTO.error("Không tìm thấy khách hàng"));
         }
     }
 }

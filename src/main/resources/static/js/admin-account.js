@@ -20,6 +20,11 @@ function viewAccountDetails(accountNumber) {
     document.getElementById('accOwnerPhone').textContent = 'Đang tải...';
     document.getElementById('accOwnerEmail').textContent = 'Đang tải...';
 
+    const savingRow = document.getElementById('savingRow');
+    const limitRow = document.getElementById('limitRow');
+    if (savingRow) savingRow.style.display = 'none';
+    if (limitRow) limitRow.style.display = 'block';
+
     accountDetailsModal.classList.add('active');
 
     // 2. Fetch dữ liệu từ API
@@ -29,19 +34,30 @@ function viewAccountDetails(accountNumber) {
             return response.json();
         })
         .then(data => {
-            // 3. Lúc này biến "data" mới tồn tại để lấy dữ liệu đổ ra UI
+            // 3. Lấy dữ liệu đổ ra UI
             document.getElementById('accOwnerName').textContent = data.ownerName;
             document.getElementById('accOwnerAvatar').textContent = data.ownerName ? data.ownerName.charAt(0).toUpperCase() : 'U';
             document.getElementById('accOwnerId').textContent = 'ID Khách hàng: #KH' + data.ownerId.toString().padStart(3, '0');
             document.getElementById('accDetailNumber').textContent = data.accountNumber;
             
-            // XỬ LÝ IN LOẠI TÀI KHOẢN VÀ HẠN MỨC
-            document.getElementById('accDetailType').textContent = data.accountType === 'SAVING' ? 'Tài khoản Tiết kiệm' : 'Thanh toán Nội địa';
-            
-            let limitText = 'Cơ bản (50.000.000 VND)';
-            if (data.transactionLimit === '500M') limitText = 'Nâng cao (500.000.000 VND)';
-            if (data.transactionLimit === 'UNLIMITED') limitText = 'Không giới hạn';
-            document.getElementById('accDetailLimit').textContent = limitText;
+            // XỬ LÝ PHÂN BIỆT HIỂN THỊ GIỮA TIẾT KIỆM VÀ THANH TOÁN
+            if (data.accountType === 'SAVING') {
+                document.getElementById('accDetailType').textContent = 'Tài khoản Tiết kiệm';
+                if (limitRow) limitRow.style.display = 'none';
+                if (savingRow) {
+                    savingRow.style.display = 'block';
+                    document.getElementById('accDetailSaving').textContent = `${data.termMonths} tháng (Lãi suất: ${data.interestRate}%/năm)`;
+                }
+            } else {
+                document.getElementById('accDetailType').textContent = 'Thanh toán Nội địa';
+                if (savingRow) savingRow.style.display = 'none';
+                if (limitRow) limitRow.style.display = 'block';
+                
+                let limitText = 'Cơ bản (50.000.000 VND)';
+                if (data.transactionLimit === '500M') limitText = 'Nâng cao (500.000.000 VND)';
+                if (data.transactionLimit === 'UNLIMITED') limitText = 'Không giới hạn';
+                document.getElementById('accDetailLimit').textContent = limitText;
+            }
             
             if (data.dateOpen) {
                 const date = new Date(data.dateOpen);

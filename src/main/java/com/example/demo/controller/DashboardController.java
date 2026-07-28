@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.DashboardAccountDTO;
+import com.example.demo.dto.DashboardTransactionDTO;
 import com.example.demo.model.Account;
 import com.example.demo.model.Transaction;
 import com.example.demo.model.User;
@@ -38,29 +40,49 @@ public class DashboardController {
 
     @GetMapping
     public String displayDashboard(HttpSession session, Model model,
-                                   @RequestParam(defaultValue = "10") int size) { 
+                                   @RequestParam(defaultValue = "10") int size) {
         
         Long currentUserId = (Long) session.getAttribute("userId");
         User currentUser = userRepository.findById(currentUserId).orElseThrow();
         
         model.addAttribute("username", session.getAttribute("username"));
-        model.addAttribute("user", currentUser);
-
+        model.addAttribute("user", currentUser); 
+        
+        // 1. MAP ACCOUNT SANG DTO
         List<Account> userAccounts = accountRepository.findAll(AccountListService.hasUserId(currentUserId));
-        model.addAttribute("accounts", userAccounts);
+        List<DashboardAccountDTO> accountDTOs = userAccounts.stream()
+            .map(acc -> new DashboardAccountDTO(
+                    acc.getAccountNumber(), 
+                    acc.getAccountType(), 
+                    acc.getTransactionLimit(), 
+                    acc.getBalance(), 
+                    acc.getDateOpen(),
+                    acc.getInterestRate(),
+                    acc.getTermMonths()))
+            .toList();
+        model.addAttribute("accounts", accountDTOs);
 
+        // 2. MAP TRANSACTION SANG DTO
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "transactionDate", "id"));
         Page<Transaction> txPage = transactionRepository.findAll(
                 TransactionSpecification.isRelatedToUserIdWithCursor(currentUserId, null, null), pageable);
-
-        List<Transaction> transactions = txPage.getContent();
-        model.addAttribute("transactions", transactions);
-        model.addAttribute("hasTransactions", !transactions.isEmpty());
-
-        Transaction latestTx = transactions.isEmpty() ? null : transactions.get(0);
+                
+        List<DashboardTransactionDTO> transactionDTOs = txPage.getContent().stream()
+            .map(tx -> new DashboardTransactionDTO(
+                    tx.getId(), 
+                    tx.getTransactionId(), 
+                    tx.getType(), 
+                    tx.getAmount(), 
+                    tx.getTransactionDate()))
+            .toList();
+            
+        model.addAttribute("transactions", transactionDTOs);
+        model.addAttribute("hasTransactions", !transactionDTOs.isEmpty());
+        
+        DashboardTransactionDTO latestTx = transactionDTOs.isEmpty() ? null : transactionDTOs.get(0);
         model.addAttribute("latestTransaction", latestTx);
+        
         model.addAttribute("newTransactionForm", new Transaction());
-
         return "dashboard";
     }
 
@@ -69,14 +91,24 @@ public class DashboardController {
                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDate,
                                        @RequestParam Long lastId,
                                        @RequestParam(defaultValue = "10") int size) {
-        
+                                       
         Long currentUserId = (Long) session.getAttribute("userId");
         
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "transactionDate", "id"));
         Page<Transaction> txPage = transactionRepository.findAll(
                 TransactionSpecification.isRelatedToUserIdWithCursor(currentUserId, lastDate, lastId), pageable);
 
-        model.addAttribute("transactions", txPage.getContent());
+        // MAP TRANSACTION SANG DTO KHI LOAD MORE
+        List<DashboardTransactionDTO> transactionDTOs = txPage.getContent().stream()
+            .map(tx -> new DashboardTransactionDTO(
+                    tx.getId(), 
+                    tx.getTransactionId(), 
+                    tx.getType(), 
+                    tx.getAmount(), 
+                    tx.getTransactionDate()))
+            .toList();
+
+        model.addAttribute("transactions", transactionDTOs);
         return "dashboard :: txItems"; 
     }
 }

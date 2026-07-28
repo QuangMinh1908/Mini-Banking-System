@@ -49,6 +49,12 @@ public class Account {
     @Column(name = "transaction_limit")
     private String transactionLimit = "50M";
 
+    @Column(name = "interest_rate", precision = 5, scale = 2)
+    private java.math.BigDecimal interestRate;
+
+    @Column(name = "term_months")
+    private Integer termMonths;
+
     // tự động gán ngày mở tài khoản khi tạo mới
     @PrePersist
     protected void onCreate() {
@@ -87,4 +93,10 @@ public class Account {
 
     public String getTransactionLimit() { return transactionLimit; }
     public void setTransactionLimit(String transactionLimit) { this.transactionLimit = transactionLimit; }
+
+    public java.math.BigDecimal getInterestRate() { return interestRate; }
+    public void setInterestRate(java.math.BigDecimal interestRate) { this.interestRate = interestRate; }
+
+    public Integer getTermMonths() { return termMonths; }
+    public void setTermMonths(Integer termMonths) { this.termMonths = termMonths; }
 }

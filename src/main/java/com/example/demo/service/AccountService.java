@@ -24,7 +24,7 @@ public class AccountService {
     }
 
     @Transactional
-    public Account createNewAccountForUser(Long userId, String accountType, String transactionLimit) {
+    public Account createNewAccountForUser(Long userId, String accountType, String transactionLimit, Integer termMonths, java.math.BigDecimal interestRate) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng trong hệ thống!"));
 
@@ -39,13 +39,23 @@ public class AccountService {
             newAccount.setUser(user);
             newAccount.setBalance(BigDecimal.ZERO);
             newAccount.setAccountType(AccountType.valueOf(accountType.toUpperCase()));
-            newAccount.setTransactionLimit(transactionLimit);
+            
+            // XỬ LÝ LƯU DỮ LIỆU THEO LOẠI TÀI KHOẢN
+            if ("SAVING".equals(accountType)) {
+                newAccount.setTransactionLimit(null);
+                newAccount.setTermMonths(termMonths);
+                newAccount.setInterestRate(interestRate);
+            } else {
+                newAccount.setTransactionLimit(transactionLimit);
+                newAccount.setTermMonths(null);
+                newAccount.setInterestRate(null);
+            }
             
             try {
                 newAccount = accountRepository.save(newAccount);
-                isSaved = true; 
+                isSaved = true;
             } catch (DataIntegrityViolationException e) {
-                System.out.println("Cảnh báo: Trùng số tài khoản " + newAccNum + ", hệ thống đang tạo số mới...");
+                System.out.println("Cảnh báo: Trùng số tài khoản " + newAccNum + ", hệ thống đang tạo lại...");
             }
         } while (!isSaved);
 

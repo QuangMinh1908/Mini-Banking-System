@@ -86,8 +86,15 @@
                             <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
                                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                                        <p class="card-label">Số dư (<span th:text="${acc.accountType == 'PAYMENT' ? 'Thanh toán' : 'Tiết kiệm'}"></span>)</p>
-                                        <span class="badge server-badge" th:text="'Hạn mức: ' + (${acc.transactionLimit == '50M' ? '50.000.000đ' : (acc.transactionLimit == '500M' ? '500.000.000đ' : 'Không giới hạn')})"></span>
+                                        <p class="card-label">Số tài khoản (<span th:text="${acc.accountType.name() == 'PAYMENT' ? 'Thanh toán' : 'Tiết kiệm'}"></span>)</p>
+    
+                                        <span th:if="${acc.accountType.name() == 'PAYMENT'}" class="badge server-badge" 
+                                            th:text="'Hạn mức: ' + (${acc.transactionLimit == '50M' ? '50.000.000' : (acc.transactionLimit == '500M' ? '500.000.000' : 'Không giới hạn')})">
+                                        </span>
+
+                                        <span th:if="${acc.accountType.name() == 'SAVING'}" class="badge server-badge" style="background-color: #dcfce7; color: #166534;"
+                                            th:text="'Kỳ hạn ' + ${acc.termMonths} + ' tháng | Lãi: ' + ${acc.interestRate} + '%/năm'">
+                                        </span>
                                     </div>
                                     <h2 class="amount-text amount-positive"
                                          th:text="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'" style="font-size: 1.75rem;">

@@ -380,19 +380,36 @@
       <div class="wizard-step" id="wizard-step-2" style="display: none;">
         <div class="dashboard-form">
           <div class="input-group">
-            <label>Loại tài khoản (Dự kiến mở rộng):</label>
-            <select id="wizardAccType">
-              <option value="PAYMENT">Tài khoản Thanh toán Nội địa (VND)</option>
+            <label>Loại tài khoản:</label>
+            <select id="wizardAccType" onchange="toggleAccountFields()">
+              <option value="PAYMENT">Tài khoản Thanh toán (VND)</option>
               <option value="SAVING">Tài khoản Tiết kiệm</option>
             </select>
           </div>
-          <div class="input-group">
-            <label>Hạn mức giao dịch / ngày (Dự kiến mở rộng):</label>
+          
+          <div class="input-group" id="paymentConfigGroup">
+            <label>Hạn mức giao dịch / ngày:</label>
             <select id="wizardLimit">
               <option value="50M">Cơ bản: 50.000.000 VND</option>
               <option value="500M">Nâng cao: 500.000.000 VND</option>
               <option value="UNLIMITED">Không giới hạn</option>
             </select>
+          </div>
+
+          <div id="savingConfigGroup" style="display: none; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="input-group">
+              <label>Kỳ hạn (Tháng):</label>
+              <select id="wizardTerm">
+                <option value="3">3 Tháng</option>
+                <option value="6">6 Tháng</option>
+                <option value="12">12 Tháng</option>
+                <option value="24">24 Tháng</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Lãi suất (%/năm):</label>
+              <input type="number" id="wizardInterest" step="0.1" value="5.5" min="0.1" max="15.0">
+            </div>
           </div>
         </div>
         <div class="modal-actions" style="justify-content: space-between; margin-top: 2rem;">

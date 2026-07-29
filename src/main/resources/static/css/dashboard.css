@@ -371,3 +371,162 @@
 .btn-secondary:hover { background-color: #e2e8f0; }
 .btn-danger { background-color: #ef4444; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 500; border: none; cursor: pointer; }
 .btn-danger:hover { background-color: #dc2626; }
+
+/* CARD */
+.bank-card {
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 210px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bank-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.25);
+}
+
+/* Gradient riêng cho Thanh toán */
+.bank-card.payment {
+    background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Gradient riêng cho Tiết kiệm */
+.bank-card.saving {
+    background: linear-gradient(135deg, #065f46 0%, #0d9488 100%);
+    border: 1px solid rgba(20, 184, 166, 0.3);
+}
+
+/* Hiệu ứng Chip thẻ ngân hàng giả lập */
+.card-chip {
+    width: 38px;
+    height: 28px;
+    background: linear-gradient(135deg, #fde047 0%, #ca8a04 100%);
+    border-radius: 5px;
+    margin-top: 0.5rem;
+    position: relative;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);
+}
+
+.card-chip::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0; height: 1px;
+    background: rgba(0,0,0,0.25);
+}
+
+/* ẩn/hiện số dư */
+.toggle-balance-btn:hover {
+    color: #ffffff !important;
+}
+
+/* POP-UP LỊCH SỬ GIAO DỊCH (TRANSACTION MODAL) */
+.tx-modal-container {
+    max-width: 650px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 1.5rem;
+}
+
+.tx-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.tx-modal-header h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.25rem;
+}
+
+.btn-close-tx {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.btn-close-tx:hover {
+    color: #0f172a;
+}
+
+.tx-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.tx-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.tx-card-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #ffffff;
+    text-align: left;
+}
+
+.tx-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+.tx-card-title {
+    font-size: 1.05rem;
+}
+
+.tx-card-title span {
+    color: #2563eb;
+}
+
+.tx-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.tx-badge.deposit {
+    background: #d1fae5;
+    color: #10b981;
+}
+
+.tx-badge.withdraw {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.tx-card-time {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+}
+
+.tx-card-detail {
+    font-size: 0.9rem;
+    background: #f8fafc;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px dashed #cbd5e1;
+}

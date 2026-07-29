@@ -15,6 +15,7 @@ public class DashboardAccountDTO {
 
     public DashboardAccountDTO(String accountNumber, AccountType accountType, String transactionLimit, 
                                BigDecimal balance, LocalDateTime dateOpen, BigDecimal interestRate, Integer termMonths) {
+        this.accountNumber = accountNumber;
         this.accountType = accountType;
         this.transactionLimit = transactionLimit;
         this.balance = balance;

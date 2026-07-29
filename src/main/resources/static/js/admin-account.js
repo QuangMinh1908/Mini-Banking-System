@@ -20,6 +20,7 @@ function viewAccountDetails(accountNumber) {
     document.getElementById('accOwnerPhone').textContent = 'Đang tải...';
     document.getElementById('accOwnerEmail').textContent = 'Đang tải...';
 
+    // Reset trạng thái ẩn/hiện của 2 dòng thông tin
     const savingRow = document.getElementById('savingRow');
     const limitRow = document.getElementById('limitRow');
     if (savingRow) savingRow.style.display = 'none';
@@ -34,7 +35,7 @@ function viewAccountDetails(accountNumber) {
             return response.json();
         })
         .then(data => {
-            // 3. Lấy dữ liệu đổ ra UI
+            // 3. Đổ dữ liệu ra UI
             document.getElementById('accOwnerName').textContent = data.ownerName;
             document.getElementById('accOwnerAvatar').textContent = data.ownerName ? data.ownerName.charAt(0).toUpperCase() : 'U';
             document.getElementById('accOwnerId').textContent = 'ID Khách hàng: #KH' + data.ownerId.toString().padStart(3, '0');

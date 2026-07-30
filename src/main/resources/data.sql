@@ -180,20 +180,5 @@ ALTER TABLE accounts ALTER COLUMN id RESTART WITH 201;;
 ALTER TABLE transactions ALTER COLUMN id RESTART WITH 503;;
 ALTER TABLE user_update_requests ALTER COLUMN id RESTART WITH 1;;
 
-CREATE OR REPLACE FUNCTION auto_create_account() RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.role = 'user' THEN
-        INSERT INTO accounts (account_number, account_type, transaction_limit, balance, date_open, user_id)
-        VALUES ('KH' || LPAD(NEW.id::TEXT, 3, '0'), 'PAYMENT', '50M', 0.00, CURRENT_TIMESTAMP, NEW.id);
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;;
-
-CREATE TRIGGER trigger_auto_create_account
-AFTER INSERT ON users
-FOR EACH ROW
-EXECUTE FUNCTION auto_create_account();;
-
 CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone_number);;
 CREATE INDEX IF NOT EXISTS idx_users_fullname ON users(full_name);;

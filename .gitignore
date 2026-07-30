@@ -11,6 +11,7 @@ HelloController.class
 # test_results/
 # logs/
 target/
+.vscode/
 
 # 4. Bỏ qua file môi trường (Cực kỳ quan trọng để không lộ key/mật khẩu)
 # .env

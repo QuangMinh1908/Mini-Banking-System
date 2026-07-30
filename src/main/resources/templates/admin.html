@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>Admin - Quản lý Khách hàng</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+
+  <script th:src="@{/js/common.js}" defer></script>
+  <script th:src="@{/js/admin-user.js}" defer></script>
+</head>
+<body>
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a th:href="@{/admin}" style="text-decoration: none; display: block; cursor: pointer;">
+          <div class="logo-wrapper">
+            <div class="logo-icon-small">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+            </div>
+            <h2 class="logo-text">E-Banking</h2>
+          </div>
+        </a>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a th:href="@{/admin}" class="active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Quản lý Khách hàng
+          </a>
+        </li>
+        <li>
+          <a th:href="@{/admin/account}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Quản lý Tài khoản
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="logout-link" id="logoutLink">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Đăng xuất
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="user-profile">
+          <span class="user-name"> Quản trị viên </span>
+          <div class="avatar" style="background-color: #ef4444;">AD</div>
+        </div>
+      </header>
+
+      <div class="content-scroll-area">
+        <div class="admin-container">
+          
+          <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}"></span>
+          </div>
+          <div th:if="${param.error}" style="margin-top: 1rem; padding: 0.75rem; border-radius: 0.5rem; background: #fee2e2; color: #b91c1c; font-size: 0.875rem;">
+            <span>Đăng nhập hoặc mật khẩu không chính xác.</span>
+          </div>
+          
+          <div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <h2>Danh sách Khách hàng</h2>
+  
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn-primary" onclick="openCreateAccountWizard()" style="background-color: #2563eb; display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Mở tài khoản mới
+              </button>
+
+              <button class="btn-primary" id="btnOpenRequests" style="background-color: #f59e0b; border-color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Danh sách Yêu cầu
+              </button>
+            </div>
+          </div>
+
+          <!-- FORM TÌM KIẾM -->
+          <form th:action="@{/admin}" method="get" class="filter-bar admin-bento-card" style="overflow: visible;">
+            
+            <div class="search-wrapper" id="searchContainer">
+              <input type="text" name="searchName" id="mainSearchInput" class="main-search-input" 
+                     placeholder="Tìm kiếm theo Tên khách hàng..." autocomplete="off" th:value="${param.searchName}">
+              
+              <div class="search-tags-container" id="activeSearchTags"></div>
+
+              <div class="advanced-popup">
+                  <input type="number" name="searchId" placeholder="Nhập ID khách hàng... (VD: 1)" th:value="${param.searchId}">
+                  <input type="text" name="searchPhone" placeholder="Nhập Số điện thoại..." th:value="${param.searchPhone}">
+              </div>
+            </div>
+
+            <select class="filter-select">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="active">Đang hoạt động</option>
+              <option value="locked">Bị khóa</option>
+            </select>
+            <button type="submit" class="btn-primary" style="padding: 0.65rem 1.25rem;">Lọc / Tìm kiếm</button>
+          </form>
+
+          <div class="table-container admin-bento-card flex-table-card">
+            <div class="table-scroll-area">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Họ và Tên</th>
+                    <th>Số điện thoại</th>
+                    <th>Trạng thái</th>
+                    <th style="text-align: center;">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="user : ${userPage.content}" 
+                    th:attr="onclick=|viewUserDetails('${user.id}')|" 
+                    style="cursor: pointer; transition: background-color 0.2s;">
+                    <td th:text="'#KH' + ${#numbers.formatInteger(user.id, 3)}">#KH001</td>
+                    <td th:text="${user.fullName}">Nguyễn Văn A</td>
+                    <td th:text="${user.phoneNumber}">0123456789</td>
+                    <td><span class="badge badge-active">Hoạt động</span></td>
+                    <td class="action-cell">
+                      <button type="button" class="btn-icon" title="Xem chi tiết" 
+                        th:attr="onclick=|event.stopPropagation(); viewUserDetails('${user.id}')|">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      </button>
+                      <button type="button" class="btn-icon" title="Chỉnh sửa tài khoản" 
+                        th:attr="onclick=|event.stopPropagation(); openEditModal('${user.id}')|">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr th:if="${userPage.empty}">
+                    <td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">
+                      Không tìm thấy khách hàng nào.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination" th:if="${userPage.totalPages > 0}">
+              <!-- Nút "Trước" -->
+              <a class="page-btn" 
+                th:if="${not userPage.first}"
+                th:href="@{/admin(page=${userPage.number - 1}, size=${userPage.size}, searchId=${searchId}, searchName=${searchName}, searchPhone=${searchPhone})}">
+                Trước
+              </a>
+              <span class="page-btn disabled" th:if="${userPage.first}">Trước</span>
+
+              <th:block th:each="i : ${#numbers.sequence(0, userPage.totalPages - 1)}">
+                  
+                  <!-- Dấu ... phía trước -->
+                  <span class="page-btn disabled" style="border: none; background: transparent; pointer-events: none;"
+                        th:if="${i == (userPage.number - 3) and i > 0}">...</span>
+
+                  <!-- Nút số -->
+                  <a class="page-btn" 
+                     th:if="${i == 0 or i == (userPage.totalPages - 1) or (i >= userPage.number - 2 and i <= userPage.number + 2)}"
+                     th:classappend="${userPage.number == i} ? 'active' : ''"
+                     th:href="@{/admin(page=${i}, size=${userPage.size}, searchId=${searchId}, searchName=${searchName}, searchPhone=${searchPhone})}"
+                     th:text="${i + 1}">1
+                  </a>
+
+                  <!-- Dấu ... phía sau -->
+                  <span class="page-btn disabled" style="border: none; background: transparent; pointer-events: none;"
+                        th:if="${i == (userPage.number + 3) and i < (userPage.totalPages - 1)}">...</span>
+              </th:block>
+
+              <!-- Nút "Sau" -->
+              <a class="page-btn" 
+                th:if="${not userPage.last}"
+                th:href="@{/admin(page=${userPage.number + 1}, size=${userPage.size}, searchId=${searchId}, searchName=${searchName}, searchPhone=${searchPhone})}">
+                Sau
+              </a>
+              <span class="page-btn disabled" th:if="${userPage.last}">Sau</span>
+              
+              <!-- Nhảy trang-->
+              <div style="display: flex; align-items: center; margin-left: 1rem; gap: 0.5rem; border-left: 2px solid #e2e8f0; padding-left: 1.5rem;" th:if="${userPage.totalPages > 1}">
+                  <span style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Đến trang:</span>
+                  <input type="number" class="jump-page-input" min="1" th:max="${userPage.totalPages}" 
+                         style="width: 55px; padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; outline: none; font-size: 0.9rem;"
+                         placeholder="...">
+              </div>
+            </div>
+          </div>
+
+  <div class="modal-overlay" id="editUserModal">
+    <div class="modal-box admin-bento-card" style="max-width: 750px; text-align: left;">
+      <div class="modal-header">
+        <h3>Chỉnh Sửa Khách Hàng</h3>
+        <button id="btnCloseEditForm" class="btn-close-modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+        
+      <form th:action="@{/admin/update-user}" method="post" class="dashboard-form" style="grid-template-columns: 1fr 1fr; align-items: start;">
+        <input type="hidden" id="editId" name="id">
+         
+        <div class="input-group">
+          <label>Tên đăng nhập (Không thể sửa):</label>
+          <input type="text" id="editUserName" name="username" readonly class="input-readonly">
+        </div>
+        
+        <div class="input-group">
+          <label>Họ tên:</label>
+          <input type="text" id="editFullName" name="fullName" 
+                 minlength="3" 
+                 maxlength="100" 
+                 title="Họ tên phải có ít nhất 3 ký tự"
+                 placeholder="VD: Nguyễn Văn A">
+        </div>
+        
+        <div class="input-group">
+          <label>Số điện thoại:</label>
+          <input type="text" id="editPhoneNumber" name="phoneNumber" 
+                 maxlength="10" 
+                 minlength="10"
+                 pattern="^0[0-9]{9}$"
+                 title="Số điện thoại phải gồm đúng 10 chữ số và bắt đầu bằng số 0"
+                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                 placeholder="VD: 0987654321">
+        </div>
+        
+        <div class="input-group">
+          <label>Email:</label>
+          <input type="email" id="editEmail" name="email" 
+                 pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                 title="Vui lòng nhập đúng định dạng email (VD: abc@gmail.com)"
+                 placeholder="VD: email@gmail.com">
+        </div>
+        
+        <div class="input-group">
+          <label>Địa chỉ:</label>
+          <input type="text" id="editAddress" name="address" 
+                 minlength="5" 
+                 title="Vui lòng nhập địa chỉ cụ thể (ít nhất 5 ký tự)"
+                 placeholder="VD: Quận 1, TP.HCM">
+        </div>
+        
+        <div class="input-group">
+          <label>Giới tính:</label>
+          <select id="editGender" name="gender"style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none; background-color: #f8fafc;">
+            <option value="">-- Chọn giới tính --</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
+          </select>
+        </div>
+
+        <div class="input-group" style="grid-column: span 2;">
+          <label>Lý do / Chi tiết thay đổi:</label>
+          <textarea id="editDetail" name="detail" rows="2" 
+                    class="auto-resize-textarea"
+                    placeholder="Ghi chú chi tiết hoặc lý do thay đổi..."></textarea>
+        </div>
+
+        <div style="grid-column: span 2; margin-top: 0.5rem;">
+            <button type="submit" class="btn-primary w-100">Gửi Yêu Cầu Chỉnh Sửa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="userDetailsModal">
+    <div class="modal-box admin-bento-card" style="max-width: 650px; text-align: left;">
+      <div class="modal-header">
+        <h3>Chi tiết Khách hàng</h3>
+        <button id="btnCloseUserDetails" class="btn-close-modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    
+      <div class="dashboard-form" style="grid-template-columns: 1fr 1fr; margin-bottom: 1.5rem; background: #ffffff; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <p><strong>ID:</strong> <span id="detailId" style="color: #2563eb;"></span></p>
+        <p><strong>Tên đăng nhập:</strong> <span id="detailUsername"></span></p>
+        <p><strong>Họ tên:</strong> <span id="detailFullName"></span></p>
+        <p><strong>SĐT:</strong> <span id="detailPhone"></span></p>
+        <p><strong>Email:</strong> <span id="detailEmail"></span></p>
+        <p><strong>Giới tính:</strong> <span id="detailGender"></span></p>
+        <p><strong>Ngày tạo:</strong> <span id="detailCreatedAt"></span></p>
+        <p style="grid-column: span 2;"><strong>Địa chỉ:</strong> <span id="detailAddress"></span></p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <h4 style="margin: 0; color: #0f172a;">Danh sách Tài khoản Ngân hàng</h4>
+        <button id="btnCreateAccount" class="btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.35rem; border-radius: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Mở tài khoản
+        </button>
+      </div>
+      <div class="table-container admin-bento-card" style="padding: 0; box-shadow: none; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+        <div class="table-scroll-area" style="max-height: 220px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Số tài khoản</th>
+                <th>Ngày mở</th>
+              </tr>
+            </thead>
+            <tbody id="detailAccountsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="requestsModal">
+    <div class="modal-box admin-bento-card" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column; text-align: left;">
+      <div class="modal-header" style="margin-bottom: 1rem;">
+        <h3>Danh sách Yêu cầu Chỉnh sửa</h3>
+        <button id="btnCloseRequests" class="btn-close-modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      
+      <div id="requestListContainer" style="flex: 1; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 1rem;">
+      </div>
+      
+      <div id="loadingRequests" style="text-align: center; padding: 1rem; color: #64748b; font-size: 0.9rem; display: none;">
+         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+         <br>Đang tải thêm...
+      </div>
+    </div>
+  </div>
+
+  <!-- MỞ TÀI KHOẢN NGÂN HÀNG-->
+  <div class="modal-overlay" id="createAccountWizardModal">
+    <div class="modal-box admin-bento-card" style="max-width: 600px; text-align: left; position: relative; overflow: visible;">
+      
+      <div class="modal-header">
+        <h3>Mở Tài Khoản Mới</h3>
+        <button id="btnCloseWizard" class="btn-close-modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      
+      <!-- Thanh tiến trình -->
+      <div class="wizard-progress">
+        <div class="progress-step active" id="step1-indicator">1. Khách hàng</div>
+        <div class="progress-step" id="step2-indicator">2. Chi tiết & Cấu hình</div>
+        <div class="progress-step" id="step3-indicator">3. Hoàn tất</div>
+      </div>
+
+      <!-- BƯỚC 1: CHỌN KHÁCH HÀNG -->
+      <div class="wizard-step" id="wizard-step-1">
+        <div class="dashboard-form">
+          <div class="input-group" id="wizardSearchContainer" style="position: relative;">
+            <label>Tìm kiếm Khách hàng:</label>
+            <input type="text" id="wizardSearchInput" placeholder="Nhập ID, SĐT, Tên hoặc Username..." autocomplete="off">
+            <div id="wizardSearchResults" class="wizard-dropdown-list" style="display: none;">
+            </div>
+          </div>
+
+          <div id="wizardSelectedUserBox" style="display: none; padding: 1.25rem; border: 1px solid #bfdbfe; border-radius: 8px; background: #eff6ff;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: #2563eb; text-transform: uppercase; letter-spacing: 0.05em;">Khách hàng đã chọn</span>
+                    <h4 id="wizardUserName" style="margin: 0.5rem 0 0.25rem; color: #0f172a; font-size: 1.15rem;">-</h4>
+                    <p id="wizardUserPhone" style="margin: 0; color: #64748b; font-size: 0.9rem;">-</p>
+                    <input type="hidden" id="wizardUserId">
+                </div>
+                <button type="button" id="btnReselectUser" class="btn-icon" title="Chọn khách hàng khác" style="color: #64748b;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+                </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions" style="justify-content: flex-end; margin-top: 2rem;">
+          <button class="btn-primary" id="btnNextToStep2" disabled style="opacity: 0.5; cursor: not-allowed;">Tiếp tục &rarr;</button>
+        </div>
+      </div>
+
+      <!-- BƯỚC 2: CẤU HÌNH TÀI KHOẢN -->
+      <div class="wizard-step" id="wizard-step-2" style="display: none;">
+        <div class="dashboard-form">
+          <div class="input-group">
+            <label>Loại tài khoản:</label>
+            <select id="wizardAccType" onchange="toggleAccountFields()">
+              <option value="PAYMENT">Tài khoản Thanh toán (VND)</option>
+              <option value="SAVING">Tài khoản Tiết kiệm</option>
+            </select>
+          </div>
+          
+          <div class="input-group" id="paymentConfigGroup">
+            <label>Hạn mức giao dịch / ngày:</label>
+            <select id="wizardLimit">
+              <option value="50M">Cơ bản: 50.000.000 VND</option>
+              <option value="500M">Nâng cao: 500.000.000 VND</option>
+              <option value="UNLIMITED">Không giới hạn</option>
+            </select>
+          </div>
+
+          <div id="savingConfigGroup" style="display: none; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="input-group">
+              <label>Kỳ hạn (Tháng):</label>
+              <select id="wizardTerm">
+                <option value="3">3 Tháng</option>
+                <option value="6">6 Tháng</option>
+                <option value="12">12 Tháng</option>
+                <option value="24">24 Tháng</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Lãi suất (%/năm):</label>
+              <input type="number" id="wizardInterest" step="0.1" value="5.5" min="0.1" max="15.0">
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions" style="justify-content: space-between; margin-top: 2rem;">
+          <button class="btn-secondary" id="btnBackToStep1">&larr; Quay lại</button>
+          <button class="btn-primary" id="btnShowConfirm">Tiếp tục &rarr;</button>
+        </div>
+      </div>
+
+      <!-- BƯỚC 3: THÀNH CÔNG -->
+      <div class="wizard-step" id="wizard-step-3" style="display: none; text-align: center;">
+        <div style="color: #10b981; margin-bottom: 1rem;">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <h3 style="color: #0f172a; margin-bottom: 0.5rem;">Cấp Phát Thành Công!</h3>
+        <p style="color: #64748b; margin-bottom: 1.5rem;">Số tài khoản đã được tự động sinh và lưu vào hệ thống.</p>
+        
+        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px dashed #cbd5e1; text-align: center; margin-bottom: 2rem;">
+          <p style="margin-bottom: 0.25rem; font-size: 0.9rem; color: #64748b;">Số tài khoản mới</p>
+          <div id="successAccNum" style="color: #2563eb; font-size: 2rem; font-weight: 700; letter-spacing: 2px;">-</div>
+        </div>
+        <button class="btn-primary" id="btnFinishWizard" style="width: 100%;">Hoàn tất & Đóng</button>
+      </div>
+
+      <div id="wizardConfirmOverlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(2px); z-index: 10; align-items: center; justify-content: center;border-radius: inherit;">
+        <div style="background: #ffffff; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; text-align: center; width: 85%; position: relative;">
+          <button id="btnCloseConfirmOverlay" style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; color: #94a3b8; padding: 5px;">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          
+          <h4 style="margin: 0 0 0.75rem 0; color: #0f172a; font-size: 1.1rem;">Xác nhận tạo tài khoản?</h4>
+          <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">Hệ thống sẽ thực thi thuật toán sinh số tài khoản ngẫu nhiên (Duy nhất) cho khách hàng <strong id="confirmOverlayName" style="color:#0f172a;">-</strong>.</p>
+          
+          <div style="display: flex; gap: 0.75rem;">
+              <button class="btn-secondary" id="btnCancelWizardAll" style="flex: 1;">Hủy (Đóng Form)</button>
+              <button class="btn-primary" id="btnConfirmCreateAPI" style="flex: 1;">Đồng ý Tạo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:replace="~{fragments :: confirmModal}"></div>
+</body>
+</html>

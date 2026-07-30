@@ -1,0 +1,56 @@
+Bước 1: Thiết lập "Rào chắn an toàn" ở tầng Database (Tùy chọn nhưng khuyên dùng)
+Trước khi viết code Java, chúng ta sẽ gia cố cấu trúc bảng accounts trong cơ sở dữ liệu.
+Hành động: Thêm một ràng buộc (Constraint) kiểu CHECK vào cột số dư (balance) để đảm bảo balance >= 0.
+Mục đích: Đây là chốt chặn cuối cùng. Nếu code Java bị lỗi logic và vô tình làm số dư âm, Database sẽ chặn lệnh
+lưu lại và báo lỗi. Lỗi này sẽ kích hoạt cơ chế Rollback ở Bước 3.
+
+Bước 2: Thiết kế DTO (Data Transfer Object) dùng chung & Cấu hình Validation
+Tạo một DTO duy nhất để hứng dữ liệu từ Form chuyển tiền trên giao diện, dùng chung cho cả 2 hình thức chuyển.
+Hành động: Tạo class TransferRequestDTO.
+Cấu trúc dữ liệu:
+- Tài khoản nguồn (chọn từ danh sách tài khoản của User đang đăng nhập).
+- Tài khoản đích (có thể là Select Box nếu chuyển cùng chủ, hoặc Input Text/Number nếu nhập số tài khoản của người khác).
+- Số tiền cần chuyển.
+- Nội dung giao dịch.
+- Thymeleaf Form Validation: Gắn các annotation kiểm tra hợp lệ (như Không được để trống, Số tiền phải > 0, Giới hạn độ dài nội
+dung...) trực tiếp vào DTO này.
+
+Bước 3: Xây dựng Business Logic & Cơ chế Rollback (Tầng Service)
+Đây là "trái tim" của tính năng. Chúng ta sẽ viết một hàm dùng chung cho mọi giao dịch chuyển tiền.
+Hành động: Tạo hàm transferMoney(...) và bắt buộc đánh dấu bằng Annotation quản lý giao dịch (Transaction Management)
+để đảm bảo nguyên lý "Thành công tất cả hoặc Hủy bỏ tất cả".
+Luồng xử lý (Business Logic) bên trong hàm:
+1. Xác thực nguồn: Lấy thông tin tài khoản nguồn từ DB. Kiểm tra xem tài khoản này có thực sự thuộc về User đang đăng nhập
+hay không (chống gian lận sửa HTML).
+2. Xác thực đích: Truy vấn DB bằng số tài khoản đích. Nếu không tìm thấy -> Ném ngoại lệ "Không tìm thấy tài khoản đích".
+Hệ thống sẽ tự phân biệt đây là chuyển cùng chủ hay khác chủ dựa vào thông tin user_id của tài khoản đích tìm được.
+3. Kiểm tra logic: Đảm bảo tài khoản nguồn và đích khác nhau (không tự chuyển cho chính mình).
+4. Kiểm tra số dư: Đảm bảo tài khoản nguồn có đủ tiền. Nếu không -> Ném ngoại lệ "Số dư không đủ".
+5. Thực thi: Trừ tiền tài khoản nguồn -> Cộng tiền tài khoản đích -> Lưu cả 2 vào DB.
+6. Ghi nhận Lịch sử: Khởi tạo đối tượng Transaction, lưu thông tin (TK nguồn, TK đích, số tiền, loại giao dịch là TRANSFER,
+thời gian) và lưu xuống bảng lịch sử.
+7. Cơ chế Rollback hoạt động: Nhờ cờ Transaction, nếu bất kỳ bước nào từ 1 đến 6 vi phạm và ném ra Ngoại lệ (Exception),
+toàn bộ các lệnh cộng/trừ tiền trước đó sẽ lập tức bị Database thu hồi về trạng thái cũ.
+
+Bước 4: Xử lý Request, Điều hướng & Bắt lỗi (Tầng Controller)
+Nơi tiếp nhận Form submit từ người dùng và phản hồi kết quả.
+Hành động (Chuẩn bị Form - GET): Truy vấn danh sách tài khoản hợp lệ của User đang đăng nhập, khởi tạo TransferRequestDTO rỗng
+và đẩy xuống giao diện.
+Hành động (Xử lý Chuyển tiền - POST):
+1. Hứng DTO và kiểm tra bằng BindingResult.
+2. Nếu BindingResult có lỗi (người dùng nhập chữ vào ô số tiền, để trống...), lập tức trả về lại trang Form kèm cảnh báo lỗi của
+Thymeleaf.
+3. Nếu Form hợp lệ, đưa vào khối try-catch và gọi hàm transferMoney ở Bước 3.
+4. Catch (Bắt lỗi): Nếu bắt được ngoại lệ (do không đủ tiền, sai số tài khoản...), lưu câu thông báo lỗi vào FlashAttributes
+(bộ nhớ tạm) và redirect (chuyển hướng) người dùng về lại trang chuyển tiền.
+5. Success (Thành công): Lưu thông báo "Chuyển tiền thành công" vào FlashAttributes và redirect về trang Dashboard.
+
+Bước 5: Hoàn thiện Giao diện & Form Validation (Tầng View - Thymeleaf)
+Hành động:
+1. Dựng Form chuyển tiền. Bạn có thể làm 1 Form dùng chung (chỉ cần nhập số tài khoản đích) hoặc làm 2 tab giao diện (1 tab liệt
+kê tài khoản nội bộ để chọn nhanh, 1 tab nhập số tài khoản người khác) nhưng khi submit vẫn dùng chung DTO ở Bước 2.
+2. Dưới mỗi ô Input, nhúng các thẻ <span> của Thymeleaf để tự động bắt lỗi từ BindingResult (Bước 4) và hiển thị màu đỏ nếu người
+dùng nhập sai.
+3. Thêm vùng thông báo (Alert) để hiển thị thông báo thành công hoặc lỗi (từ FlashAttributes).
+4. Tự động cập nhật: Vì khi giao dịch thành công, Controller sử dụng lệnh redirect về trang Dashboard, trình duyệt sẽ tự động
+tải lại dữ liệu từ DB. Số dư mới và lịch sử giao dịch sẽ tự động hiển thị chính xác mà không cần viết thêm logic xử lý giao diện nào.

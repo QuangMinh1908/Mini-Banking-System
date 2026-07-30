@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Bảng Điều Khiển Server-side</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrapper">
+                    <div class="logo-icon-small">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+                    </div>
+                    <h2 class="logo-text">E-Banking</h2>
+                </div>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <a class="active" th:href="@{/dashboard}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        Tổng quan
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        Chuyển khoản
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        Báo cáo
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="logout-link" id="logoutLink">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Đăng xuất
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="user-profile">
+                    <span class="user-name" th:text="${username}">Tên người dùng</span>
+                    <div class="avatar" th:text="${#strings.substring(username, 0, 1)}">M</div>
+                </div>
+            </header>
+
+            <div class="content-scroll-area">
+                
+                <div th:if="${successMessage}" class="alert alert-success">
+                    <span th:text="${successMessage}"></span>
+                </div>
+                <div th:if="${txSuccessMessage}" class="alert alert-success">
+                    <span th:text="${txSuccessMessage}"></span>
+                </div>
+                <div th:if="${txErrorMessage}" class="alert alert-error">
+                    <span th:text="${txErrorMessage}"></span>
+                </div>
+
+                <section class="bento-grid-container">
+                    <!-- 1. VÒNG LẶP IN RA CÁC TÀI KHOẢN -->
+                    <div class="bento-card" style="grid-column: 1 / -1; padding: 1.5rem;">
+                        <div class="action-grid" style="grid-template-columns: repeat(4, 1fr); max-width: 800px; margin: 0 auto;">
+                            <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nạp tiền</div>
+                            <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg> Rút tiền</div>
+                            <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> Chuyển khoản</div>
+                            <div class="action-item" id="btnOpenTxHistory">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> 
+                                Lịch sử
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KHUNG 2 CỘT: Tài khoản -->
+                    <div class="bank-cards-grid">
+
+                        <!-- CỘT 1: TÀI KHOẢN THANH TOÁN -->
+                        <div class="bank-card-column">
+                            <h3 class="column-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                    Tài khoản Thanh toán
+                            </h3>
+
+                            <th:block th:each="acc : ${accounts}" th:if="${acc.accountType.name() == 'PAYMENT'}">
+                                <div class="bank-card payment">
+                                    <div class="card-top-row">
+                                        <div>
+                                            <span class="card-type-label">Thẻ Thanh Toán</span>
+                                            <div class="card-chip"></div>
+                                        </div>
+                                        <span class="badge card-badge-glass"
+                                            th:text="'Hạn mức: ' + (${acc.transactionLimit == '50M' ? '50 Tr' : (acc.transactionLimit == '500M' ? '500 Tr' : 'Không giới hạn')})">
+                                        </span>
+                                    </div>
+
+                                    <div class="card-balance-section">
+                                        <div class="card-balance-header">
+                                            <p class="card-balance-label">Số dư khả dụng</p>
+                                            <button type="button" class="toggle-balance-btn" title="Ẩn/Hiện số dư">
+                                                <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                                <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: block;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                            </button>
+                                        </div>
+                                        <h2 class="balance-value card-balance-amount"
+                                            th:data-raw-balance="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'"
+                                            data-hidden="true">•••••••• VND
+                                        </h2>
+                                    </div>
+
+                                    <div class="card-footer-row">
+                                        <div>
+                                            <span class="card-footer-sub">SỐ TÀI KHOẢN (STK)</span>
+                                            <strong class="card-acc-number" th:text="${acc.accountNumber}"></strong>
+                                        </div>
+                                        <div class="card-date-box">
+                                            <span class="card-footer-sub">MỞ NGÀY</span>
+                                            <span class="card-date-val" th:text="${#temporals.format(acc.dateOpen, 'dd/MM/yyyy')}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
+
+                        <!-- CỘT 2: SỔ TIẾT KIỆM -->
+                        <div class="bank-card-column">
+                            <h3 class="column-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                Sổ Tiết Kiệm
+                            </h3>
+
+                            <th:block th:each="acc : ${accounts}" th:if="${acc.accountType.name() == 'SAVING'}">
+                                <div class="bank-card saving">
+                                    <div class="card-top-row">
+                                        <div>
+                                            <span class="card-type-label">Sổ Tiết Kiệm</span>
+                                            <div class="card-chip"></div>
+                                        </div>
+                                        <span class="badge card-badge-glass"
+                                            th:text="'Lãi: ' + ${acc.interestRate} + '%/năm (' + ${acc.termMonths} + ' tháng)'">
+                                        </span>
+                                    </div>
+
+                                    <div class="card-balance-section">
+                                        <div class="card-balance-header">
+                                            <p class="card-balance-label">Số dư khả dụng</p>
+                                            <button type="button" class="toggle-balance-btn" title="Ẩn/Hiện số dư">
+                                                <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                                <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: block;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                            </button>
+                                        </div>
+                                        <h2 class="balance-value card-balance-amount"
+                                            th:data-raw-balance="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'"
+                                            data-hidden="true">•••••••• VND
+                                        </h2>
+                                    </div>
+
+                                    <div class="card-footer-row">
+                                        <div>
+                                            <span class="card-footer-sub">SỐ TÀI KHOẢN (STK)</span>
+                                            <strong class="card-acc-number" th:text="${acc.accountNumber}"></strong>
+                                        </div>
+                                        <div class="card-date-box">
+                                            <span class="card-footer-sub">MỞ NGÀY</span>
+                                            <span class="card-date-val" th:text="${#temporals.format(acc.dateOpen, 'dd/MM/yyyy')}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- POP-UP LỊCH SỬ GIAO DỊCH -->
+    <div class="modal-overlay" id="transactionHistoryModal">
+        <div class="modal-box bento-card tx-modal-container">
+            
+            <div class="tx-modal-header">
+                <h3>Lịch sử giao dịch</h3>
+                <button id="btnCloseTxModal" class="btn-close-tx">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div class="tx-scroll-area" id="txModalScrollArea">
+                <div id="transactionList" th:if="${hasTransactions}" class="tx-card-list">
+                    <th:block th:fragment="txItems">
+                        
+                        <div th:each="tx : ${transactions}" class="tx-card-item"
+                             th:attr="data-id=${tx.id}, data-date=${tx.transactionDate}">
+
+                            <div class="tx-card-header">
+                                <strong class="tx-card-title">
+                                    GD: <span th:text="${tx.type.name() == 'DEPOSIT' ? 'Nạp tiền' : (tx.type.name() == 'WITHDRAW' ? 'Rút tiền' : 'Chuyển khoản')}"></span>
+                                </strong>
+                                <!-- Dùng th:classappend để gắn màu động (deposit/withdraw) tùy theo loại giao dịch -->
+                                <span class="tx-badge"
+                                      th:classappend="${tx.type.name() == 'DEPOSIT' ? 'deposit' : 'withdraw'}"
+                                      th:text="${tx.type.name() == 'DEPOSIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                                </span>
+                            </div>
+
+                            <p class="tx-card-time">
+                                Thời gian: <span th:text="${#temporals.format(tx.transactionDate, 'dd/MM/yyyy HH:mm')}"></span>
+                            </p>
+
+                            <div class="tx-card-detail">
+                                <div><strong>Mã giao dịch:</strong> <span th:text="${tx.transactionId}"></span></div>
+                            </div>
+                        </div>
+                        
+                    </th:block>
+                </div>
+                
+                <div id="loadingIndicator" style="display: none; text-align: center; padding: 1.5rem; color: #64748b; font-size: 0.9rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                    <br> Đang tải thêm...
+                </div>
+                
+                <div class="empty-state" th:unless="${hasTransactions}">
+                    <p>Danh sách giao dịch sẽ hiển thị khi có yêu cầu.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments :: confirmModal}"></div>
+
+<script th:src="@{/js/common.js}" defer></script>
+<script th:src="@{/js/dashboard.js}" defer></script>
+</body>
+</html>

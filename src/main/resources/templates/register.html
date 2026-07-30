@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <title>E-Banking - Đăng ký tài khoản</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+<div class="login-container" style="padding: 2rem 0;">
+  <div class="login-header-top" style="margin-top: 1rem !important;">
+    <div class="logo-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>        
+    </div>
+    <h1> Tạo tài khoản mới </h1>
+    <p> Trải nghiệm E-Banking ngay hôm nay </p>
+  </div>
+
+  <div class="login-box bento-card">
+    <form id="regForm" th:action="@{/register}" th:object="${user}" method="post" class="login-form" autocomplete="off">
+      <!-- ================= BƯỚC 1: THÔNG TIN CƠ BẢN ================= -->
+      <div id="step1">
+        <h3 style="margin-bottom: 1rem; color: #0f172a; font-size: 1.1rem;">Bước 1: Thông tin cơ bản</h3>
+        
+        <div class="input-group">
+          <label for="username">Tên đăng nhập</label>
+          <input type="text" id="username" th:field="*{username}" placeholder="Ví dụ: user123" required minlength="3" maxlength="50">
+        </div>
+
+        <div class="input-group">
+          <label for="password">Mật khẩu</label>
+          <input type="password" id="password" th:field="*{password}" placeholder="••••••••" required minlength="6">
+        </div>
+
+        <div class="input-group">
+          <label for="fullName">Họ và tên</label>
+          <input type="text" id="fullName" th:field="*{fullName}" placeholder="Ví dụ: Nguyễn Văn A" required>
+        </div>
+
+        <div class="input-group">
+          <label for="phoneNumber">Số điện thoại</label>
+          <input type="text" id="phoneNumber" th:field="*{phoneNumber}" placeholder="Ví dụ: 0987654321" required pattern="^0[0-9]{9}$" title="SĐT bắt đầu bằng số 0 và gồm 10 chữ số">
+        </div>
+
+        <button type="button" class="btn-primary login-btn" style="margin-top: 1rem;" onclick="goToStep2()">Tiếp tục &rarr;</button>
+      </div>
+
+      <!-- ================= BƯỚC 2: THÔNG TIN KHÁCH HÀNG ================= -->
+      <div id="step2" style="display: none;">
+        <h3 style="margin-bottom: 1rem; color: #0f172a; font-size: 1.1rem;">Bước 2: Thông tin bổ sung</h3>
+        
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" th:field="*{email}" placeholder="Ví dụ: email@gmail.com" required>
+        </div>
+
+        <div class="input-group">
+          <label for="address">Địa chỉ</label>
+          <input type="text" id="address" th:field="*{address}" placeholder="Ví dụ: Quận 1, TP.HCM" required>
+        </div>
+
+        <div class="input-group">
+          <label for="gender">Giới tính</label>
+          <select id="gender" th:field="*{gender}" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none; background-color: #f8fafc;" required>
+            <option value="">-- Chọn giới tính --</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="button" class="btn-secondary" style="flex: 1;" onclick="goToStep1()">&larr; Quay lại</button>
+            <button type="submit" class="btn-primary login-btn" style="flex: 1; margin-top: 0;">Hoàn tất</button>
+        </div>
+      </div>
+
+      <!-- Báo lỗi -->
+      <div th:if="${errorMessage}" style="margin-top: 1.25rem; padding: 0.75rem; border-radius: 0.5rem; background: #fee2e2; color: #b91c1c; font-size: 0.875rem; text-align: center;">
+        <span th:text="${errorMessage}"></span>
+      </div>
+    </form>
+  </div>
+
+  <div class="login-footer">
+    Đã có tài khoản? <a th:href="@{/login}">Đăng nhập ngay</a>
+  </div>
+</div>
+
+<script th:src="@{/js/register.js}" defer></script>
+</body>
+</html>

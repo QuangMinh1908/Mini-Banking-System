@@ -14,4 +14,5 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @EntityGraph(attributePaths = {"accounts"})
     @Query("SELECT u FROM User u WHERE u.id = :id")
     Optional<User> findByIdWithAccounts(@Param("id") Long id);
+    boolean existsByPhoneNumber(String phoneNumber);
 }

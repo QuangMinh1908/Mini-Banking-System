@@ -634,3 +634,33 @@
 .card-date-val {
     font-weight: 500;
 }
+
+/* nút ẩn/hiện số dư */
+.toggle-balance-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.9);
+    transition: all 0.2s ease;
+    padding: 0;
+    backdrop-filter: blur(4px);
+}
+
+.toggle-balance-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #ffffff !important;
+    transform: scale(1.05);
+}
+
+.toggle-balance-btn svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+}

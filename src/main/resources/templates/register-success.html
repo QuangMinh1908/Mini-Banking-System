@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấp phát tài khoản thành công</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+<div class="login-container">
+  <div class="login-box bento-card" style="text-align: center; padding: 3rem 2rem;">
+    
+    <div style="color: #10b981; margin-bottom: 1rem;">
+      <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+    </div>
+    
+    <h2 style="color: #0f172a; margin-bottom: 0.5rem; font-size: 1.5rem;">Cấp Phát Thành Công!</h2>
+    <p style="color: #64748b; margin-bottom: 2rem;">Chào mừng bạn đến với E-Banking. Một tài khoản thanh toán đã được tạo tự động cho bạn.</p>
+    
+    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px dashed #cbd5e1; text-align: center; margin-bottom: 2rem;">
+      <p style="margin-bottom: 0.25rem; font-size: 0.9rem; color: #64748b;">Số tài khoản của bạn</p>
+      <div style="color: #2563eb; font-size: 2.2rem; font-weight: 700; letter-spacing: 2px;" th:text="${accountNumber}">8800000000</div>
+    </div>
+
+    <a th:href="@{/dashboard}" class="btn-primary" style="display: block; width: 100%; padding: 1rem; text-decoration: none;">Vào Bảng điều khiển ngay</a>
+    
+  </div>
+</div>
+</body>
+</html>

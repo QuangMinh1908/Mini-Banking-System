@@ -1,13 +1,18 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Nếu server trả về lỗi (ví dụ trùng SĐT), tự động hiện lại Step 1 nếu lỗi nằm ở step 1
-    const errorMessage = document.querySelector('div[th:if="${errorMessage}"], [style*="fee2e2"]');
-    if (errorMessage && errorMessage.textContent.trim() !== "") {
-        // Có lỗi -> Giữ ở Step 1 vì Username/SĐT nằm ở Step 1
-        document.getElementById('step1').style.display = 'block';
-        document.getElementById('step2').style.display = 'none';
+    // 1. Logic ẩn/hiện mật khẩu
+    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+    const passwordInput = document.getElementById("password");
+
+    if (togglePasswordBtn && passwordInput) {
+        togglePasswordBtn.addEventListener("click", function () {
+            const isPassword = passwordInput.getAttribute("type") === "password";
+            passwordInput.setAttribute("type", isPassword ? "text" : "password");
+            this.textContent = isPassword ? "🙈" : "👁️";
+            this.title = isPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu";
+        });
     }
 
-    // Chặn nhấn Enter submit form bậy bạ ở Bước 1
+    // 2. chặn nhấn Enter submit form ở Bước 1
     const step1Inputs = document.querySelectorAll('#step1 input');
     step1Inputs.forEach(input => {
         input.addEventListener('keypress', function(e) {

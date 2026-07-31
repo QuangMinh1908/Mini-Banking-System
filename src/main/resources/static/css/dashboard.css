@@ -337,6 +337,36 @@
   background-color: #ffffff;
 }
 
+/* Viền đỏ cho ô nhập bị lỗi validation (BindingResult) */
+.input-group input.input-invalid,
+.input-group select.input-invalid {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+/* Thông báo lỗi field-level hiển thị dưới mỗi ô input (Thymeleaf th:errors) */
+.field-error {
+  display: block;
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+  font-weight: 500;
+}
+
+/* Ghi chú phụ dưới ô input (VD: chưa có tài khoản khả dụng) */
+.input-hint {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+/* Khung form Chuyển khoản (trang /dashboard/transfer) */
+.transfer-form-card {
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 .btn-primary {
   background-color: #0f172a;
   color: #ffffff;

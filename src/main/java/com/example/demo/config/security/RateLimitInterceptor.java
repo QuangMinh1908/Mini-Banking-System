@@ -24,8 +24,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         }, 1, 1, TimeUnit.MINUTES);
     }
 
-    // Dựa vào cấu hình của Spring Boot,sẽ trả về IP thật của client hoặc IP của proxy nếu chưa được cấu hình đúng.
-    private String getClientIp(HttpServletRequest request) {    
+    private String getClientIp(HttpServletRequest request) {
         return request.getRemoteAddr();
     }
 

@@ -1,6 +1,9 @@
 package com.example.demo.exception;
 
 import com.example.demo.dto.ResponseDTO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +12,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ResponseDTO<Void>> handleAccountNotFound(AccountNotFoundException ex) {
@@ -32,7 +37,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDTO<Void>> handleGeneralException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseDTO.error("Xảy ra lỗi hệ thống: " + ex.getMessage()));
+        logger.error("Lỗi hệ thống không xác định: ", ex);
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ResponseDTO.error("Đã xảy ra lỗi hệ thống, vui lòng thử lại sau!"));
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)

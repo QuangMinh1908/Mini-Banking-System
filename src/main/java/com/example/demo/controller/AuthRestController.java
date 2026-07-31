@@ -27,13 +27,11 @@ public class AuthRestController {
 
         Map<String, String> response = new HashMap<>();
 
-        if (userRepository.findByUsername(username).isPresent()) {
-            response.put("error", "Tên đăng nhập này đã tồn tại!");
-            return ResponseEntity.badRequest().body(response);
-        }
+        boolean isUsernameExist = userRepository.findByUsername(username).isPresent();
+        boolean isPhoneExist = userRepository.existsByPhoneNumber(phoneNumber);
 
-        if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            response.put("error", "Số điện thoại này đã được sử dụng!");
+        if (isUsernameExist || isPhoneExist) {
+            response.put("error", "Tên đăng nhập hoặc số điện thoại đã tồn tại trên hệ thống!");
             return ResponseEntity.badRequest().body(response);
         }
 

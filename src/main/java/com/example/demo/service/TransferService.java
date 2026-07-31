@@ -47,14 +47,13 @@ public class TransferService {
 
         // 2. XÁC THỰC TÀI KHOẢN ĐÍCH
         String toAccountNumber = request.getToAccountNumber().trim();
-        Account toAccount = accountRepository.findByAccountNumber(toAccountNumber);
+        Account toAccount = accountRepository.findByAccountNumberForUpdate(toAccountNumber);
 
         if (toAccount == null) {
             throw new AccountNotFoundException("Không tìm thấy tài khoản đích! Vui lòng kiểm tra lại số tài khoản.");
         }
 
         // 3. KIỂM TRA LOGIC
-        // Đảm bảo tài khoản nguồn và đích khác nhau (không tự chuyển cho chính mình) và ko vượt quá hạn mức tài khoản.
         if (fromAccount.getId().equals(toAccount.getId())) {
             throw new InvalidTransferException("Không thể chuyển tiền đến chính tài khoản nguồn!");
         }
@@ -69,8 +68,20 @@ public class TransferService {
                 maxLimit = new BigDecimal("500000000");
             }
 
-            if (maxLimit.compareTo(BigDecimal.ZERO) > 0 && amount.compareTo(maxLimit) > 0) {
-                throw new InvalidTransferException("Số tiền chuyển vượt quá hạn mức (" + limitStr + ") của tài khoản!");
+            if (maxLimit.compareTo(BigDecimal.ZERO) > 0) {
+                // Kiểm tra: Số tiền 1 giao dịch có vượt hạn mức không
+                if (amount.compareTo(maxLimit) > 0) {
+                    throw new InvalidTransferException("Số tiền vượt quá hạn mức (" + limitStr + ") trên 1 giao dịch!");
+                }
+
+                // Kiểm tra: Tổng số tiền giao dịch trong ngày có vượt hạn mức không
+                LocalDateTime startOfDay = LocalDateTime.now().with(java.time.LocalTime.MIN);
+                LocalDateTime endOfDay = LocalDateTime.now().with(java.time.LocalTime.MAX);
+                BigDecimal totalSpentToday = transactionRepository.sumOutgoingAmountByAccountIdAndDate(fromAccount.getId(), startOfDay, endOfDay);
+
+                if (totalSpentToday.add(amount).compareTo(maxLimit) > 0) {
+                    throw new InvalidTransferException("Giao dịch thất bại! Tổng số tiền giao dịch trong ngày của bạn đã vượt quá hạn mức " + limitStr);
+                }
             }
         }
 
@@ -119,14 +130,13 @@ public class TransferService {
 
         return debitTx;
     }
-
-    /**
-     * Sinh mã giao dịch duy nhất theo định dạng TXN-yyyyMMdd-XXXXXXXX, cùng
-     * quy ước với dữ liệu mẫu trong data.sql (transaction_id UNIQUE trong DB).
+/**
+     * Sinh mã giao dịch duy nhất theo định dạng TXN-yyyyMMdd-XXXXXXXXXXXXXXXX, 
+     * mở rộng phần random lên 16 ký tự để triệt tiêu hoàn toàn nguy cơ trùng lặp.
      */
     private String generateTransactionId() {
         String datePart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
         return "TXN-" + datePart + "-" + randomPart;
     }
 }

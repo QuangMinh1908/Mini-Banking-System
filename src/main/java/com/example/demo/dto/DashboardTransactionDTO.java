@@ -10,13 +10,18 @@ public class DashboardTransactionDTO {
     private TransactionType type;
     private BigDecimal amount;
     private LocalDateTime transactionDate;
+    private String direction;
+    private String accountNumber;
 
-    public DashboardTransactionDTO(Long id, String transactionId, TransactionType type, BigDecimal amount, LocalDateTime transactionDate) {
+    public DashboardTransactionDTO(Long id, String transactionId, TransactionType type, BigDecimal amount, LocalDateTime transactionDate, String direction,
+                                    String accountNumber) {
         this.id = id;
         this.transactionId = transactionId;
         this.type = type;
         this.amount = amount;
         this.transactionDate = transactionDate;
+        this.direction = direction;
+        this.accountNumber = accountNumber;
     }
     // Getters
     public Long getId() { return id; }
@@ -24,4 +29,6 @@ public class DashboardTransactionDTO {
     public TransactionType getType() { return type; }
     public BigDecimal getAmount() { return amount; }
     public LocalDateTime getTransactionDate() { return transactionDate; }
+    public String getDirection() { return direction; }
+    public String getAccountNumber() { return accountNumber; }
 }

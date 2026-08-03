@@ -73,7 +73,9 @@ public class DashboardController {
                     tx.getTransactionId(), 
                     tx.getType(), 
                     tx.getAmount(), 
-                    tx.getTransactionDate()))
+                    tx.getTransactionDate(),
+                    tx.getDirection(),
+                    tx.getAccount().getAccountNumber()))
             .toList();
             
         model.addAttribute("transactions", transactionDTOs);
@@ -105,7 +107,9 @@ public class DashboardController {
                     tx.getTransactionId(), 
                     tx.getType(), 
                     tx.getAmount(), 
-                    tx.getTransactionDate()))
+                    tx.getTransactionDate(),
+                    tx.getDirection(),
+                    tx.getAccount().getAccountNumber()))
             .toList();
 
         model.addAttribute("transactions", transactionDTOs);

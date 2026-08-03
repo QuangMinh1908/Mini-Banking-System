@@ -207,21 +207,23 @@
 
                             <div class="tx-card-header">
                                 <strong class="tx-card-title">
-                                    GD: <span th:text="${tx.type.name() == 'DEPOSIT' ? 'Nạp tiền' : (tx.type.name() == 'WITHDRAW' ? 'Rút tiền' : 'Chuyển khoản')}"></span>
+                                    <!-- Đổi text rõ ràng hơn dựa vào direction -->
+                                    GD: <span th:text="${tx.type.name() == 'DEPOSIT' ? 'Nạp tiền' : (tx.type.name() == 'WITHDRAW' ? 'Rút tiền' : (tx.direction == 'CREDIT' ? 'Nhận tiền' : 'Chuyển tiền'))}"></span>
                                 </strong>
-                                <!-- Dùng th:classappend để gắn màu động (deposit/withdraw) tùy theo loại giao dịch -->
+                                    <!-- Dùng tx.direction == 'CREDIT' để quyết định dấu cộng/trừ và màu sắc -->
                                 <span class="tx-badge"
-                                      th:classappend="${tx.type.name() == 'DEPOSIT' ? 'deposit' : 'withdraw'}"
-                                      th:text="${tx.type.name() == 'DEPOSIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                                    th:classappend="${tx.direction == 'CREDIT' ? 'deposit' : 'withdraw'}"
+                                    th:text="${tx.direction == 'CREDIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">
                                 </span>
                             </div>
 
                             <p class="tx-card-time">
-                                Thời gian: <span th:text="${#temporals.format(tx.transactionDate, 'dd/MM/yyyy HH:mm')}"></span>
+                                Thời gian: <span class="local-time" th:attr="data-utc=${tx.transactionDate}"></span>
                             </p>
 
                             <div class="tx-card-detail">
                                 <div><strong>Mã giao dịch:</strong> <span th:text="${tx.transactionId}"></span></div>
+                                <div><strong>Tài khoản giao dịch:</strong> <span style="color: #2563eb; font-weight: 500;" th:text="${tx.accountNumber}"></span></div>
                             </div>
                         </div>
                         

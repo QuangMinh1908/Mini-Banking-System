@@ -1,3 +1,8 @@
+//Đồng bộ giờ local ngay khi tải trang
+document.addEventListener("DOMContentLoaded", function() {
+    formatLocalTime();
+});
+
 document.addEventListener("DOMContentLoaded", function() {
     // --- 1. ĐIỀU KHIỂN MỞ/ĐÓNG MODAL LỊCH SỬ GIAO DỊCH ---
     const txModal = document.getElementById('transactionHistoryModal');
@@ -43,7 +48,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (html.trim() === '') {
                             hasMoreTx = false; 
                         } else {
-                            txList.insertAdjacentHTML('beforeend', html); 
+                            txList.insertAdjacentHTML('beforeend', html);
+                            formatLocalTime();
                         }
                     })
                     .finally(() => {
@@ -82,3 +88,24 @@ toggleButtons.forEach(btn => {
         }
     });
 });
+
+// Hàm chuyển đổi thời gian gốc của Server sang Local Time của trình duyệt
+function formatLocalTime() {
+    document.querySelectorAll('.local-time:not(.formatted)').forEach(el => {
+        let utcStr = el.getAttribute('data-utc');
+
+        if (utcStr && !utcStr.endsWith('Z')) {
+            utcStr += 'Z';
+        }
+        
+        const date = new Date(utcStr);
+        const dd = String(date.getDate()).padStart(2, '0');
+        const MM = String(date.getMonth() + 1).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        const HH = String(date.getHours()).padStart(2, '0');
+        const mm = String(date.getMinutes()).padStart(2, '0');
+        
+        el.textContent = `${dd}/${MM}/${yyyy} ${HH}:${mm}`;
+        el.classList.add('formatted');
+    });
+}

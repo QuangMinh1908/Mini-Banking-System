@@ -36,11 +36,8 @@ public class Account {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "fromAccount", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> sentTransactions;
-
-    @OneToMany(mappedBy = "toAccount", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> receivedTransactions;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type")
@@ -82,11 +79,8 @@ public class Account {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public List<Transaction> getSentTransactions() { return sentTransactions; }
-    public void setSentTransactions(List<Transaction> sentTransactions) { this.sentTransactions = sentTransactions; }
-
-    public List<Transaction> getReceivedTransactions() { return receivedTransactions; }
-    public void setReceivedTransactions(List<Transaction> receivedTransactions) { this.receivedTransactions = receivedTransactions; }
+    public List<Transaction> getTransactions() { return transactions; }
+    public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }
 
     public AccountType getAccountType() { return accountType; }
     public void setAccountType(AccountType accountType) { this.accountType = accountType; }

@@ -1,0 +1,115 @@
+/* ==========================================================================
+   CSS DÀNH RIÊNG CHO LUỒNG ĐĂNG KÝ (REGISTER)
+   ========================================================================== */
+
+/* ----- 1. TRANG ĐĂNG KÝ (register.html) ----- */
+.register-container {
+    padding: 2rem 0;
+}
+
+.register-header {
+    margin-top: 1rem !important;
+}
+
+.step-title {
+    margin-bottom: 1rem;
+    color: #0f172a;
+    font-size: 1.1rem;
+}
+
+/* Khung chọn Giới tính */
+.register-select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    outline: none;
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.register-select:focus {
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn-next-step {
+    margin-top: 1rem;
+}
+
+.step-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.btn-flex {
+    flex: 1;
+}
+
+.btn-finish {
+    flex: 1;
+    margin-top: 0;
+}
+
+.register-error-msg {
+    margin-top: 1.25rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+/* ----- 2. TRANG THÀNH CÔNG (register-success.html) ----- */
+.success-card {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.success-icon-wrapper {
+    color: #10b981;
+    margin-bottom: 1rem;
+}
+
+.success-title {
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.success-desc {
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+.account-info-box {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.account-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.account-number-display {
+    color: #2563eb;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.btn-dashboard {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    text-decoration: none;
+}

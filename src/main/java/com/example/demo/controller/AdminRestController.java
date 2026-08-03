@@ -53,7 +53,7 @@ public class AdminRestController {
     public ResponseEntity<Page<UserUpdateRequestDTO>> getRequestsApi(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("requestDate").ascending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("requestDate").descending());
         Page<UserUpdateRequest> requests = requestRepository.findAll(pageable);
         Page<UserUpdateRequestDTO> dtoPage = requests.map(req -> new UserUpdateRequestDTO(
                 req.getId(), req.getUser().getUsername(), req.getStatus(), req.getRequestDate(),

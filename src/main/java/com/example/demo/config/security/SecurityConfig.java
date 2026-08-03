@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .requestMatchers("/login", "/").permitAll()
                 .requestMatchers("/admin/**").hasAuthority("admin")
                 .requestMatchers("/dashboard/**").hasAuthority("user")
+                .requestMatchers("/login", "/", "/register", "/register/success", "/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -57,7 +58,7 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
+                .deleteCookies("JSESSIONID", "remember-me")
                 .permitAll()
             );
         return http.build();

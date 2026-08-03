@@ -337,6 +337,36 @@
   background-color: #ffffff;
 }
 
+/* Viền đỏ cho ô nhập bị lỗi validation (BindingResult) */
+.input-group input.input-invalid,
+.input-group select.input-invalid {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+/* Thông báo lỗi field-level hiển thị dưới mỗi ô input (Thymeleaf th:errors) */
+.field-error {
+  display: block;
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+  font-weight: 500;
+}
+
+/* Ghi chú phụ dưới ô input (VD: chưa có tài khoản khả dụng) */
+.input-hint {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+/* Khung form Chuyển khoản (trang /dashboard/transfer) */
+.transfer-form-card {
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 .btn-primary {
   background-color: #0f172a;
   color: #ffffff;
@@ -633,4 +663,34 @@
 
 .card-date-val {
     font-weight: 500;
+}
+
+/* nút ẩn/hiện số dư */
+.toggle-balance-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.9);
+    transition: all 0.2s ease;
+    padding: 0;
+    backdrop-filter: blur(4px);
+}
+
+.toggle-balance-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #ffffff !important;
+    transform: scale(1.05);
+}
+
+.toggle-balance-btn svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
 }

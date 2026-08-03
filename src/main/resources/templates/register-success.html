@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấp phát tài khoản thành công</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <link rel="stylesheet" th:href="@{/css/login.css}">
+  <link rel="stylesheet" th:href="@{/css/register.css}">
+</head>
+<body>
+<div class="login-container">
+  <div class="login-box bento-card success-card">
+    
+    <div class="success-icon-wrapper">
+      <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+    </div>
+    
+    <h2 class="success-title">Cấp Phát Thành Công!</h2>
+    <p class="success-desc">Chào mừng bạn đến với E-Banking. Một tài khoản thanh toán đã được tạo tự động cho bạn.</p>
+    
+    <div class="account-info-box">
+      <p class="account-label">Số tài khoản của bạn</p>
+      <div class="account-number-display" th:text="${accountNumber}">8800000000</div>
+    </div>
+
+    <a th:href="@{/dashboard}" class="btn-primary btn-dashboard">Vào Bảng điều khiển ngay</a>
+    
+  </div>
+</div>
+</body>
+</html>

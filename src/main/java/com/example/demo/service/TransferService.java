@@ -32,31 +32,46 @@ public class TransferService {
 
     @Transactional
     public Transaction transferMoney(Long currentUserId, TransferRequestDTO request) {
-
-        // 1. XÁC THỰC TÀI KHOẢN NGUỒN
         String fromAccountNumber = request.getFromAccountNumber().trim();
-        Account fromAccount = accountRepository.findByAccountNumber(fromAccountNumber);
+        String toAccountNumber = request.getToAccountNumber().trim();
 
-        if (fromAccount == null || fromAccount.getUser() == null
-                || !fromAccount.getUser().getId().equals(currentUserId)) {
+        // 1. KIỂM TRA LOGIC CƠ BẢN ĐẦU TIÊN
+        if (fromAccountNumber.equals(toAccountNumber)) {
+            throw new InvalidTransferException("Không thể chuyển tiền đến chính tài khoản nguồn!");
+        }
+
+        // 2. CHỐNG DEADLOCK: SẮP XẾP THỨ TỰ KHÓA TÀI KHOẢN (Quy tắc vàng)
+        String firstLockAcc;
+        String secondLockAcc;
+
+        if (fromAccountNumber.compareTo(toAccountNumber) < 0) {
+            firstLockAcc = fromAccountNumber;
+            secondLockAcc = toAccountNumber;
+        } else {
+            firstLockAcc = toAccountNumber;
+            secondLockAcc = fromAccountNumber;
+        }
+
+        Account account1 = accountRepository.findByAccountNumberForUpdate(firstLockAcc);
+        Account account2 = accountRepository.findByAccountNumberForUpdate(secondLockAcc);
+
+        if (account1 == null || account2 == null) {
+            throw new AccountNotFoundException("Không tìm thấy tài khoản nguồn hoặc đích! Vui lòng kiểm tra lại.");
+        }
+
+        // 3. PHÂN ĐỊNH LẠI ĐÂU LÀ TÀI KHOẢN GỬI, ĐÂU LÀ TÀI KHOẢN NHẬN
+        Account fromAccount = account1.getAccountNumber().equals(fromAccountNumber) ? account1 : account2;
+        Account toAccount = account1.getAccountNumber().equals(toAccountNumber) ? account1 : account2;
+
+        // 4. XÁC THỰC CHỦ SỞ HỮU & LOẠI TÀI KHOẢN NGUỒN
+        if (fromAccount.getUser() == null || !fromAccount.getUser().getId().equals(currentUserId)) {
             throw new AccountNotFoundException("Tài khoản nguồn không hợp lệ hoặc không thuộc quyền sở hữu của bạn!");
         }
         if (fromAccount.getAccountType() != AccountType.PAYMENT) {
             throw new InvalidTransferException("Giao dịch thất bại! Chỉ được phép chuyển tiền từ tài khoản thanh toán.");
         }
 
-        // 2. XÁC THỰC TÀI KHOẢN ĐÍCH
-        String toAccountNumber = request.getToAccountNumber().trim();
-        Account toAccount = accountRepository.findByAccountNumberForUpdate(toAccountNumber);
-
-        if (toAccount == null) {
-            throw new AccountNotFoundException("Không tìm thấy tài khoản đích! Vui lòng kiểm tra lại số tài khoản.");
-        }
-
-        // 3. KIỂM TRA LOGIC
-        if (fromAccount.getId().equals(toAccount.getId())) {
-            throw new InvalidTransferException("Không thể chuyển tiền đến chính tài khoản nguồn!");
-        }
+        // 5. KIỂM TRA HẠN MỨC GIAO DỊCH
         BigDecimal amount = request.getAmount();
         String limitStr = fromAccount.getTransactionLimit();
         
@@ -69,12 +84,10 @@ public class TransferService {
             }
 
             if (maxLimit.compareTo(BigDecimal.ZERO) > 0) {
-                // Kiểm tra: Số tiền 1 giao dịch có vượt hạn mức không
                 if (amount.compareTo(maxLimit) > 0) {
                     throw new InvalidTransferException("Số tiền vượt quá hạn mức (" + limitStr + ") trên 1 giao dịch!");
                 }
 
-                // Kiểm tra: Tổng số tiền giao dịch trong ngày có vượt hạn mức không
                 LocalDateTime startOfDay = LocalDateTime.now().with(java.time.LocalTime.MIN);
                 LocalDateTime endOfDay = LocalDateTime.now().with(java.time.LocalTime.MAX);
                 BigDecimal totalSpentToday = transactionRepository.sumOutgoingAmountByAccountIdAndDate(fromAccount.getId(), startOfDay, endOfDay);
@@ -85,23 +98,22 @@ public class TransferService {
             }
         }
 
-        // 4. KIỂM TRA SỐ DƯ
+        // 6. KIỂM TRA SỐ DƯ
         if (fromAccount.getBalance().compareTo(amount) < 0) {
             throw new InsufficientBalanceException("Số dư tài khoản nguồn không đủ để thực hiện giao dịch này!");
         }
 
-        // 5. THỰC THI: trừ tiền nguồn -> cộng tiền đích -> lưu cả
+        // 7. THỰC THI: trừ tiền nguồn -> cộng tiền đích -> lưu cả
         fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
         toAccount.setBalance(toAccount.getBalance().add(amount));
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
 
-        // 6. GHI NHẬN LỊCH SỬ GIAO DỊCH (BÚT TOÁN KÉP)
+        // 8. GHI NHẬN LỊCH SỬ GIAO DỊCH (BÚT TOÁN KÉP)
         String sharedTransactionId = generateTransactionId();
         LocalDateTime now = LocalDateTime.now();
         String reqDescription = request.getDescription();
         
-        // Record 1: DEBIT (Trừ tiền người gửi)
         Transaction debitTx = new Transaction();
         debitTx.setTransactionId(sharedTransactionId);
         debitTx.setType(TransactionType.TRANSFER);
@@ -114,7 +126,6 @@ public class TransferService {
                 ? "Chuyển tiền đến " + toAccount.getUser().getFullName() 
                 : reqDescription.trim());
 
-        // Record 2: CREDIT (Cộng tiền người nhận)
         Transaction creditTx = new Transaction();
         creditTx.setTransactionId(sharedTransactionId);
         creditTx.setType(TransactionType.TRANSFER);
@@ -130,10 +141,7 @@ public class TransferService {
 
         return debitTx;
     }
-/**
-     * Sinh mã giao dịch duy nhất theo định dạng TXN-yyyyMMdd-XXXXXXXXXXXXXXXX, 
-     * mở rộng phần random lên 16 ký tự để triệt tiêu hoàn toàn nguy cơ trùng lặp.
-     */
+
     private String generateTransactionId() {
         String datePart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();

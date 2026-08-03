@@ -115,4 +115,30 @@ public class DashboardController {
         model.addAttribute("transactions", transactionDTOs);
         return "dashboard :: txItems"; 
     }
+
+    @GetMapping("/history")
+    public String displayTransactionHistoryPage(HttpSession session, Model model, 
+                                                @RequestParam(defaultValue = "20") int size) {
+        Long currentUserId = (Long) session.getAttribute("userId");
+        User currentUser = userRepository.findById(currentUserId).orElseThrow();
+        
+        model.addAttribute("username", session.getAttribute("username"));
+        model.addAttribute("user", currentUser); 
+        
+        // Lấy danh sách giao dịch
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "transactionDate", "id"));
+        Page<Transaction> txPage = transactionRepository.findAll(
+                TransactionSpecification.isRelatedToUserIdWithCursor(currentUserId, null, null), pageable);
+                
+        List<DashboardTransactionDTO> transactionDTOs = txPage.getContent().stream()
+            .map(tx -> new DashboardTransactionDTO(
+                    tx.getId(), tx.getTransactionId(), tx.getType(), tx.getAmount(), 
+                    tx.getTransactionDate(), tx.getDirection(), tx.getAccount().getAccountNumber()))
+            .toList();
+            
+        model.addAttribute("transactions", transactionDTOs);
+        model.addAttribute("hasTransactions", !transactionDTOs.isEmpty());
+        
+        return "dashboard-history";
+    }
 }

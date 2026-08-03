@@ -109,3 +109,56 @@ function formatLocalTime() {
         el.classList.add('formatted');
     });
 }
+
+// HÀM MỞ CHI TIẾT GIAO DỊCH (BIÊN LAI)
+function openTxDetail(id) {
+    const modal = document.getElementById('txDetailModal');
+    
+    fetch(`/api/transactions/${id}`)
+        .then(res => {
+            if (!res.ok) throw new Error('Failed');
+            return res.json();
+        })
+        .then(data => {
+            const amtStr = new Intl.NumberFormat('vi-VN').format(data.amount) + ' VND';
+            
+            let title = '', sign = '', color = '', icon = '';
+            if (data.type === 'DEPOSIT') {
+                title = 'Nạp tiền'; sign = '+'; color = '#10b981';
+                icon = '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 5v14M5 12l7-7 7 7"/></svg>';
+            } else if (data.type === 'WITHDRAW') {
+                title = 'Rút tiền'; sign = '-'; color = '#ef4444';
+                icon = '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 19V5M5 12l7 7 7-7"/></svg>';
+            } else {
+                title = data.direction === 'CREDIT' ? 'Nhận tiền chuyển khoản' : 'Chuyển khoản đi';
+                sign = data.direction === 'CREDIT' ? '+' : '-';
+                color = data.direction === 'CREDIT' ? '#10b981' : '#ef4444';
+                icon = data.direction === 'CREDIT' 
+                    ? '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="15 10 20 15 15 20"></polyline><path d="M4 4v7a4 4 0 0 0 4 4h12"></path></svg>'
+                    : '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>';
+            }
+
+            let utcStr = data.transactionDate;
+            if (utcStr && !utcStr.endsWith('Z')) utcStr += 'Z';
+            const d = new Date(utcStr);
+            const timeStr = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+            document.getElementById('dtIcon').innerHTML = icon;
+            document.getElementById('dtAmount').textContent = `${sign}${amtStr}`;
+            document.getElementById('dtAmount').style.color = color;
+            document.getElementById('dtId').textContent = data.transactionId;
+            document.getElementById('dtTime').textContent = timeStr;
+            document.getElementById('dtType').textContent = title;
+            document.getElementById('dtDesc').textContent = data.description || 'Không có nội dung';
+            
+            if(data.type === 'TRANSFER') {
+                 document.getElementById('dtAccLabel').textContent = data.direction === 'CREDIT' ? 'Từ tài khoản' : 'Đến tài khoản';
+                 document.getElementById('dtAcc').textContent = data.relatedAccountNumber || 'N/A';
+            } else {
+                 document.getElementById('dtAccLabel').textContent = 'Tài khoản giao dịch';
+                 document.getElementById('dtAcc').textContent = data.accountNumber;
+            }
+
+            modal.classList.add('active');
+        });
+}

@@ -11,6 +11,8 @@ import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.TransactionRepository;
 import com.example.demo.model.enums.AccountType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,8 @@ import java.util.UUID;
 
 @Service
 public class TransferService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransferService.class);
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
@@ -71,30 +75,31 @@ public class TransferService {
             throw new InvalidTransferException("Giao dịch thất bại! Chỉ được phép chuyển tiền từ tài khoản thanh toán.");
         }
 
+        // 4b. XÁC THỰC LOẠI TÀI KHOẢN ĐÍCH: tài khoản tiết kiệm (SAVING) là sổ kỳ hạn riêng
+        // của từng chủ sở hữu, KHÔNG cho phép người khác chuyển thẳng tiền vào (chỉ chủ sổ
+        // được tự nạp thêm vào chính sổ của mình từ tài khoản thanh toán).
+        if (toAccount.getAccountType() == AccountType.SAVING
+                && (toAccount.getUser() == null || !toAccount.getUser().getId().equals(currentUserId))) {
+            throw new InvalidTransferException("Không thể chuyển tiền vào tài khoản tiết kiệm của người khác!");
+        }
+
         // 5. KIỂM TRA HẠN MỨC GIAO DỊCH
         BigDecimal amount = request.getAmount();
         String limitStr = fromAccount.getTransactionLimit();
-        
+
         if (limitStr != null && !"UNLIMITED".equals(limitStr)) {
-            BigDecimal maxLimit = BigDecimal.ZERO;
-            if ("50M".equals(limitStr)) {
-                maxLimit = new BigDecimal("50000000");
-            } else if ("500M".equals(limitStr)) {
-                maxLimit = new BigDecimal("500000000");
+            BigDecimal maxLimit = resolveMaxLimit(limitStr, fromAccount.getAccountNumber());
+
+            if (amount.compareTo(maxLimit) > 0) {
+                throw new InvalidTransferException("Số tiền vượt quá hạn mức (" + limitStr + ") trên 1 giao dịch!");
             }
 
-            if (maxLimit.compareTo(BigDecimal.ZERO) > 0) {
-                if (amount.compareTo(maxLimit) > 0) {
-                    throw new InvalidTransferException("Số tiền vượt quá hạn mức (" + limitStr + ") trên 1 giao dịch!");
-                }
+            LocalDateTime startOfDay = LocalDateTime.now().with(java.time.LocalTime.MIN);
+            LocalDateTime endOfDay = LocalDateTime.now().with(java.time.LocalTime.MAX);
+            BigDecimal totalSpentToday = transactionRepository.sumOutgoingAmountByAccountIdAndDate(fromAccount.getId(), startOfDay, endOfDay);
 
-                LocalDateTime startOfDay = LocalDateTime.now().with(java.time.LocalTime.MIN);
-                LocalDateTime endOfDay = LocalDateTime.now().with(java.time.LocalTime.MAX);
-                BigDecimal totalSpentToday = transactionRepository.sumOutgoingAmountByAccountIdAndDate(fromAccount.getId(), startOfDay, endOfDay);
-
-                if (totalSpentToday.add(amount).compareTo(maxLimit) > 0) {
-                    throw new InvalidTransferException("Giao dịch thất bại! Tổng số tiền giao dịch trong ngày của bạn đã vượt quá hạn mức " + limitStr);
-                }
+            if (totalSpentToday.add(amount).compareTo(maxLimit) > 0) {
+                throw new InvalidTransferException("Giao dịch thất bại! Tổng số tiền giao dịch trong ngày của bạn đã vượt quá hạn mức " + limitStr);
             }
         }
 
@@ -134,12 +139,40 @@ public class TransferService {
         creditTx.setAmount(amount);
         creditTx.setDirection("CREDIT");
         creditTx.setTransactionDate(now);
-        creditTx.setDescription("Nhận tiền từ " + fromAccount.getUser().getFullName());
+        creditTx.setDescription((reqDescription == null || reqDescription.isBlank()) 
+                ? "Nhận tiền từ " + fromAccount.getUser().getFullName() 
+                : reqDescription.trim());
 
         transactionRepository.save(debitTx);
         transactionRepository.save(creditTx);
 
+        // Log audit: phục vụ tra soát/đối chiếu giao dịch sau này (không log ở mức DEBUG vì
+        // đây là dữ liệu tài chính cần giữ lại theo mức log mặc định INFO của production).
+        logger.info("Transfer succeeded - txId={}, fromAcc={}, toAcc={}, amount={}, userId={}",
+                sharedTransactionId, fromAccount.getAccountNumber(), toAccount.getAccountNumber(),
+                amount, currentUserId);
+
         return debitTx;
+    }
+
+    /**
+     * Quy đổi mã hạn mức (lưu dạng String trong DB) sang số tiền tối đa.
+     * FAIL-CLOSED: nếu gặp giá trị không nằm trong danh sách đã biết (dữ liệu lỗi do
+     * migration/nhập tay/bug ở nơi khác), TỪ CHỐI giao dịch thay vì âm thầm bỏ qua kiểm tra
+     * hạn mức như code cũ (fail-open) - tránh vô tình cho phép chuyển không giới hạn.
+     */
+    private BigDecimal resolveMaxLimit(String limitStr, String accountNumber) {
+        switch (limitStr) {
+            case "50M":
+                return new BigDecimal("50000000");
+            case "500M":
+                return new BigDecimal("500000000");
+            default:
+                logger.error("Phát hiện transactionLimit không hợp lệ trong dữ liệu: account={}, value={}",
+                        accountNumber, limitStr);
+                throw new InvalidTransferException(
+                        "Không thể xác định hạn mức giao dịch của tài khoản nguồn. Vui lòng liên hệ hỗ trợ để được kiểm tra lại!");
+        }
     }
 
     private String generateTransactionId() {

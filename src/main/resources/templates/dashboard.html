@@ -35,6 +35,12 @@
                     </a>
                 </li>
                 <li>
+                    <a th:href="@{/dashboard/history}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                        Giao dịch
+                    </a>
+                </li>
+                <li>
                     <a href="#">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                         Báo cáo
@@ -62,12 +68,6 @@
                 
                 <div th:if="${successMessage}" class="alert alert-success">
                     <span th:text="${successMessage}"></span>
-                </div>
-                <div th:if="${txSuccessMessage}" class="alert alert-success">
-                    <span th:text="${txSuccessMessage}"></span>
-                </div>
-                <div th:if="${txErrorMessage}" class="alert alert-error">
-                    <span th:text="${txErrorMessage}"></span>
                 </div>
 
                 <section class="bento-grid-container">
@@ -203,14 +203,13 @@
                     <th:block th:fragment="txItems">
                         
                         <div th:each="tx : ${transactions}" class="tx-card-item"
-                             th:attr="data-id=${tx.id}, data-date=${tx.transactionDate}">
+                            th:attr="data-id=${tx.id}, data-date=${tx.transactionDate}"
+                            onclick="openTxDetail(this.getAttribute('data-id'))" style="cursor: pointer;">
 
                             <div class="tx-card-header">
                                 <strong class="tx-card-title">
-                                    <!-- Đổi text rõ ràng hơn dựa vào direction -->
                                     GD: <span th:text="${tx.type.name() == 'DEPOSIT' ? 'Nạp tiền' : (tx.type.name() == 'WITHDRAW' ? 'Rút tiền' : (tx.direction == 'CREDIT' ? 'Nhận tiền' : 'Chuyển tiền'))}"></span>
                                 </strong>
-                                    <!-- Dùng tx.direction == 'CREDIT' để quyết định dấu cộng/trừ và màu sắc -->
                                 <span class="tx-badge"
                                     th:classappend="${tx.direction == 'CREDIT' ? 'deposit' : 'withdraw'}"
                                     th:text="${tx.direction == 'CREDIT' ? '+' : '-'} + ${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">
@@ -237,6 +236,45 @@
                 
                 <div class="empty-state" th:unless="${hasTransactions}">
                     <p>Danh sách giao dịch sẽ hiển thị khi có yêu cầu.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POP-UP CHI TIẾT GIAO DỊCH -->
+    <div class="modal-overlay" id="txDetailModal" style="z-index: 100000;">
+        <div class="modal-box bento-card" style="max-width: 450px; text-align: left; position: relative; padding: 2rem 1.5rem;">
+            <button class="btn-close-modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; cursor: pointer; color: #64748b;" onclick="document.getElementById('txDetailModal').classList.remove('active')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div id="dtIcon" style="margin-bottom: 0.5rem;"></div>
+                <h2 id="dtAmount" style="font-size: 2rem; color: #0f172a; margin-bottom: 0.25rem;">- VND</h2>
+                <span id="dtStatus" style="background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 99px; font-size: 0.8rem; font-weight: 600;">Thành công</span>
+            </div>
+
+            <div style="background: #f8fafc; border-radius: 8px; padding: 1rem; border: 1px dashed #cbd5e1; font-size: 0.9rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="color: #64748b;">Mã giao dịch</span>
+                    <strong style="color: #0f172a;" id="dtId">...</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="color: #64748b;">Thời gian</span>
+                    <strong style="color: #0f172a;" id="dtTime">...</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="color: #64748b;">Loại giao dịch</span>
+                    <strong style="color: #0f172a;" id="dtType">...</strong>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 0.75rem 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="color: #64748b;" id="dtAccLabel">Tài khoản</span>
+                    <strong style="color: #2563eb;" id="dtAcc">...</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; flex-direction: column; gap: 0.25rem;">
+                    <span style="color: #64748b;">Nội dung</span>
+                    <strong style="color: #0f172a;" id="dtDesc">...</strong>
                 </div>
             </div>
         </div>

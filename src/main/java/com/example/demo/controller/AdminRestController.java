@@ -79,12 +79,22 @@ public class AdminRestController {
         return ResponseEntity.ok(dto);
     }
 
+    private static final java.util.Set<String> ALLOWED_TRANSACTION_LIMITS =
+            java.util.Set.of("50M", "500M", "UNLIMITED");
+
     @PostMapping("/user/{userId}/create-account")
     public ResponseEntity<ResponseDTO<String>> createAccountForUser(@PathVariable Long userId,
                                                                     @RequestBody Map<String, String> payload) {
         String accountType = payload.getOrDefault("accountType", "PAYMENT");
         String transactionLimit = payload.getOrDefault("transactionLimit", "50M");
-        
+
+        // Chặn ngay tại điểm ghi dữ liệu: không cho lưu vào DB giá trị hạn mức không nằm
+        // trong danh sách hợp lệ (tránh dữ liệu rác về sau khiến TransferService phải xử lý).
+        if ("PAYMENT".equals(accountType) && !ALLOWED_TRANSACTION_LIMITS.contains(transactionLimit)) {
+            return ResponseEntity.badRequest().body(
+                    ResponseDTO.error("Hạn mức giao dịch không hợp lệ! Chỉ chấp nhận: 50M, 500M, UNLIMITED"));
+        }
+
         Integer termMonths = null;
         java.math.BigDecimal interestRate = null;
         

@@ -19,6 +19,14 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     
     private static final long USER_COOLDOWN_TIME = 1000;
     private static final long IP_COOLDOWN_TIME = 50;
+
+    // Các endpoint GET mang tính "tra cứu" có thể bị lợi dụng để dò quét dữ liệu
+    // (vd: dò số tài khoản để lấy họ tên chủ tài khoản) - trước đây interceptor chỉ áp
+    // dụng cho POST nên các endpoint GET này hoàn toàn không bị giới hạn tốc độ.
+    private static final java.util.Set<String> RATE_LIMITED_GET_PATHS = java.util.Set.of(
+            "/api/transfer/lookup-receiver"
+    );
+
     public RateLimitInterceptor() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
@@ -34,9 +42,12 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (request.getMethod().equalsIgnoreCase("POST")) {
+        String targetUri = request.getRequestURI();
+        boolean isPost = request.getMethod().equalsIgnoreCase("POST");
+        boolean isSensitiveGet = request.getMethod().equalsIgnoreCase("GET") && RATE_LIMITED_GET_PATHS.contains(targetUri);
+
+        if (isPost || isSensitiveGet) {
             long currentTime = System.currentTimeMillis();
-            String targetUri = request.getRequestURI();
             
             // ==========================================
             // LỚP 1: KIỂM TRA THEO IP (Bảo vệ Hạ tầng)
@@ -46,7 +57,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             Long lastIpRequestTime = ipRequestCounts.get(ipKey);
             
             if (lastIpRequestTime != null && (currentTime - lastIpRequestTime) < IP_COOLDOWN_TIME) {
-                sendErrorResponse(response, "Hệ thống đang quá tải yêu cầu từ mạng của bạn. Vui lòng chậm lại!");
+                sendRateLimitResponse(request, response, "Hệ thống đang quá tải yêu cầu từ mạng của bạn. Vui lòng chậm lại!");
                 return false;
             }
             ipRequestCounts.put(ipKey, currentTime);
@@ -62,7 +73,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 Long lastUserRequestTime = userRequestCounts.get(userKey);
                 
                 if (lastUserRequestTime != null && (currentTime - lastUserRequestTime) < USER_COOLDOWN_TIME) {
-                    sendErrorResponse(response, "Bạn thao tác quá nhanh, vui lòng đợi 1 giây!");
+                    sendRateLimitResponse(request, response, "Bạn thao tác quá nhanh, vui lòng đợi 1 giây!");
                     return false;
                 }
                 userRequestCounts.put(userKey, currentTime);
@@ -71,9 +82,30 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    private void sendErrorResponse(HttpServletResponse response, String message) throws Exception {
-        response.setStatus(429);
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"error\": \"" + message + "\"}");
+    /**
+     * Trước đây luôn trả JSON thô kể cả khi request là điều hướng trang bình thường
+     * (submit form HTML, vd nút "Xác nhận chuyển khoản" bị double-click) - khiến trình
+     * duyệt hiển thị nguyên văn {"error": "..."} thay vì quay lại trang với thông báo.
+     * Giờ phân biệt 2 loại request:
+     *  - Gọi bằng fetch()/AJAX (không ưu tiên text/html trong Accept header) -> vẫn trả JSON
+     *    để tương thích với code JS hiện có (dashboard-transfer.js, common.js...).
+     *  - Điều hướng trình duyệt thật sự (submit form, Accept ưu tiên text/html) -> redirect
+     *    (303) về lại trang trước đó kèm cờ để hiển thị thông báo thân thiện, thay vì JSON thô.
+     */
+    private void sendRateLimitResponse(HttpServletRequest request, HttpServletResponse response, String message) throws Exception {
+        String acceptHeader = request.getHeader("Accept");
+        boolean looksLikeBrowserNavigation = acceptHeader != null && acceptHeader.contains("text/html");
+
+        if (looksLikeBrowserNavigation) {
+            String referer = request.getHeader("Referer");
+            String redirectTarget = (referer != null && !referer.isBlank()) ? referer : "/dashboard";
+            String separator = redirectTarget.contains("?") ? "&" : "?";
+            response.setStatus(HttpServletResponse.SC_SEE_OTHER);
+            response.setHeader("Location", redirectTarget + separator + "rateLimited=true");
+        } else {
+            response.setStatus(429);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\": \"" + message + "\"}");
+        }
     }
 }

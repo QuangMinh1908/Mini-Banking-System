@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Chuyển khoản - E-Banking</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrapper">
+                    <div class="logo-icon-small">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+                    </div>
+                    <h2 class="logo-text">E-Banking</h2>
+                </div>
+            </div>
+
+            <ul class="nav-links">
+                <li>
+                    <a th:href="@{/dashboard}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        Tổng quan
+                    </a>
+                </li>
+                <li>
+                    <a class="active" th:href="@{/dashboard/transfer}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        Chuyển khoản
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/dashboard/history}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                        Giao dịch
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        Báo cáo
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="#" class="logout-link" id="logoutLink">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Đăng xuất
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="user-profile">
+                    <span class="user-name" th:text="${username}">Tên người dùng</span>
+                    <div class="avatar" th:text="${#strings.substring(username, 0, 1)}">M</div>
+                </div>
+            </header>
+
+            <div class="content-scroll-area">
+
+                <div class="transfer-layout-grid">
+                    <!-- CỘT TRÁI: FORM CHUYỂN KHOẢN -->
+                    <div class="bento-card transfer-form-card" style="margin: 0; max-width: 100%;">
+                        <div class="card-header-flex">
+                            <h3>Chuyển khoản</h3>
+                        </div>
+
+                        <form id="transferForm" th:action="@{/dashboard/transfer}" th:object="${transferRequest}" method="post" autocomplete="off">
+            
+                            <div class="input-group">
+                                <label for="fromAccountNumber">Tài khoản nguồn</label>
+                                <select id="fromAccountNumber" th:field="*{fromAccountNumber}" required
+                                        th:classappend="${#fields.hasErrors('fromAccountNumber')} ? 'input-invalid'">
+                                    <option value="">-- Chọn tài khoản chuyển --</option>
+                                    <option th:each="acc : ${sourceAccounts}"
+                                            th:value="${acc.accountNumber}"
+                                            th:data-balance="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'"
+                                            th:data-limit="${acc.transactionLimit == '50M' ? '50 Tr' : (acc.transactionLimit == '500M' ? '500 Tr' : 'Không giới hạn')}"
+                                            th:data-date="${#temporals.format(acc.dateOpen, 'dd/MM/yyyy')}"
+                                            th:text="${acc.accountNumber} + ' — Số dư: ' + ${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                                    </option>
+                                </select>
+                                <span class="field-error" th:if="${#fields.hasErrors('fromAccountNumber')}" th:errors="*{fromAccountNumber}"></span>
+                            </div>
+                
+                            <div class="input-group">
+                                <label for="toAccountNumber">Tài khoản đích (số tài khoản người nhận)</label>
+                                <input type="text" id="toAccountNumber" th:field="*{toAccountNumber}" required
+                                       th:classappend="${#fields.hasErrors('toAccountNumber')} ? 'input-invalid'"
+                                       placeholder="Nhập số tài khoản người nhận" inputmode="numeric" maxlength="20">
+                                <span class="field-error" th:if="${#fields.hasErrors('toAccountNumber')}" th:errors="*{toAccountNumber}"></span>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="amount">Số tiền (VND)</label>
+                                <input type="number" id="amount" th:field="*{amount}" required
+                                       th:classappend="${#fields.hasErrors('amount')} ? 'input-invalid'"
+                                       placeholder="Ví dụ: 500000" step="1" min="1">
+                                <span class="field-error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></span>
+                            </div>
+                
+                            <div class="input-group">
+                                <label for="description">Nội dung chuyển khoản</label>
+                                <input type="text" id="description" th:field="*{description}"
+                                       th:classappend="${#fields.hasErrors('description')} ? 'input-invalid'"
+                                       placeholder="Ví dụ: Chuyển tiền ăn trưa (không bắt buộc)" maxlength="255">
+                                <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+                            </div>
+                
+                            <button type="submit" id="btnSubmitTransfer" class="btn-primary w-100">Xác nhận chuyển khoản</button>
+                        </form>
+                    </div>
+                
+                    <!-- CỘT PHẢI: HIỂN THỊ ẢNH THẺ -->
+                    <div class="transfer-preview-col" style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center;">
+                        <h4 style="margin-bottom: 1rem; color: #64748b; font-weight: 500;">Thẻ giao dịch</h4>
+                        <div id="cardPreviewContainer" style="width: 100%;">
+                            <div style="background: #e2e8f0; height: 210px; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 2px dashed #cbd5e1;">
+                                Vui lòng chọn tài khoản nguồn...
+                            </div>
+                        </div>
+
+                        <!-- BOX HIỂN THỊ THÔNG TIN NGƯỜI NHẬN MỚI -->
+                        <div id="receiverInfoBox" style="display: none; margin-top: 1.5rem; width: 100%; max-width: 420px; padding: 1.25rem; border-radius: 1rem; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+        <!-- POP-UP GIAO DỊCH THÀNH CÔNG -->
+    <div class="modal-overlay active" th:if="${txSuccessMessage}" id="successModal" style="z-index: 99999;">
+        <div class="modal-box bento-card" style="max-width: 450px; text-align: center; position: relative;">
+            <button class="btn-close-modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; cursor: pointer; color: #64748b;" onclick="document.getElementById('successModal').classList.remove('active')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <div style="color: #10b981; margin-bottom: 1rem; margin-top: 1rem;">
+                <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <h3 style="color: #0f172a; margin-bottom: 0.5rem; font-size: 1.5rem;">Giao Dịch Thành Công!</h3>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Số tiền đã được chuyển đến người nhận.</p>
+            
+            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px dashed #cbd5e1; text-align: center; margin-bottom: 2rem;">
+                <p style="margin-bottom: 0.25rem; font-size: 0.9rem; color: #64748b;">Mã giao dịch</p>
+                <div style="color: #2563eb; font-size: 1.25rem; font-weight: 700; word-break: break-all;" 
+                     th:text="${#strings.substringAfter(txSuccessMessage, 'Mã giao dịch: ')}">
+                    TXN-...
+                </div>
+            </div>
+            <button class="btn-primary" style="width: 100%;" onclick="window.location.href='/dashboard'">Hoàn tất & Đóng</button>
+        </div>
+    </div>
+
+    <!-- POP-UP GIAO DỊCH THẤT BẠI (LỖI) -->
+    <div class="modal-overlay active" th:if="${txErrorMessage}" id="errorModal" style="z-index: 99999;">
+        <div class="modal-box bento-card" style="max-width: 450px; text-align: center; position: relative;">
+            <button class="btn-close-modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; cursor: pointer; color: #64748b;" onclick="document.getElementById('errorModal').classList.remove('active')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <div style="color: #ef4444; margin-bottom: 1rem; margin-top: 1rem;">
+                <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            </div>
+            <h3 style="color: #0f172a; margin-bottom: 0.5rem; font-size: 1.5rem;">Giao Dịch Thất Bại!</h3>
+            <p style="color: #b91c1c; margin-bottom: 2rem; background: #fef2f2; padding: 1rem; border-radius: 8px; border: 1px solid #fecaca;" 
+               th:text="${txErrorMessage}">
+                Lý do lỗi hiển thị ở đây...
+            </p>
+            
+            <button class="btn-primary" style="width: 100%; background-color: #0f172a;" onclick="document.getElementById('errorModal').classList.remove('active')">Đã hiểu & Đóng</button>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments :: confirmModal}"></div>
+
+<script th:src="@{/js/common.js}" defer></script>
+<script th:src="@{/js/dashboard-transfer.js}" defer></script>
+</body>
+</html>

@@ -17,6 +17,8 @@ import com.example.demo.service.TransferService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +34,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/dashboard/transfer")
 public class TransferController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransferController.class);
 
     private final TransferService transferService;
     private final AccountRepository accountRepository;
@@ -54,7 +58,7 @@ public class TransferController {
         model.addAttribute("sourceAccounts", loadSourceAccounts(currentUserId));
         model.addAttribute("transferRequest", new TransferRequestDTO());
 
-        return "transfer";
+        return "dashboard-transfer";
     }
 
     // XỬ LÝ CHUYỂN TIỀN (POST)
@@ -74,7 +78,7 @@ public class TransferController {
             model.addAttribute("username", session.getAttribute("username"));
             model.addAttribute("user", currentUser);
             model.addAttribute("sourceAccounts", loadSourceAccounts(currentUserId));
-            return "transfer";
+            return "dashboard-transfer";
         }
 
         // 2. Nếu Form hợp lệ, đưa vào khối try-catch và gọi hàm transferMoney.
@@ -83,18 +87,32 @@ public class TransferController {
 
             redirectAttributes.addFlashAttribute("txSuccessMessage",
                     "Chuyển tiền thành công! Mã giao dịch: " + result.getTransactionId());
-            return "redirect:/dashboard";
+            return "redirect:/dashboard/transfer";
 
         } catch (AccountNotFoundException | InsufficientBalanceException | InvalidTransferException ex) {
+            // Lỗi nghiệp vụ/người dùng: không phải bug, nhưng vẫn nên log ở mức INFO/WARN
+            // để phục vụ theo dõi gian lận, tra soát khiếu nại sau này (không cần log stack trace).
+            logger.warn("Transfer rejected - userId={}, from={}, to={}, amount={}, reason={}",
+                    currentUserId, transferRequest.getFromAccountNumber(), transferRequest.getToAccountNumber(),
+                    transferRequest.getAmount(), ex.getMessage());
             redirectAttributes.addFlashAttribute("txErrorMessage", ex.getMessage());
             return "redirect:/dashboard/transfer";
-            
+
         } catch (ObjectOptimisticLockingFailureException ex) {
+            logger.warn("Transfer conflict (optimistic lock) - userId={}, from={}, to={}, amount={}",
+                    currentUserId, transferRequest.getFromAccountNumber(), transferRequest.getToAccountNumber(),
+                    transferRequest.getAmount(), ex);
             redirectAttributes.addFlashAttribute("txErrorMessage", 
                     "Tài khoản của bạn đang xử lý một giao dịch khác. Vui lòng đợi trong giây lát và thử lại!");
             return "redirect:/dashboard/transfer";
         
         } catch (Exception ex) {
+            // Lỗi hệ thống/DB không lường trước (mất kết nối DB, lock timeout, NPE, bug...).
+            // Đây là nhóm QUAN TRỌNG NHẤT cần log đầy đủ (kèm stack trace) vì người dùng chỉ
+            // thấy thông báo chung chung - nếu không log, đội vận hành sẽ không biết sự cố đã xảy ra.
+            logger.error("Transfer failed with unexpected system error - userId={}, from={}, to={}, amount={}",
+                    currentUserId, transferRequest.getFromAccountNumber(), transferRequest.getToAccountNumber(),
+                    transferRequest.getAmount(), ex);
             redirectAttributes.addFlashAttribute("txErrorMessage", "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau!");
             return "redirect:/dashboard/transfer";
         }

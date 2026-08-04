@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.User;
 import com.example.demo.model.Account;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.service.UserListService;
@@ -22,6 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import com.example.demo.dto.UserUpdateFormDTO;
 
 
 @Controller
@@ -57,14 +59,24 @@ public class AdminController {
     }
 
     @PostMapping("/admin/update-user")
-    public String updateUser(@ModelAttribute User updatedUser, @RequestParam(required = false) String detail, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    public String updateUser(@Valid @ModelAttribute UserUpdateFormDTO updatedUser, 
+                            BindingResult bindingResult,
+                            @RequestParam(required = false) String detail, 
+                            HttpServletRequest request, 
+                            RedirectAttributes redirectAttributes) {
+    
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error", "Dữ liệu nhập không hợp lệ, vui lòng kiểm tra lại!");
+            return "redirect:" + resolveSafeRedirect(request.getHeader("Referer"));
+        }
     
         userService.createUpdateRequest(updatedUser, detail);
-    
+
         redirectAttributes.addFlashAttribute("successMessage", "Yêu cầu thay đổi thông tin đã được gửi lên hệ thống và đang chờ xét duyệt!");
-    
+
         return "redirect:" + resolveSafeRedirect(request.getHeader("Referer"));
     }
+
     private static final java.util.Set<String> ALLOWED_REDIRECT_PATHS = java.util.Set.of("/admin", "/admin/account");
     /**
      * Chỉ tin tưởng phần PATH của Referer (bỏ qua scheme/host hoàn toàn), và chỉ chấp nhận

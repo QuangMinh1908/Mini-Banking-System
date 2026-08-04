@@ -5,6 +5,7 @@ import com.example.demo.dto.UserDetailDTO;
 import com.example.demo.dto.UserListDTO;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.dto.UserUpdateFormDTO;
 
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.model.UserUpdateRequest;
@@ -67,11 +68,12 @@ public class UserListService {
         ));
     }
 
-    public void createUpdateRequest(User updatedUser, String detail) {
+    public void createUpdateRequest(UserUpdateFormDTO updatedUser, String detail) {
         User existingUser = userRepository.findById(updatedUser.getId()).orElse(null);
         if (existingUser != null) {
             UserUpdateRequest request = new UserUpdateRequest();
             request.setUser(existingUser);
+        
             request.setNewFullName(updatedUser.getFullName());
             request.setNewPhoneNumber(updatedUser.getPhoneNumber());
             request.setNewEmail(updatedUser.getEmail());

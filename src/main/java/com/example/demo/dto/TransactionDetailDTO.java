@@ -13,9 +13,11 @@ public class TransactionDetailDTO {
     private String description;
     private String accountNumber;
     private String relatedAccountNumber;
+    private String relatedAccountName;
 
     public TransactionDetailDTO(String transactionId, TransactionType type, String direction, BigDecimal amount, 
-                                LocalDateTime transactionDate, String description, String accountNumber, String relatedAccountNumber) {
+                                LocalDateTime transactionDate, String description, String accountNumber, 
+                                String relatedAccountNumber, String relatedAccountName) {
         this.transactionId = transactionId;
         this.type = type;
         this.direction = direction;
@@ -24,6 +26,7 @@ public class TransactionDetailDTO {
         this.description = description;
         this.accountNumber = accountNumber;
         this.relatedAccountNumber = relatedAccountNumber;
+        this.relatedAccountName = relatedAccountName;
     }
 
     // Getters
@@ -35,4 +38,5 @@ public class TransactionDetailDTO {
     public String getDescription() { return description; }
     public String getAccountNumber() { return accountNumber; }
     public String getRelatedAccountNumber() { return relatedAccountNumber; }
+    public String getRelatedAccountName() { return relatedAccountName; }
 }

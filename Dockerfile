@@ -1,14 +1,13 @@
-# Sử dụng môi trường Maven kèm Java 21
-FROM maven:3.9-eclipse-temurin-21
-
-# Tạo thư mục làm việc
+# Stage 1: Build file JAR
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy toàn bộ mã nguồn vào container
-COPY . .
-
-# Mở cổng 8080 (cổng mặc định của Spring Boot)
+# Stage 2: Chạy ứng dụng với Java 21
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Chạy ứng dụng bằng lệnh của Maven
-CMD ["mvn", "spring-boot:run"]
+ENTRYPOINT ["java","-jar","app.jar"]

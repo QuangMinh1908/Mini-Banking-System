@@ -153,7 +153,14 @@ function openTxDetail(id) {
             
             if(data.type === 'TRANSFER') {
                  document.getElementById('dtAccLabel').textContent = data.direction === 'CREDIT' ? 'Từ tài khoản' : 'Đến tài khoản';
-                 document.getElementById('dtAcc').textContent = data.relatedAccountNumber || 'N/A';
+                 
+                 let displayText = data.relatedAccountNumber || 'N/A';
+                 if (data.relatedAccountName) {
+                     displayText = `${data.relatedAccountName} / ${displayText}`;
+                 }
+                 document.getElementById('dtAcc').textContent = displayText;
+                 // ---------------------------------------------
+                 
             } else {
                  document.getElementById('dtAccLabel').textContent = 'Tài khoản giao dịch';
                  document.getElementById('dtAcc').textContent = data.accountNumber;

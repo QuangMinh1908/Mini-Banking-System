@@ -85,9 +85,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // --- 2. LOGIC TRA CỨU NGƯỜI NHẬN & BẮT LỖI TRÙNG STK ---
+    let abortController = null;
+
     function lookupReceiver() {
         const targetAccNum = toAccountInput.value.trim();
-        const sourceAccNum = fromSelect.value; // Lấy STK nguồn đang chọn
+        const sourceAccNum = fromSelect.value; 
 
         confirmedReceiverName = null;
 
@@ -96,7 +98,6 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // KIỂM TRA LỖI TRÙNG SỐ TÀI KHOẢN (so sánh trước khi escape, escape chỉ áp dụng khi hiển thị)
         if (targetAccNum === sourceAccNum) {
             receiverInfoBox.style.display = 'block';
             receiverInfoBox.style.background = '#fef2f2';
@@ -115,9 +116,17 @@ document.addEventListener("DOMContentLoaded", function() {
         receiverInfoBox.style.display = 'block';
         receiverInfoBox.style.background = '#f8fafc';
         receiverInfoBox.style.border = '1px solid #e2e8f0';
-        receiverInfoBox.innerHTML = '<span style="color: #64748b; animation: pulse 1.5s infinite;">Đang tra cứu thông tin hệ thống...</span>';
+        receiverInfoBox.innerHTML = '<span style="color: #64748b;">Đang tra cứu thông tin hệ thống...</span>';
 
-        fetch(`/api/transfer/lookup-receiver?accountNumber=${targetAccNum}`)
+        // Nếu đang có request nào dở dang trước đó thì hủy ngay lập tức để chống dồn dập
+        if (abortController) {
+            abortController.abort();
+        }
+        abortController = new AbortController();
+
+        fetch(`/api/transfer/lookup-receiver?accountNumber=${targetAccNum}`, {
+            signal: abortController.signal
+        })
             .then(res => {
                 if (!res.ok) throw new Error('Not found');
                 return res.json();
@@ -125,7 +134,6 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(data => {
                 confirmedReceiverName = data.fullName;
                 toAccountInput.dataset.confirmedFor = targetAccNum;
-                // UI KHI THÀNH CÔNG: Box xanh, có Tên và STK
                 receiverInfoBox.style.background = '#f0fdf4';
                 receiverInfoBox.style.border = '1px solid #bbf7d0';
                 receiverInfoBox.innerHTML = `
@@ -141,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>`;
             })
             .catch(err => {
-                // UI KHI SAI SỐ TÀI KHOẢN
+                if (err.name === 'AbortError') return;
                 receiverInfoBox.style.background = '#fef2f2';
                 receiverInfoBox.style.border = '1px solid #fecaca';
                 receiverInfoBox.innerHTML = `
@@ -158,7 +166,22 @@ document.addEventListener("DOMContentLoaded", function() {
     if (toAccountInput) {
         toAccountInput.addEventListener('input', function() {
             clearTimeout(typingTimer);
-            typingTimer = setTimeout(lookupReceiver, 800); // Đợi 0.8s
+            typingTimer = setTimeout(lookupReceiver, 400);
+        });
+
+        toAccountInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(typingTimer);
+                lookupReceiver();
+            }
+        });
+    }
+
+    if (toAccountInput) {
+        toAccountInput.addEventListener('input', function() {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(lookupReceiver, 800);
         });
 
         toAccountInput.addEventListener('keydown', function(e) {

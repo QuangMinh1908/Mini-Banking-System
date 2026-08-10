@@ -23,7 +23,6 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // Lấy toàn bộ user hiện có trong Database
         List<User> users = userRepository.findAll();
-        boolean isUpdated = false;
 
         for (User user : users) {
             // Chuỗi mã hóa BCrypt luôn bắt đầu bằng ký tự "$2a$" hoặc "$2b$"
@@ -35,14 +34,7 @@ public class DataSeeder implements CommandLineRunner {
                 
                 user.setPassword(encodedPassword);
                 userRepository.save(user);
-                isUpdated = true;
             }
-        }
-
-        if (isUpdated) {
-            System.out.println("✅ Đã tự động quét và mã hóa BCrypt thành công cho toàn bộ mật khẩu mẫu!");
-        } else {
-            System.out.println("✅ Toàn bộ mật khẩu trong hệ thống đã an toàn, không cần mã hóa thêm.");
         }
     }
 }

@@ -2,18 +2,6 @@
 // ADMIN-USER.JS - XỬ LÝ LOGIC TRANG QUẢN LÝ KHÁCH HÀNG
 // ==========================================
 
-// chống XSS
-function escapeHTML(str) {
-    if (!str) return '';
-    return str.toString().replace(/[&<>'"]/g, tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-    }[tag] || tag));
-}
-
 // --- 1. XEM CHI TIẾT KHÁCH HÀNG ---
 const userDetailsModal = document.getElementById('userDetailsModal');
 function viewUserDetails(userId) {

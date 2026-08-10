@@ -58,7 +58,7 @@
 
         <main class="main-content">
             <header class="topbar">
-                <div class="user-profile">
+                <div class="user-profile" id="userProfileBtn" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" title="Xem thông tin cá nhân">
                     <span class="user-name" th:text="${username}">Tên người dùng</span>
                     <div class="avatar" th:text="${#strings.substring(username, 0, 1)}">M</div>
                 </div>
@@ -181,7 +181,8 @@
     </div>
 
     <div th:replace="~{fragments :: confirmModal}"></div>
-
+    <div th:replace="~{fragments :: userProfileModal}"></div>
+    
 <script th:src="@{/js/common.js}" defer></script>
 <script th:src="@{/js/dashboard-transfer.js}" defer></script>
 </body>

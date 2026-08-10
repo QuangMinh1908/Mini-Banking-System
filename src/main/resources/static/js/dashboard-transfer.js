@@ -17,12 +17,6 @@ document.addEventListener("DOMContentLoaded", function() {
     let confirmedReceiverName = null;
     let lastCheckedAccount = null;
 
-    function escapeHtml(value) {
-        const div = document.createElement('div');
-        div.textContent = value ?? '';
-        return div.innerHTML;
-    }
-
     // --- 1. LOGIC VẼ ẢNH THẺ ---
     function renderCard() {
         const selectedOpt = fromSelect.options[fromSelect.selectedIndex];
@@ -34,10 +28,10 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        const accNum = escapeHtml(selectedOpt.value);
-        const balance = escapeHtml(selectedOpt.getAttribute('data-balance'));
-        const limit = escapeHtml(selectedOpt.getAttribute('data-limit'));
-        const date = escapeHtml(selectedOpt.getAttribute('data-date'));
+        const accNum = escapeHTML(selectedOpt.value);
+        const balance = escapeHTML(selectedOpt.getAttribute('data-balance'));
+        const limit = escapeHTML(selectedOpt.getAttribute('data-limit'));
+        const date = escapeHTML(selectedOpt.getAttribute('data-date'));
 
         cardPreview.innerHTML = `
             <div class="bank-card payment" style="margin: 0 auto; width: 100%; max-width: 420px; min-height: 220px;">
@@ -142,8 +136,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         </div>
                         <div style="flex: 1;">
                             <div style="font-size: 0.85rem; color: #166534; opacity: 0.85; text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Người thụ hưởng</div>
-                            <div style="font-size: 1.15rem; font-weight: 700; color: #14532d; margin-bottom: 0.25rem;">${escapeHtml(data.fullName)}</div>
-                            <div style="font-size: 0.95rem; font-family: monospace; font-weight: 600; color: #166534;">STK: ${escapeHtml(targetAccNum)}</div>
+                            <div style="font-size: 1.15rem; font-weight: 700; color: #14532d; margin-bottom: 0.25rem;">${escapeHTML(data.fullName)}</div>
+                            <div style="font-size: 0.95rem; font-family: monospace; font-weight: 600; color: #166534;">STK: ${escapeHTML(targetAccNum)}</div>
                         </div>
                     </div>`;
             })
@@ -227,12 +221,12 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             const receiverLine = (confirmedReceiverName && toAcc === lastCheckedAccount)
-                ? `<b>${escapeHtml(confirmedReceiverName)}</b> (STK: ${escapeHtml(toAcc)})`
-                : `STK: <b>${escapeHtml(toAcc)}</b>`;
+                ? `<b>${escapeHTML(confirmedReceiverName)}</b> (STK: ${escapeHTML(toAcc)})`
+                : `STK: <b>${escapeHTML(toAcc)}</b>`;
 
             showConfirmModal(
                 'Xác nhận chuyển khoản',
-                `Bạn sắp chuyển <b>${escapeHtml(amountFormatted)} VND</b> đến ${receiverLine}. Vui lòng kiểm tra kỹ trước khi xác nhận, giao dịch không thể hoàn tác.`,
+                `Bạn sắp chuyển <b>${escapeHTML(amountFormatted)} VND</b> đến ${receiverLine}. Vui lòng kiểm tra kỹ trước khi xác nhận, giao dịch không thể hoàn tác.`,
                 'info',
                 function() {
                     submitBtn.disabled = true;

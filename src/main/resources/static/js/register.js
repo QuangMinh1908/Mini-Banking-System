@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 2. chặn nhấn Enter submit form ở Bước 1
+    // 2. Chặn nhấn Enter submit form ở Bước 1
     const step1Inputs = document.querySelectorAll('#step1 input');
     step1Inputs.forEach(input => {
         input.addEventListener('keypress', function(e) {
@@ -23,6 +23,18 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+// HÀM HIỂN THỊ POP-UP LỖI
+function showErrorModal(message) {
+    const modal = document.getElementById('registerErrorModal');
+    const errorText = document.getElementById('registerErrorText');
+    if (modal && errorText) {
+        errorText.textContent = message;
+        modal.classList.add('active');
+    } else {
+        alert(message); // Dự phòng nếu DOM bị lỗi
+    }
+}
 
 function goToStep2() {
     const step1Inputs = document.querySelectorAll('#step1 input');
@@ -48,14 +60,14 @@ function goToStep2() {
             .then(res => res.json().then(data => ({ status: res.status, body: data })))
             .then(result => {
                 if (result.status !== 200) {
-                    alert(result.body.error);
+                    showErrorModal(result.body.error); // Đã thay thế alert()
                 } else {
                     document.getElementById('step1').style.display = 'none';
                     document.getElementById('step2').style.display = 'block';
                 }
             })
             .catch(err => {
-                alert("Lỗi kết nối đến máy chủ!");
+                showErrorModal("Lỗi kết nối đến máy chủ!"); // Đã thay thế alert()
             })
             .finally(() => {
                 btn.innerHTML = originalText;

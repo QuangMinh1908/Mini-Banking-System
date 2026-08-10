@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Service
@@ -94,8 +95,9 @@ public class TransferService {
                 throw new InvalidTransferException("Số tiền vượt quá hạn mức (" + limitStr + ") trên 1 giao dịch!");
             }
 
-            LocalDateTime startOfDay = LocalDateTime.now().with(java.time.LocalTime.MIN);
-            LocalDateTime endOfDay = LocalDateTime.now().with(java.time.LocalTime.MAX);
+            LocalDateTime nowUTC = LocalDateTime.now(ZoneOffset.UTC);
+            LocalDateTime startOfDay = nowUTC.with(java.time.LocalTime.MIN);
+            LocalDateTime endOfDay = nowUTC.with(java.time.LocalTime.MAX);
             BigDecimal totalSpentToday = transactionRepository.sumOutgoingAmountByAccountIdAndDate(fromAccount.getId(), startOfDay, endOfDay);
 
             if (totalSpentToday.add(amount).compareTo(maxLimit) > 0) {

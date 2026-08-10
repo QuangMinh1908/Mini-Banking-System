@@ -96,6 +96,25 @@
   </div>
 </div>
 
+<!-- ================= POP-UP BÁO LỖI (CHẤM THAN ĐỎ) ================= -->
+<div class="modal-overlay" id="registerErrorModal" style="z-index: 99999;">
+  <div class="modal-box bento-card" style="max-width: 400px; text-align: center; position: relative;">
+    <button type="button" class="btn-close-modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; cursor: pointer; color: #64748b;" onclick="document.getElementById('registerErrorModal').classList.remove('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    
+    <div style="color: #ef4444; margin-bottom: 1rem; margin-top: 1rem;">
+      <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    </div>
+    <h3 style="color: #0f172a; margin-bottom: 0.5rem; font-size: 1.5rem;">Lỗi Đăng Ký</h3>
+    <p style="color: #b91c1c; margin-bottom: 2rem; background: #fef2f2; padding: 1rem; border-radius: 8px; border: 1px solid #fecaca;" id="registerErrorText">
+      Nội dung lỗi hiển thị ở đây
+    </p>
+    
+    <button type="button" class="btn-primary" style="width: 100%; background-color: #0f172a;" onclick="document.getElementById('registerErrorModal').classList.remove('active')">Đã hiểu & Đóng</button>
+  </div>
+</div>
+
 <script th:src="@{/js/register.js}" defer></script>
 </body>
 </html>

@@ -1,8 +1,3 @@
-//Đồng bộ giờ local ngay khi tải trang
-document.addEventListener("DOMContentLoaded", function() {
-    formatLocalTime();
-});
-
 document.addEventListener("DOMContentLoaded", function() {
     // --- 1. ĐIỀU KHIỂN MỞ/ĐÓNG MODAL LỊCH SỬ GIAO DỊCH ---
     const txModal = document.getElementById('transactionHistoryModal');
@@ -42,14 +37,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 isFetching = true;
                 loadingIndicator.style.display = 'block';
                 
-                fetch(`/dashboard/transactions/more?lastDate=${encodeURIComponent(lastDate)}&lastId=${lastId}`)
+                const isHistoryPage = window.location.pathname.includes('/history');
+                const sourceParam = isHistoryPage ? 'history' : 'dashboard';
+                
+                fetch(`/dashboard/transactions/more?lastDate=${encodeURIComponent(lastDate)}&lastId=${lastId}&source=${sourceParam}`)
                     .then(res => res.text())
                     .then(html => {
-                        if (html.trim() === '') {
-                            hasMoreTx = false; 
+                        if (!html.includes('tx-card-item')) {
+                            hasMoreTx = false;
                         } else {
                             txList.insertAdjacentHTML('beforeend', html);
-                            formatLocalTime();
+                            if (typeof formatLocalTime === 'function') {
+                                formatLocalTime();
+                            }
                         }
                     })
                     .finally(() => {
@@ -88,26 +88,6 @@ toggleButtons.forEach(btn => {
         }
     });
 });
-
-// Hàm chuyển đổi thời gian gốc của Server sang Local Time của trình duyệt
-function formatLocalTime() {
-    document.querySelectorAll('.local-time:not(.formatted)').forEach(el => {
-        let utcStr = el.getAttribute('data-utc');
-        if (utcStr && !utcStr.endsWith('Z')) {
-            utcStr += 'Z';
-        }
-
-        const date = new Date(utcStr);
-        const dd = String(date.getDate()).padStart(2, '0');
-        const MM = String(date.getMonth() + 1).padStart(2, '0');
-        const yyyy = date.getFullYear();
-        const HH = String(date.getHours()).padStart(2, '0');
-        const mm = String(date.getMinutes()).padStart(2, '0');
-        
-        el.textContent = `${dd}/${MM}/${yyyy} ${HH}:${mm}`;
-        el.classList.add('formatted');
-    });
-}
 
 // HÀM MỞ CHI TIẾT GIAO DỊCH (BIÊN LAI)
 function openTxDetail(id) {
@@ -153,13 +133,8 @@ function openTxDetail(id) {
             if(data.type === 'TRANSFER') {
                  document.getElementById('dtAccLabel').textContent = data.direction === 'CREDIT' ? 'Từ tài khoản' : 'Đến tài khoản';
                  
-                 let displayText = data.relatedAccountNumber || 'N/A';
-                 if (data.relatedAccountName) {
-                     displayText = `${data.relatedAccountName} / ${displayText}`;
-                 }
-                 document.getElementById('dtAcc').textContent = displayText;
-                 // ---------------------------------------------
-                 
+                 const relatedName = data.relatedAccountName ? ` - ${data.relatedAccountName}` : '';
+                 document.getElementById('dtAcc').textContent = (data.relatedAccountNumber || 'N/A') + relatedName;
             } else {
                  document.getElementById('dtAccLabel').textContent = 'Tài khoản giao dịch';
                  document.getElementById('dtAcc').textContent = data.accountNumber;

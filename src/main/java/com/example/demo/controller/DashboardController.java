@@ -67,16 +67,7 @@ public class DashboardController {
         Page<Transaction> txPage = transactionRepository.findAll(
                 TransactionSpecification.isRelatedToUserIdWithCursor(currentUserId, null, null), pageable);
                 
-        List<DashboardTransactionDTO> transactionDTOs = txPage.getContent().stream()
-            .map(tx -> new DashboardTransactionDTO(
-                    tx.getId(), 
-                    tx.getTransactionId(), 
-                    tx.getType(), 
-                    tx.getAmount(), 
-                    tx.getTransactionDate(),
-                    tx.getDirection(),
-                    tx.getAccount().getAccountNumber()))
-            .toList();
+        List<DashboardTransactionDTO> transactionDTOs = mapTransactionsToDTOs(txPage);
             
         model.addAttribute("transactions", transactionDTOs);
         model.addAttribute("hasTransactions", !transactionDTOs.isEmpty());
@@ -92,7 +83,8 @@ public class DashboardController {
     public String loadMoreTransactions(HttpSession session, Model model,
                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDate,
                                        @RequestParam Long lastId,
-                                       @RequestParam(defaultValue = "10") int size) {
+                                       @RequestParam(defaultValue = "10") int size,
+                                       @RequestParam(defaultValue = "dashboard") String source) { // BỔ SUNG THAM SỐ SOURCE
                                        
         Long currentUserId = (Long) session.getAttribute("userId");
         
@@ -100,19 +92,14 @@ public class DashboardController {
         Page<Transaction> txPage = transactionRepository.findAll(
                 TransactionSpecification.isRelatedToUserIdWithCursor(currentUserId, lastDate, lastId), pageable);
 
-        // MAP TRANSACTION SANG DTO KHI LOAD MORE
-        List<DashboardTransactionDTO> transactionDTOs = txPage.getContent().stream()
-            .map(tx -> new DashboardTransactionDTO(
-                    tx.getId(), 
-                    tx.getTransactionId(), 
-                    tx.getType(), 
-                    tx.getAmount(), 
-                    tx.getTransactionDate(),
-                    tx.getDirection(),
-                    tx.getAccount().getAccountNumber()))
-            .toList();
+        List<DashboardTransactionDTO> transactionDTOs = mapTransactionsToDTOs(txPage);
 
         model.addAttribute("transactions", transactionDTOs);
+        
+        if ("history".equals(source)) {
+            return "dashboard-history :: txItems";
+        }
+        
         return "dashboard :: txItems"; 
     }
 
@@ -130,15 +117,24 @@ public class DashboardController {
         Page<Transaction> txPage = transactionRepository.findAll(
                 TransactionSpecification.isRelatedToUserIdWithCursor(currentUserId, null, null), pageable);
                 
-        List<DashboardTransactionDTO> transactionDTOs = txPage.getContent().stream()
-            .map(tx -> new DashboardTransactionDTO(
-                    tx.getId(), tx.getTransactionId(), tx.getType(), tx.getAmount(), 
-                    tx.getTransactionDate(), tx.getDirection(), tx.getAccount().getAccountNumber()))
-            .toList();
+        List<DashboardTransactionDTO> transactionDTOs = mapTransactionsToDTOs(txPage);
             
         model.addAttribute("transactions", transactionDTOs);
         model.addAttribute("hasTransactions", !transactionDTOs.isEmpty());
         
         return "dashboard-history";
+    }
+
+    private List<DashboardTransactionDTO> mapTransactionsToDTOs(Page<Transaction> txPage) {
+    return txPage.getContent().stream()
+        .map(tx -> new DashboardTransactionDTO(
+                tx.getId(), 
+                tx.getTransactionId(), 
+                tx.getType(), 
+                tx.getAmount(), 
+                tx.getTransactionDate(),
+                tx.getDirection(),
+                tx.getAccount().getAccountNumber()))
+        .toList();
     }
 }

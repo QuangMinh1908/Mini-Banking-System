@@ -14,4 +14,28 @@
       </div>
     </div>
   </div>
+
+  <!-- 2. POP-UP THÔNG TIN CÁ NHÂN -->
+  <div th:fragment="userProfileModal" class="modal-overlay" id="userProfileModal" style="z-index: 100000;">
+      <div class="modal-box bento-card" style="max-width: 600px; text-align: left; padding: 2rem 1.5rem;">
+          <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+              <h3 style="margin: 0; color: #0f172a; font-size: 1.25rem;">Thông tin Cá nhân</h3>
+              <button id="btnCloseUserProfile" class="btn-close-modal" style="background: none; border: none; color: #64748b; cursor: pointer; padding: 0.25rem;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+          </div>
+          
+          <div class="dashboard-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: #ffffff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.95rem;">
+              <p style="margin: 0;"><strong>ID:</strong> <span style="color: #2563eb;" th:text="'#KH' + ${#numbers.formatInteger(user.id, 3)}"></span></p>
+              <p style="margin: 0;"><strong>Tên đăng nhập:</strong> <span th:text="${user.username}"></span></p>
+              <p style="margin: 0;"><strong>Họ tên:</strong> <span th:text="${user.fullName}"></span></p>
+              <p style="margin: 0;"><strong>SĐT:</strong> <span th:text="${user.phoneNumber}"></span></p>
+              <p style="margin: 0;"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+              <p style="margin: 0;"><strong>Giới tính:</strong> <span th:text="${user.gender}"></span></p>
+              <p style="margin: 0; grid-column: span 2;"><strong>Ngày tạo:</strong> <span class="local-time" th:attr="data-utc=${user.createdAt}"></span></p>
+              <p style="margin: 0; grid-column: span 2;"><strong>Địa chỉ:</strong> <span th:text="${user.address}"></span></p>
+          </div>
+      </div>
+  </div>
 </body>
+</html>

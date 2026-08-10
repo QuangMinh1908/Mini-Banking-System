@@ -2,6 +2,18 @@
 // COMMON.JS - HÀM DÙNG CHUNG CHO TẤT CẢ CÁC TRANG
 // ==========================================
 
+// Xử lý escape HTML để tránh lỗi hiển thị và bảo mật
+function escapeHTML(str) {
+    if (!str) return '';
+    return str.toString().replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+    }[tag] || tag));
+}
+
 // 1. Hàm hiển thị Pop-up xác nhận chung
 function showConfirmModal(title, message, iconType, confirmCallback) {
     const modal = document.getElementById('globalConfirmModal');
@@ -302,4 +314,52 @@ document.getElementById('btnFinishWizard')?.addEventListener('click', (e) => {
 document.addEventListener("DOMContentLoaded", function() {
     const openUserId = new URLSearchParams(window.location.search).get('openUserId');
     if (openUserId) setTimeout(() => { if (typeof viewUserDetails === 'function') viewUserDetails(openUserId); }, 150);
+});
+
+// ==========================================
+// Chi tiết user
+// ==========================================
+document.addEventListener("DOMContentLoaded", function() {
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    const userProfileModal = document.getElementById('userProfileModal');
+    const btnCloseUserProfile = document.getElementById('btnCloseUserProfile');
+
+    if (userProfileBtn && userProfileModal) {
+        userProfileBtn.addEventListener('click', () => userProfileModal.classList.add('active'));
+    }
+    if (btnCloseUserProfile && userProfileModal) {
+        btnCloseUserProfile.addEventListener('click', () => userProfileModal.classList.remove('active'));
+    }
+    if (userProfileModal) {
+        userProfileModal.addEventListener('click', (e) => {
+            if (e.target === userProfileModal) userProfileModal.classList.remove('active');
+        });
+    }
+});
+
+// ==========================================
+// ĐỊNH DẠNG THỜI GIAN LOCAL (DÙNG CHUNG)
+// ==========================================
+function formatLocalTime() {
+    document.querySelectorAll('.local-time:not(.formatted)').forEach(el => {
+        let utcStr = el.getAttribute('data-utc');
+        if (utcStr && !utcStr.endsWith('Z')) {
+            utcStr += 'Z';
+        }
+
+        const date = new Date(utcStr);
+        const dd = String(date.getDate()).padStart(2, '0');
+        const MM = String(date.getMonth() + 1).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        const HH = String(date.getHours()).padStart(2, '0');
+        const mm = String(date.getMinutes()).padStart(2, '0');
+        
+        el.textContent = `${dd}/${MM}/${yyyy} ${HH}:${mm}`;
+        el.classList.add('formatted');
+    });
+}
+
+// Gọi hàm format khi trang đã tải xong
+document.addEventListener("DOMContentLoaded", function() {
+    formatLocalTime();
 });

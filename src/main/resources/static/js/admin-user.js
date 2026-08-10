@@ -2,18 +2,6 @@
 // ADMIN-USER.JS - XỬ LÝ LOGIC TRANG QUẢN LÝ KHÁCH HÀNG
 // ==========================================
 
-// chống XSS
-function escapeHTML(str) {
-    if (!str) return '';
-    return str.toString().replace(/[&<>'"]/g, tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-    }[tag] || tag));
-}
-
 // --- 1. XEM CHI TIẾT KHÁCH HÀNG ---
 const userDetailsModal = document.getElementById('userDetailsModal');
 function viewUserDetails(userId) {
@@ -43,7 +31,9 @@ function viewUserDetails(userId) {
             document.getElementById('detailGender').textContent = data.gender || 'Chưa cập nhật';
             
             if (data.createdAt) {
-                const createdDate = new Date(data.createdAt);
+                let dateStr = data.createdAt;
+                if (!dateStr.endsWith('Z')) dateStr += 'Z';
+                const createdDate = new Date(dateStr);
                 const formattedCreated = `${createdDate.getDate().toString().padStart(2, '0')}/${(createdDate.getMonth()+1).toString().padStart(2, '0')}/${createdDate.getFullYear()} ${createdDate.getHours().toString().padStart(2, '0')}:${createdDate.getMinutes().toString().padStart(2, '0')}`;
                 document.getElementById('detailCreatedAt').textContent = formattedCreated;
             } else {
@@ -66,7 +56,9 @@ function viewUserDetails(userId) {
             tbody.innerHTML = '';
             if (data.accounts && data.accounts.length > 0) {
                 data.accounts.forEach(acc => {
-                    const date = new Date(acc.dateOpen);
+                    let openDateStr = acc.dateOpen;
+                    if (!openDateStr.endsWith('Z')) openDateStr += 'Z';
+                    const date = new Date(openDateStr);
                     const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
                     const row = `<tr onclick="window.location.href='/admin/account?searchAccNum=${acc.accountNumber}&ref=user&userId=${userId}'" style="cursor: pointer;">
                         <td><span style="color: #2563eb; font-weight: 600; text-decoration: underline;">${acc.accountNumber}</span></td>
@@ -104,7 +96,7 @@ function openEditModal(userId) {
     const detailInput = document.getElementById('editDetail');
     if (detailInput) {
         detailInput.value = '';
-        detailInput.style.height = 'auto'; // Trả về chiều cao mặc định theo rows="2"
+        detailInput.style.height = 'auto';
     }
 
     fetch(`/admin/api/user/${userId}`)
@@ -177,7 +169,9 @@ function loadRequests() {
         .then(data => {
             if (data.content.length === 0 || data.last) hasMoreReqs = false;
             data.content.forEach(req => {
-                const d = new Date(req.requestDate);
+                let reqDateStr = req.requestDate;
+                if (!reqDateStr.endsWith('Z')) reqDateStr += 'Z';
+                const d = new Date(reqDateStr);
                 const formattedDate = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
                 let statusColor = req.status === 'PENDING' ? '#f59e0b' : (req.status === 'APPROVED' ? '#10b981' : '#ef4444');
                 let statusBg = req.status === 'PENDING' ? '#fef3c7' : (req.status === 'APPROVED' ? '#d1fae5' : '#fee2e2');
@@ -250,4 +244,3 @@ if (editDetailTextArea) {
         this.style.height = this.scrollHeight + 'px';
     });
 }
-

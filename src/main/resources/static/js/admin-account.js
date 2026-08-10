@@ -61,7 +61,9 @@ function viewAccountDetails(accountNumber) {
             }
             
             if (data.dateOpen) {
-                const date = new Date(data.dateOpen);
+                let dateStr = data.dateOpen;
+                if (!dateStr.endsWith('Z')) dateStr += 'Z';
+                const date = new Date(dateStr);
                 document.getElementById('accDetailDate').textContent = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
             }
             

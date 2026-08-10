@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.TransactionDetailDTO;
+import com.example.demo.model.Account;
 import com.example.demo.model.Transaction;
+import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.TransactionRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
@@ -14,9 +16,12 @@ import java.util.Map;
 public class TransactionRestController {
 
     private final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository; // Thêm AccountRepository
 
-    public TransactionRestController(TransactionRepository transactionRepository) {
+    // Tiêm AccountRepository vào constructor
+    public TransactionRestController(TransactionRepository transactionRepository, AccountRepository accountRepository) {
         this.transactionRepository = transactionRepository;
+        this.accountRepository = accountRepository;
     }
 
     @GetMapping("/{id}")
@@ -30,10 +35,20 @@ public class TransactionRestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Không có quyền truy cập"));
         }
 
+        // Lấy tên của tài khoản liên quan (nếu có)
+        String relatedName = null;
+        if (tx.getRelatedAccountNumber() != null) {
+            Account relatedAcc = accountRepository.findByAccountNumber(tx.getRelatedAccountNumber());
+            if (relatedAcc != null && relatedAcc.getUser() != null) {
+                relatedName = relatedAcc.getUser().getFullName();
+            }
+        }
+
+        // Đưa relatedName vào DTO
         TransactionDetailDTO dto = new TransactionDetailDTO(
                 tx.getTransactionId(), tx.getType(), tx.getDirection(), tx.getAmount(),
                 tx.getTransactionDate(), tx.getDescription(), 
-                tx.getAccount().getAccountNumber(), tx.getRelatedAccountNumber()
+                tx.getAccount().getAccountNumber(), tx.getRelatedAccountNumber(), relatedName
         );
         return ResponseEntity.ok(dto);
     }

@@ -59,6 +59,13 @@
       <div class="content-scroll-area">
         <div class="admin-container">
 
+          <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}"></span>
+          </div>
+          <div th:if="${error}" style="margin-top: 1rem; padding: 0.75rem; border-radius: 0.5rem; background: #fee2e2; color: #b91c1c; font-size: 0.875rem;">
+            <span th:text="${error}"></span>
+          </div>
+
           <div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 1rem;">
               <button th:if="${param.ref != null and #strings.equals(param.ref, 'user')}" 

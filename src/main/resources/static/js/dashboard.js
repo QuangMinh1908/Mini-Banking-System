@@ -93,11 +93,10 @@ toggleButtons.forEach(btn => {
 function formatLocalTime() {
     document.querySelectorAll('.local-time:not(.formatted)').forEach(el => {
         let utcStr = el.getAttribute('data-utc');
-
         if (utcStr && !utcStr.endsWith('Z')) {
             utcStr += 'Z';
         }
-        
+
         const date = new Date(utcStr);
         const dd = String(date.getDate()).padStart(2, '0');
         const MM = String(date.getMonth() + 1).padStart(2, '0');

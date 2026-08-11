@@ -9,15 +9,6 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
-/**
- * DTO dùng chung để hứng dữ liệu từ Form chuyển tiền trên giao diện.
- * Dùng chung cho cả 2 hình thức chuyển: cùng chủ tài khoản (nội bộ)
- * và khác chủ tài khoản (nhập số tài khoản người nhận).
- *
- * Hệ thống KHÔNG cần 2 DTO riêng biệt: Controller/Service sẽ tự phân biệt
- * đây là chuyển cùng chủ hay khác chủ dựa vào user_id của tài khoản đích
- * tìm được trong lúc xử lý (xem TransferService).
- */
 public class TransferRequestDTO {
 
     @NotBlank(message = "Vui lòng chọn tài khoản nguồn")

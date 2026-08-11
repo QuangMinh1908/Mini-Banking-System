@@ -65,7 +65,6 @@
             </header>
 
             <div class="content-scroll-area">
-
                 <div class="transfer-layout-grid">
                     <!-- CỘT TRÁI: FORM CHUYỂN KHOẢN -->
                     <div class="bento-card transfer-form-card" style="margin: 0; max-width: 100%;">
@@ -73,46 +72,67 @@
                             <h3>Chuyển khoản</h3>
                         </div>
 
-                        <form id="transferForm" th:action="@{/dashboard/transfer}" th:object="${transferRequest}" method="post" autocomplete="off">
+                        <!-- NÚT GẠT ĐƠN (TOGGLE SWITCH) -->
+                        <div class="toggle-switch-container">
+                            <label for="transferTypeCheckbox" class="toggle-label-text">Chuyển cùng tài khoản</label>
+                            <label class="switch">
+                                <input type="checkbox" id="transferTypeCheckbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <form id="transferForm" th:action="@{/dashboard/transfer}" method="post" autocomplete="off">
+                            
+                            <!-- Input Ẩn thực sự gửi xuống Spring Boot -->
+                            <input type="hidden" id="realToAccountNumber" name="toAccountNumber" th:value="${transferRequest.toAccountNumber}">
             
                             <div class="input-group">
                                 <label for="fromAccountNumber">Tài khoản nguồn</label>
-                                <select id="fromAccountNumber" th:field="*{fromAccountNumber}" required
-                                        th:classappend="${#fields.hasErrors('fromAccountNumber')} ? 'input-invalid'">
+                                <select id="fromAccountNumber" name="fromAccountNumber" required class="input-select">
                                     <option value="">-- Chọn tài khoản chuyển --</option>
                                     <option th:each="acc : ${sourceAccounts}"
                                             th:value="${acc.accountNumber}"
+                                            th:selected="${acc.accountNumber == transferRequest.fromAccountNumber}"
                                             th:data-balance="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'"
                                             th:data-limit="${acc.transactionLimit == '50M' ? '50 Tr' : (acc.transactionLimit == '500M' ? '500 Tr' : 'Không giới hạn')}"
                                             th:data-date="${#temporals.format(acc.dateOpen, 'dd/MM/yyyy')}"
                                             th:text="${acc.accountNumber} + ' — Số dư: ' + ${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">
                                     </option>
                                 </select>
-                                <span class="field-error" th:if="${#fields.hasErrors('fromAccountNumber')}" th:errors="*{fromAccountNumber}"></span>
                             </div>
                 
-                            <div class="input-group">
-                                <label for="toAccountNumber">Tài khoản đích (số tài khoản người nhận)</label>
-                                <input type="text" id="toAccountNumber" th:field="*{toAccountNumber}" required
-                                       th:classappend="${#fields.hasErrors('toAccountNumber')} ? 'input-invalid'"
-                                       placeholder="Nhập số tài khoản người nhận" inputmode="numeric" maxlength="20">
-                                <span class="field-error" th:if="${#fields.hasErrors('toAccountNumber')}" th:errors="*{toAccountNumber}"></span>
+                            <!-- Ô Nhập Cùng Tài Khoản (Dropdown) -->
+                            <div class="input-group" id="internalTargetGroup">
+                                <label for="toAccountNumberInternal">Tài khoản đích</label>
+                                <select id="toAccountNumberInternal" class="input-select">
+                                    <option value="">-- Chọn tài khoản nhận --</option>
+                                    <option th:each="acc : ${allMyAccounts}"
+                                            th:value="${acc.accountNumber}"
+                                            th:data-type="${acc.accountType.name()}"
+                                            th:data-balance="${#numbers.formatDecimal(acc.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'"
+                                            th:data-limit="${acc.transactionLimit != null ? (acc.transactionLimit == '50M' ? '50 Tr' : (acc.transactionLimit == '500M' ? '500 Tr' : 'Không giới hạn')) : ''}"
+                                            th:data-interest="${acc.interestRate}"
+                                            th:data-term="${acc.termMonths}"
+                                            th:data-date="${#temporals.format(acc.dateOpen, 'dd/MM/yyyy')}"
+                                            th:text="${acc.accountType.name() == 'PAYMENT' ? 'Thanh toán - ' : 'Tiết kiệm - '} + ${acc.accountNumber}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Ô Nhập Người Khác (Text) -->
+                            <div class="input-group" id="externalTargetGroup" style="display: none;">
+                                <label for="toAccountNumberExternal">Tài khoản đích (số tài khoản người nhận)</label>
+                                <input type="text" id="toAccountNumberExternal" placeholder="Nhập số tài khoản người nhận" inputmode="numeric" maxlength="20">
                             </div>
 
                             <div class="input-group">
                                 <label for="amount">Số tiền (VND)</label>
-                                <input type="number" id="amount" th:field="*{amount}" required
-                                       th:classappend="${#fields.hasErrors('amount')} ? 'input-invalid'"
-                                       placeholder="Ví dụ: 500000" step="1" min="1">
-                                <span class="field-error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></span>
+                                <input type="number" id="amount" name="amount" th:value="${transferRequest.amount}" required placeholder="Ví dụ: 500000" step="1" min="1">
                             </div>
                 
                             <div class="input-group">
                                 <label for="description">Nội dung chuyển khoản</label>
-                                <input type="text" id="description" th:field="*{description}"
-                                       th:classappend="${#fields.hasErrors('description')} ? 'input-invalid'"
-                                       placeholder="Ví dụ: Chuyển tiền ăn trưa (không bắt buộc)" maxlength="255">
-                                <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+                                <input type="text" id="description" name="description" th:value="${transferRequest.description}" placeholder="Ví dụ: Chuyển tiền ăn trưa (không bắt buộc)" maxlength="255">
                             </div>
                 
                             <button type="submit" id="btnSubmitTransfer" class="btn-primary w-100">Xác nhận chuyển khoản</button>
@@ -121,22 +141,31 @@
                 
                     <!-- CỘT PHẢI: HIỂN THỊ ẢNH THẺ -->
                     <div class="transfer-preview-col" style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center;">
-                        <h4 style="margin-bottom: 1rem; color: #64748b; font-weight: 500;">Thẻ giao dịch</h4>
+                        <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: #64748b; font-weight: 500;">Tài khoản nguồn</h4>
                         <div id="cardPreviewContainer" style="width: 100%;">
                             <div style="background: #e2e8f0; height: 210px; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 2px dashed #cbd5e1;">
                                 Vui lòng chọn tài khoản nguồn...
                             </div>
                         </div>
 
-                        <!-- BOX HIỂN THỊ THÔNG TIN NGƯỜI NHẬN MỚI -->
-                        <div id="receiverInfoBox" style="display: none; margin-top: 1.5rem; width: 100%; max-width: 420px; padding: 1.25rem; border-radius: 1rem; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);"></div>
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem; color: #64748b; font-weight: 500;">Tài khoản đích</h4>
+                        
+                        <!-- Hiển thị Card khi chọn Cùng Tài Khoản -->
+                        <div id="targetCardContainer" style="width: 100%;">
+                            <div style="background: #e2e8f0; height: 210px; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 2px dashed #cbd5e1;">
+                                Vui lòng chọn tài khoản nhận...
+                            </div>
+                        </div>
+
+                        <!-- Hiển thị Box Tên khi chọn Người Khác -->
+                        <div id="receiverInfoBox" style="display: none; width: 100%; max-width: 420px; padding: 1.25rem; border-radius: 1rem; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);"></div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-        <!-- POP-UP GIAO DỊCH THÀNH CÔNG -->
+    <!-- KHÔI PHỤC LẠI POP-UP GIAO DỊCH THÀNH CÔNG -->
     <div class="modal-overlay active" th:if="${txSuccessMessage}" id="successModal" style="z-index: 99999;">
         <div class="modal-box bento-card" style="max-width: 450px; text-align: center; position: relative;">
             <button class="btn-close-modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; cursor: pointer; color: #64748b;" onclick="document.getElementById('successModal').classList.remove('active')">

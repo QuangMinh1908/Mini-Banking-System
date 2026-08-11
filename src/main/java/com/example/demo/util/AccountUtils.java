@@ -4,14 +4,8 @@ import java.security.SecureRandom;
 
 public class AccountUtils {
     
-    // Khởi tạo SecureRandom tĩnh để tái sử dụng, tối ưu hiệu suất và tăng cường bảo mật
     private static final SecureRandom secureRandom = new SecureRandom();
 
-    /**
-     * Sinh số tài khoản ngẫu nhiên gồm 10 chữ số chuẩn thuật toán Luhn (Modulus 10)
-     * Cấu trúc: [Prefix] + [7 số ngẫu nhiên] + [1 số checksum]
-     * Prefix: 88 (PAYMENT) hoặc 99 (SAVING)
-     */
     public static String generateLuhnAccountNumber(String prefix) {
         // 1. Khởi tạo chuỗi với tiền tố được truyền vào (88 hoặc 99)
         StringBuilder accNum = new StringBuilder(prefix);

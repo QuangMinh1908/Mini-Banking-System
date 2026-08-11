@@ -148,8 +148,6 @@ public class TransferService {
         transactionRepository.save(debitTx);
         transactionRepository.save(creditTx);
 
-        // Log audit: phục vụ tra soát/đối chiếu giao dịch sau này (không log ở mức DEBUG vì
-        // đây là dữ liệu tài chính cần giữ lại theo mức log mặc định INFO của production).
         logger.info("Transfer succeeded - txId={}, fromAcc={}, toAcc={}, amount={}, userId={}",
                 sharedTransactionId, fromAccount.getAccountNumber(), toAccount.getAccountNumber(),
                 amount, currentUserId);
@@ -157,12 +155,6 @@ public class TransferService {
         return debitTx;
     }
 
-    /**
-     * Quy đổi mã hạn mức (lưu dạng String trong DB) sang số tiền tối đa.
-     * FAIL-CLOSED: nếu gặp giá trị không nằm trong danh sách đã biết (dữ liệu lỗi do
-     * migration/nhập tay/bug ở nơi khác), TỪ CHỐI giao dịch thay vì âm thầm bỏ qua kiểm tra
-     * hạn mức như code cũ (fail-open) - tránh vô tình cho phép chuyển không giới hạn.
-     */
     private BigDecimal resolveMaxLimit(String limitStr, String accountNumber) {
         switch (limitStr) {
             case "50M":

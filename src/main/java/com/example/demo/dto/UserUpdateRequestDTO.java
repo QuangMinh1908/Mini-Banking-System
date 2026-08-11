@@ -8,8 +8,6 @@ public class UserUpdateRequestDTO {
     private String status;
     private LocalDateTime requestDate;
     private String detail;
-    
-    // Các trường thay đổi
     private String newFullName;
     private String newPhoneNumber;
     private String newEmail;

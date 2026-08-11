@@ -5,12 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-/**
- * LƯU Ý: DTO này hiện chưa được bind/validate ở controller nào (chưa có luồng admin
- * áp dụng yêu cầu cập nhật hồ sơ vào User thật). Thêm validate ở đây trước để khi
- * luồng đó được implement, dữ liệu ghi vào fullName/address... đã được chặn ký tự
- * HTML đặc biệt ngay từ DTO, tránh lặp lại rủi ro XSS đã thấy ở nơi hiển thị fullName.
- */
 public class UserUpdateFormDTO {
 
     @NotNull(message = "Thiếu ID khách hàng")

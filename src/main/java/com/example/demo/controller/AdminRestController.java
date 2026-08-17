@@ -1,15 +1,18 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.AccountDetailDTO;
+import com.example.demo.dto.AccountListDTO;
 import com.example.demo.dto.ResponseDTO;
 import com.example.demo.dto.UserDetailDTO;
 import com.example.demo.dto.UserListDTO;
+import com.example.demo.dto.UserUpdateFormDTO;
 import com.example.demo.dto.UserUpdateRequestDTO;
 import com.example.demo.model.Account;
 import com.example.demo.model.User;
 import com.example.demo.model.UserUpdateRequest;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.UserUpdateRequestRepository;
+import com.example.demo.service.AccountListService;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.UserListService;
 
@@ -17,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -131,5 +135,57 @@ public class AdminRestController {
         } else {
             return ResponseEntity.status(404).body(ResponseDTO.error("Không tìm thấy khách hàng"));
         }
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<Page<UserListDTO>> listUsers(
+            @RequestParam(required = false) Long searchId,
+            @RequestParam(required = false) String searchName,
+            @RequestParam(required = false) String searchPhone,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(userService.searchUsers(searchId, searchName, searchPhone, page, size));
+    }
+
+    @PostMapping("/users/update")
+    public ResponseEntity<ResponseDTO<Void>> updateUser(@RequestBody Map<String, String> payload) {
+        if (payload.get("id") == null) {
+            return ResponseEntity.badRequest().body(ResponseDTO.error("Thiếu ID khách hàng"));
+        }
+
+        UserUpdateFormDTO form = new UserUpdateFormDTO();
+        form.setId(Long.valueOf(payload.get("id")));
+        form.setFullName(payload.get("fullName"));
+        form.setPhoneNumber(payload.get("phoneNumber"));
+        form.setEmail(payload.get("email"));
+        form.setAddress(payload.get("address"));
+        form.setGender(payload.get("gender"));
+
+        userService.createUpdateRequest(form, payload.get("detail"));
+
+        return ResponseEntity.ok(ResponseDTO.<Void>success("Yêu cầu chỉnh sửa đã được gửi và đang chờ xét duyệt!", null));
+    }
+
+    @GetMapping("/accounts")
+    public ResponseEntity<Page<AccountListDTO>> listAccounts(
+            @RequestParam(required = false) String searchAccNum,
+            @RequestParam(required = false) String searchFullName,
+            @RequestParam(required = false) String searchUsername,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Specification<Account> spec = Specification.where(AccountListService.hasUserRole("user"))
+                .and(AccountListService.hasAccountNumber(searchAccNum))
+                .and(AccountListService.hasFullName(searchFullName))
+                .and(AccountListService.hasUsername(searchUsername));
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Account> accountPage = accountRepository.findAll(spec, pageable);
+
+        Page<AccountListDTO> dtoPage = accountPage.map(acc -> new AccountListDTO(
+                acc.getAccountNumber(), acc.getDateOpen(),
+                acc.getUser() != null ? acc.getUser().getFullName() : null));
+
+        return ResponseEntity.ok(dtoPage);
     }
 }

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -15,6 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseDTO<Void>> handleValidationException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(fieldError -> fieldError.getDefaultMessage())
+                .orElse("Dữ liệu nhập không hợp lệ, vui lòng kiểm tra lại!");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.error(message));
+    }
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ResponseDTO<Void>> handleAccountNotFound(AccountNotFoundException ex) {

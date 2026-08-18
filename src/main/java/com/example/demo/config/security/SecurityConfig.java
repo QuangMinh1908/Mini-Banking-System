@@ -1,6 +1,9 @@
 package com.example.demo.config.security;
 
 import com.example.demo.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,20 +11,49 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     SecurityConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Nhận biết request tới từ frontend React (fetch) để trả JSON,
+     * ngược lại xử lý theo kiểu form HTML truyền thống (Thymeleaf).
+     */
+    private boolean wantsJson(HttpServletRequest request) {
+        String accept = request.getHeader("Accept");
+        String xhr = request.getHeader("X-Requested-With");
+        return (accept != null && accept.contains("application/json")) || "XMLHttpRequest".equals(xhr);
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        
+        // Cấu hình bắt buộc cho Spring Security 6 + SPA: 
+        // Tắt tính năng "Trì hoãn CSRF" (Deferred CSRF) để cookie XSRF-TOKEN luôn được gửi về ngay.
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName(null);
+
         http
+            .csrf(csrf -> csrf
+                // BƯỚC QUAN TRỌNG: Bỏ qua kiểm tra CSRF cho các API đăng nhập/đăng ký ban đầu
+                // để tránh lỗi 403 do React chưa kịp có token khi gửi request lần đầu.
+                .ignoringRequestMatchers("/login", "/register", "/api/auth/register")
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(requestHandler)
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/login", "/").permitAll()
@@ -30,20 +62,59 @@ public class SecurityConfig {
                 .requestMatchers("/login", "/", "/register", "/register/success", "/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
+            // THÊM XỬ LÝ LỖI: Chặn Spring Security tự động redirect 302 nếu request lỗi thuộc về React
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    if (wantsJson(request)) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json;charset=UTF-8");
+                        try {
+                            objectMapper.writeValue(response.getWriter(), Map.of("error", "Vui lòng đăng nhập"));
+                        } catch (Exception ignored) {}
+                    } else {
+                        try {
+                            response.sendRedirect("/login");
+                        } catch (Exception ignored) {}
+                    }
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    if (wantsJson(request)) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("application/json;charset=UTF-8");
+                        try {
+                            objectMapper.writeValue(response.getWriter(), Map.of("error", "Không có quyền truy cập hoặc lỗi CSRF"));
+                        } catch (Exception ignored) {}
+                    } else {
+                        try {
+                            response.sendRedirect("/login?error=access-denied");
+                        } catch (Exception ignored) {}
+                    }
+                })
+            )
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
                 .successHandler((request, response, authentication) -> {
                     String role = authentication.getAuthorities().iterator().next().getAuthority();
                     String username = authentication.getName();
-                    
+
                     request.getSession().setAttribute("username", username);
                     request.getSession().setAttribute("role", role);
-                    
+
                     // Khắc phục lỗi: Lấy userId từ DB để lưu vào session
-                    userRepository.findByUsername(username).ifPresent(user -> {
-                        request.getSession().setAttribute("userId", user.getId());
-                    });
+                    userRepository.findByUsername(username).ifPresent(user ->
+                        request.getSession().setAttribute("userId", user.getId())
+                    );
+
+                    if (wantsJson(request)) {
+                        response.setStatus(200);
+                        response.setContentType("application/json;charset=UTF-8");
+                        Map<String, Object> body = new HashMap<>();
+                        body.put("username", username);
+                        body.put("role", role);
+                        objectMapper.writeValue(response.getWriter(), body);
+                        return;
+                    }
 
                     if ("admin".equals(role)) {
                         response.sendRedirect("/admin");
@@ -51,14 +122,31 @@ public class SecurityConfig {
                         response.sendRedirect("/dashboard");
                     }
                 })
-                .failureUrl("/login?error=true")
+                .failureHandler((request, response, exception) -> {
+                    if (wantsJson(request)) {
+                        response.setStatus(401);
+                        response.setContentType("application/json;charset=UTF-8");
+                        objectMapper.writeValue(response.getWriter(),
+                                Map.of("error", "Tài khoản hoặc mật khẩu không chính xác."));
+                        return;
+                    }
+                    response.sendRedirect("/login?error=true");
+                })
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    if (wantsJson(request)) {
+                        response.setStatus(200);
+                        response.setContentType("application/json;charset=UTF-8");
+                        objectMapper.writeValue(response.getWriter(), Map.of("status", "SUCCESS"));
+                        return;
+                    }
+                    response.sendRedirect("/login?logout=true");
+                })
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID", "remember-me")
+                .deleteCookies("JSESSIONID", "remember-me", "XSRF-TOKEN")
                 .permitAll()
             );
         return http.build();

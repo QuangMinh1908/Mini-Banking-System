@@ -49,7 +49,12 @@ public class AuthRestController {
         return ResponseEntity.ok(response);
     }
 
-
+    /**
+     * Trả về thông tin phiên đăng nhập hiện tại — dùng bởi frontend React để biết ai đang đăng
+     * nhập (thay cho biến "user"/"username" Thymeleaf trước đây truyền thẳng vào model).
+     * 401 nếu chưa đăng nhập (thay vì dựa vào SecurityConfig, kiểm tra thủ công vì "/api/auth/**"
+     * đang permitAll để endpoint /register, /check-step1 phía trên vẫn dùng được lúc chưa đăng nhập).
+     */
     @GetMapping("/me")
     public ResponseEntity<CurrentUserDTO> me(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
@@ -68,7 +73,11 @@ public class AuthRestController {
         return ResponseEntity.ok(dto);
     }
 
-
+    /**
+     * Đăng ký tài khoản mới (phiên bản JSON của POST /register truyền thống).
+     * Giữ đúng hành vi bản gốc: tự động đăng nhập (tạo session) ngay sau khi đăng ký thành công,
+     * để nút "Vào Bảng điều khiển ngay" ở trang thành công điều hướng thẳng vào /dashboard được.
+     */
     @PostMapping("/register")
     public ResponseEntity<ResponseDTO<String>> register(@Valid @RequestBody RegisterRequestDTO form,
                                                           HttpServletRequest request) throws Exception {
@@ -76,7 +85,7 @@ public class AuthRestController {
 
         User newUser = new User();
         newUser.setUsername(form.getUsername());
-        newUser.setPassword(rawPassword);
+        newUser.setPassword(rawPassword); // UserService sẽ mã hoá BCrypt trước khi lưu
         newUser.setFullName(form.getFullName());
         newUser.setPhoneNumber(form.getPhoneNumber());
         newUser.setEmail(form.getEmail());
@@ -85,6 +94,7 @@ public class AuthRestController {
 
         Account newAccount = userService.registerNewUser(newUser);
 
+        // Tự động đăng nhập (giống hệt AuthController.registerUser bản form cũ)
         request.login(newUser.getUsername(), rawPassword);
         request.getSession().setAttribute("username", newUser.getUsername());
         request.getSession().setAttribute("role", "user");

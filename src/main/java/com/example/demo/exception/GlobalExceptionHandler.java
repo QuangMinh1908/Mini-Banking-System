@@ -17,9 +17,7 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // Lỗi validation (@Valid) trên @RequestBody của các endpoint JSON mới (vd POST
-    // /dashboard/api/transfer, POST /api/auth/register) — trả đúng thông báo lỗi field đầu tiên,
-    // giống cách AuthController/TransferController xử lý BindingResult cho luồng form cũ.
+    // Lỗi validation (@Valid) trên @RequestBody của các endpoint JSON
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseDTO<Void>> handleValidationException(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getFieldErrors().stream()

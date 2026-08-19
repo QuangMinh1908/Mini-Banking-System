@@ -50,10 +50,7 @@ public class AuthRestController {
     }
 
     /**
-     * Trả về thông tin phiên đăng nhập hiện tại — dùng bởi frontend React để biết ai đang đăng
-     * nhập (thay cho biến "user"/"username" Thymeleaf trước đây truyền thẳng vào model).
-     * 401 nếu chưa đăng nhập (thay vì dựa vào SecurityConfig, kiểm tra thủ công vì "/api/auth/**"
-     * đang permitAll để endpoint /register, /check-step1 phía trên vẫn dùng được lúc chưa đăng nhập).
+     * Trả về thông tin phiên đăng nhập hiện tại (Current User) nếu đã đăng nhập, hoặc 401 nếu chưa.
      */
     @GetMapping("/me")
     public ResponseEntity<CurrentUserDTO> me(HttpSession session) {
@@ -74,9 +71,7 @@ public class AuthRestController {
     }
 
     /**
-     * Đăng ký tài khoản mới (phiên bản JSON của POST /register truyền thống).
-     * Giữ đúng hành vi bản gốc: tự động đăng nhập (tạo session) ngay sau khi đăng ký thành công,
-     * để nút "Vào Bảng điều khiển ngay" ở trang thành công điều hướng thẳng vào /dashboard được.
+     * Đăng ký tài khoản mới và tự động đăng nhập (tương tự như AuthController.registerUser bản form cũ).
      */
     @PostMapping("/register")
     public ResponseEntity<ResponseDTO<String>> register(@Valid @RequestBody RegisterRequestDTO form,
@@ -94,7 +89,7 @@ public class AuthRestController {
 
         Account newAccount = userService.registerNewUser(newUser);
 
-        // Tự động đăng nhập (giống hệt AuthController.registerUser bản form cũ)
+        // Tự động đăng nhập
         request.login(newUser.getUsername(), rawPassword);
         request.getSession().setAttribute("username", newUser.getUsername());
         request.getSession().setAttribute("role", "user");

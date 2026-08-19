@@ -54,7 +54,7 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf
-                // BƯỚC QUAN TRỌNG: Bỏ qua kiểm tra CSRF cho các API đăng nhập/đăng ký ban đầu
+                // Bỏ qua kiểm tra CSRF cho các API đăng nhập/đăng ký ban đầu
                 // để tránh lỗi 403 do React chưa kịp có token khi gửi request lần đầu.
                 .ignoringRequestMatchers("/login", "/register", "/api/auth/register")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -69,7 +69,7 @@ public class SecurityConfig {
                 .requestMatchers("/login", "/", "/register", "/register/success", "/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
-            // THÊM XỬ LÝ LỖI: Chặn Spring Security tự động redirect 302 nếu request lỗi thuộc về React
+            // Chặn Spring Security tự động redirect 302 nếu request lỗi thuộc về React
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
                     if (wantsJson(request)) {
@@ -167,14 +167,6 @@ public class SecurityConfig {
     /**
      * Ép CsrfToken được "resolve" (và do đó lưu vào cookie XSRF-TOKEN) ngay ở MỌI request, kể cả
      * khi không có đoạn code nào (Thymeleaf, controller...) chủ động đọc CsrfToken.
-     *
-     * Lý do cần thiết: mặc định CookieCsrfTokenRepository dùng cơ chế "deferred" — token/cookie
-     * chỉ thực sự được ghi khi có gì đó gọi CsrfToken.getToken(). Với các trang Thymeleaf cũ,
-     * th:action tự động đọc _csrf nên cookie luôn được set. Nhưng SPA React không render HTML nào
-     * ở server cả — nếu không ép resolve thủ công như dưới đây, request GET đầu tiên (vd
-     * /api/auth/me lúc app vừa load) có thể không set cookie XSRF-TOKEN, khiến request POST/PUT
-     * kế tiếp (login, transfer...) thiếu token để gửi lên. Đây là pattern chính thức được khuyến
-     * nghị trong tài liệu Spring Security (mục "CSRF and Single Page Applications").
      */
     private static final class CsrfCookieFilter extends OncePerRequestFilter {
         @Override

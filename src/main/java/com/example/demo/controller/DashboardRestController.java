@@ -29,15 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-/**
- * API JSON dùng bởi frontend React cho khu vực khách hàng (Dashboard/Chuyển khoản/Lịch sử).
- * Đặt dưới tiền tố "/dashboard/api/..." để tái sử dụng đúng luật phân quyền có sẵn
- * (SecurityConfig: "/dashboard/**" -> hasAuthority("user")) mà không cần thêm luật mới.
- *
- * Toàn bộ logic nghiệp vụ tái sử dụng lại y hệt DashboardController / TransferController /
- * TransferService hiện có (không viết trùng lặp) — chỉ khác ở việc trả JSON thay vì render
- * Thymeleaf, để phù hợp với kiến trúc SPA.
- */
+
 @RestController
 @RequestMapping("/dashboard/api")
 public class DashboardRestController {

@@ -2,34 +2,34 @@
    1. CSS VARIABLES (ĐỊNH NGHĨA BIẾN TOÀN CỤC)
    ========================================================================== */
 :root {
-  /* Hệ màu sắc (Color Palette) - Chuẩn ngân hàng số hiện đại */
-  --color-primary: #2563eb;       /* Xanh dương chủ đạo: tạo sự tin cậy */
+  /* Hệ màu sắc */
+  --color-primary: #2563eb;
   --color-primary-hover: #1d4ed8; 
-  --color-background: #f1f5f9;    /* Màu nền tổng thể (xám rất nhạt) */
-  --color-surface: #ffffff;       /* Màu nền của các thẻ card/bento */
+  --color-background: #f1f5f9;
+  --color-surface: #ffffff;
   
-  /* Màu văn bản (Typography Colors) */
-  --text-main: #0f172a;           /* Chữ chính (Đen/Xanh đen đậm) */
-  --text-muted: #64748b;          /* Chữ phụ, mô tả (Xám) */
+  /* Màu văn bản */
+  --text-main: #0f172a;
+  --text-muted: #64748b;
   
-  /* Màu trạng thái giao dịch (Status Colors) */
-  --color-success: #10b981;       /* Xanh lá: Tiền vào, Thành công */
-  --color-danger: #ef4444;        /* Đỏ: Tiền ra, Lỗi, Khóa tài khoản */
-  --color-warning: #f59e0b;       /* Cam: Chờ xử lý, Cảnh báo */
+  /* Màu trạng thái giao dịch */
+  --color-success: #10b981;       /*Thành công */
+  --color-danger: #ef4444;        /*Tiền ra, Lỗi, Khóa tài khoản */
+  --color-warning: #f59e0b;       /*Chờ xử lý, Cảnh báo */
 
-  /* Bố cục & Lưới (Bento Grid & Spacing) */
-  --gap-bento: 1.5rem;            /* Khoảng cách chuẩn giữa các ô trong lưới */
+  /* Bố cục & Lưới */
+  --gap-bento: 1.5rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
   --spacing-lg: 2rem;
 
-  /* Bo góc & Đổ bóng (Border Radius & Shadows) */
-  --radius-card: 1.25rem;         /* Bo góc khá tròn, đặc trưng của UI hiện đại/Bento */
+  /* Bo góc & Đổ bóng */
+  --radius-card: 1.25rem;
   --radius-button: 0.5rem;
   --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 
-  /* Phông chữ (Typography) */
+  /* Phông chữ */
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -67,7 +67,7 @@ button {
    3. UTILITY CLASSES (CÁC CLASS DÙNG CHUNG)
    ========================================================================== */
 
-/* Nút bấm (Buttons) */
+/* Nút bấm */
 .btn-primary {
   background-color: var(--color-primary);
   color: #fff;
@@ -81,7 +81,6 @@ button {
   background-color: var(--color-primary-hover);
 }
 
-/* Khung giao diện Bento Grid chung cho các Widget/Cards */
 .bento-card {
   background-color: var(--color-surface);
   border-radius: var(--radius-card);
@@ -94,7 +93,7 @@ button {
   box-shadow: var(--shadow-hover);
 }
 
-/* Định dạng số tiền (Số dư) */
+/* Định dạng số dư */
 .amount-text {
   font-size: 2rem;
   font-weight: 700;
@@ -113,19 +112,16 @@ button {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(15, 23, 42, 0.6); /* Lớp phủ đen mờ */
+  background-color: rgba(15, 23, 42, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; /* Luôn nằm trên cùng */
-  
-  /* Mặc định ẩn đi */
+  z-index: 9999;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
 }
 
-/* Khi có class 'active', popup sẽ hiện ra */
 .modal-overlay.active {
   opacity: 1;
   visibility: visible;
@@ -136,7 +132,6 @@ button {
   max-width: 400px;
   text-align: center;
   
-  /* Hiệu ứng trượt từ trên xuống một chút khi xuất hiện */
   transform: translateY(-20px);
   transition: transform 0.3s ease;
 }
@@ -161,7 +156,6 @@ button {
   gap: var(--spacing-md);
 }
 
-/* Nút bấm phụ (Nút Không) */
 .btn-secondary {
   background-color: #e2e8f0;
   color: var(--text-main);

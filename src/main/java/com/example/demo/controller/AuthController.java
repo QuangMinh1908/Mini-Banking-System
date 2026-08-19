@@ -61,7 +61,7 @@ public class AuthController {
         try {
             User newUser = new User();
             newUser.setUsername(form.getUsername());
-            newUser.setPassword(rawPassword); // UserService sẽ mã hoá BCrypt trước khi lưu
+            newUser.setPassword(rawPassword);
             newUser.setFullName(form.getFullName());
             newUser.setPhoneNumber(form.getPhoneNumber());
             newUser.setEmail(form.getEmail());

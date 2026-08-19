@@ -2,10 +2,6 @@ package com.example.demo.dto;
 
 import java.time.LocalDateTime;
 
-/**
- * Trả về cho GET /api/auth/me — dùng bởi frontend React để biết phiên đăng nhập hiện tại
- * (thay cho việc Thymeleaf trước đây truyền thẳng biến "user" vào model).
- */
 public class CurrentUserDTO {
     private Long id;
     private String username;

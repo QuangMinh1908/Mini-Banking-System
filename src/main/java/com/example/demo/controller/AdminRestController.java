@@ -140,8 +140,6 @@ public class AdminRestController {
     // ==========================================
     // API JSON DÙNG BỞI FRONTEND REACT (trang Admin)
     // ==========================================
-    // Đặt dưới "/admin/api/..." để tái sử dụng đúng luật phân quyền có sẵn
-    // (SecurityConfig: "/admin/**" -> hasAuthority("admin")), không cần thêm luật mới.
 
     /** Danh sách khách hàng có phân trang + tìm kiếm — thay cho model "userPage" của GET /admin. */
     @GetMapping("/users")
@@ -155,12 +153,7 @@ public class AdminRestController {
     }
 
     /**
-     * Gửi yêu cầu chỉnh sửa thông tin khách hàng — thay cho POST /admin/update-user (form-post +
-     * redirect). Nhận Map thay vì DTO có @Valid: cũng như bản gốc, các field KHÔNG thay đổi được
-     * frontend gửi lên dưới dạng chuỗi rỗng "" (để phân biệt với "cố ý xoá trắng"), nhưng các ràng
-     * buộc @Pattern trên UserUpdateFormDTO (SĐT, email...) không cho phép chuỗi rỗng — nếu áp
-     * @Valid trực tiếp ở đây sẽ chặn nhầm các lượt chỉnh sửa chỉ đổi 1 vài trường. Nên chỉ validate
-     * thủ công (qua @Pattern có sẵn trong DTO) cho field nào THỰC SỰ có giá trị mới.
+     * Gửi yêu cầu chỉnh sửa thông tin khách hàng
      */
     @PostMapping("/users/update")
     public ResponseEntity<ResponseDTO<Void>> updateUser(@RequestBody Map<String, String> payload) {
@@ -181,7 +174,7 @@ public class AdminRestController {
         return ResponseEntity.ok(ResponseDTO.<Void>success("Yêu cầu chỉnh sửa đã được gửi và đang chờ xét duyệt!", null));
     }
 
-    /** Danh sách tài khoản ngân hàng có phân trang + tìm kiếm — thay cho model "accountPage" của GET /admin/account. */
+    /** Danh sách tài khoản ngân hàng có phân trang + tìm kiếm */
     @GetMapping("/accounts")
     public ResponseEntity<Page<AccountListDTO>> listAccounts(
             @RequestParam(required = false) String searchAccNum,

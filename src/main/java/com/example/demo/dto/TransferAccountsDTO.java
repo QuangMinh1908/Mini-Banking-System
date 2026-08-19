@@ -2,10 +2,6 @@ package com.example.demo.dto;
 
 import java.util.List;
 
-/**
- * Trả về cho GET /dashboard/api/transfer/accounts — dữ liệu chuẩn bị form Chuyển khoản
- * (thay cho model "sourceAccounts" + "allMyAccounts" mà TransferController render sẵn).
- */
 public class TransferAccountsDTO {
     private List<DashboardAccountDTO> sourceAccounts;
     private List<DashboardAccountDTO> allMyAccounts;

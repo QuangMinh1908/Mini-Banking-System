@@ -2,6 +2,8 @@ package com.example.demo.config.security;
 
 import com.example.demo.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -11,9 +13,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +60,7 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(requestHandler)
             )
+            .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/login", "/").permitAll()
@@ -155,5 +162,29 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Ép CsrfToken được "resolve" (và do đó lưu vào cookie XSRF-TOKEN) ngay ở MỌI request, kể cả
+     * khi không có đoạn code nào (Thymeleaf, controller...) chủ động đọc CsrfToken.
+     *
+     * Lý do cần thiết: mặc định CookieCsrfTokenRepository dùng cơ chế "deferred" — token/cookie
+     * chỉ thực sự được ghi khi có gì đó gọi CsrfToken.getToken(). Với các trang Thymeleaf cũ,
+     * th:action tự động đọc _csrf nên cookie luôn được set. Nhưng SPA React không render HTML nào
+     * ở server cả — nếu không ép resolve thủ công như dưới đây, request GET đầu tiên (vd
+     * /api/auth/me lúc app vừa load) có thể không set cookie XSRF-TOKEN, khiến request POST/PUT
+     * kế tiếp (login, transfer...) thiếu token để gửi lên. Đây là pattern chính thức được khuyến
+     * nghị trong tài liệu Spring Security (mục "CSRF and Single Page Applications").
+     */
+    private static final class CsrfCookieFilter extends OncePerRequestFilter {
+        @Override
+        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                         FilterChain filterChain) throws ServletException, IOException {
+            CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+            if (csrfToken != null) {
+                csrfToken.getToken();
+            }
+            filterChain.doFilter(request, response);
+        }
     }
 }

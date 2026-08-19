@@ -2,10 +2,10 @@ package com.example.demo.config.security;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component

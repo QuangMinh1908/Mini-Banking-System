@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,7 +44,7 @@ public class TransferService {
             throw new InvalidTransferException("Không thể chuyển tiền đến chính tài khoản nguồn!");
         }
 
-        // 2. CHỐNG DEADLOCK: SẮP XẾP THỨ TỰ KHÓA TÀI KHOẢN (Quy tắc vàng)
+        // 2. CHỐNG DEADLOCK: SẮP XẾP THỨ TỰ KHÓA TÀI KHOẢN
         String firstLockAcc;
         String secondLockAcc;
 

@@ -278,15 +278,29 @@
   color: #0f172a;
 }
 
-.dashboard-form { display: grid; gap: 1rem; }
-.password-wrapper { position: relative; display: flex; align-items: center; }
-.password-wrapper input { width: 100%; padding-right: 40px; }
+.dashboard-form {
+  display: grid; gap: 1rem; 
+}
+
+.password-wrapper { 
+  position: relative; display: flex; align-items: center;
+}
+
+.password-wrapper input { 
+  width: 100%; padding-right: 40px; 
+}
+
 .toggle-password-btn {
   position: absolute; right: 10px; background: none; border: none; 
   cursor: pointer; color: #64748b; display: flex; align-items: center;
 }
-.toggle-password-btn:hover { color: #0f172a; }
-.input-readonly { background-color: #f1f5f9 !important; cursor: not-allowed; color: #64748b !important; }
+
+.toggle-password-btn:hover { 
+  color: #0f172a; 
+}
+.input-readonly { 
+  background-color: #f1f5f9 !important; cursor: not-allowed; color: #64748b !important; 
+}
 
 /* thanh tìm kiếm */
 .search-wrapper {
@@ -400,7 +414,7 @@
     transform: scale(1.1);
 }
 
-/* HIỆU ỨNG (ANIMATIONS) */
+/* HIỆU ỨNG */
 @keyframes spin { 
     100% { 
         transform: rotate(360deg); 

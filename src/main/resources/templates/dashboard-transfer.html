@@ -82,8 +82,6 @@
                         </div>
 
                         <form id="transferForm" th:action="@{/dashboard/transfer}" method="post" autocomplete="off">
-                            
-                            <!-- Input Ẩn thực sự gửi xuống Spring Boot -->
                             <input type="hidden" id="realToAccountNumber" name="toAccountNumber" th:value="${transferRequest.toAccountNumber}">
             
                             <div class="input-group">

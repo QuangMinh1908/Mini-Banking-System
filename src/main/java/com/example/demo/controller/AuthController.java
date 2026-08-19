@@ -4,6 +4,7 @@ import com.example.demo.dto.RegisterRequestDTO;
 import com.example.demo.model.Account;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
@@ -61,7 +62,7 @@ public class AuthController {
         try {
             User newUser = new User();
             newUser.setUsername(form.getUsername());
-            newUser.setPassword(rawPassword); // UserService sẽ mã hoá BCrypt trước khi lưu
+            newUser.setPassword(rawPassword);
             newUser.setFullName(form.getFullName());
             newUser.setPhoneNumber(form.getPhoneNumber());
             newUser.setEmail(form.getEmail());

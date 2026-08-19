@@ -1,6 +1,7 @@
 package com.example.demo.config.security;
 
 import com.example.demo.repository.UserRepository;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,7 +41,6 @@ public class SecurityConfig {
                     request.getSession().setAttribute("username", username);
                     request.getSession().setAttribute("role", role);
                     
-                    // Khắc phục lỗi: Lấy userId từ DB để lưu vào session
                     userRepository.findByUsername(username).ifPresent(user -> {
                         request.getSession().setAttribute("userId", user.getId());
                     });

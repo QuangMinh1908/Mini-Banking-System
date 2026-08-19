@@ -77,7 +77,6 @@
                     <div class="tx-scroll-area" id="txModalScrollArea" style="max-height: 70vh; padding-right: 10px;">
                         <div id="transactionList" th:if="${hasTransactions}" class="tx-card-list">
                             <th:block th:fragment="txItems">
-                                <!-- Lặp qua danh sách giao dịch -->
                                 <div th:each="tx : ${transactions}" class="tx-card-item"
                                      th:attr="data-id=${tx.id}, data-date=${tx.transactionDate}"
                                      onclick="openTxDetail(this.getAttribute('data-id'))" 

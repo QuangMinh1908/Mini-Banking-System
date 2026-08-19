@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
 import java.util.List;
 
@@ -89,7 +88,7 @@ public class AdminRestController {
         String transactionLimit = payload.getOrDefault("transactionLimit", "50M");
 
         // Chặn ngay tại điểm ghi dữ liệu: không cho lưu vào DB giá trị hạn mức không nằm
-        // trong danh sách hợp lệ (tránh dữ liệu rác về sau khiến TransferService phải xử lý).
+        // trong danh sách hợp lệ .
         if ("PAYMENT".equals(accountType) && !ALLOWED_TRANSACTION_LIMITS.contains(transactionLimit)) {
             return ResponseEntity.badRequest().body(
                     ResponseDTO.error("Hạn mức giao dịch không hợp lệ! Chỉ chấp nhận: 50M, 500M, UNLIMITED"));

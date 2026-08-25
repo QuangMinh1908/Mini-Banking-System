@@ -24,6 +24,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.validation.BindingResult;
 
+import java.net.URI;
+import java.util.Set;
 
 @Controller
 public class AdminController {
@@ -76,7 +78,7 @@ public class AdminController {
         return "redirect:" + resolveSafeRedirect(request.getHeader("Referer"));
     }
 
-    private static final java.util.Set<String> ALLOWED_REDIRECT_PATHS = java.util.Set.of("/admin", "/admin/account");
+    private static final Set<String> ALLOWED_REDIRECT_PATHS = Set.of("/admin", "/admin/account");
     /**
      * Chỉ tin tưởng phần PATH của Referer (bỏ qua scheme/host hoàn toàn), và chỉ chấp nhận
      * nếu path nằm trong allowlist bên trên. Nhờ vậy kết quả trả về luôn là một đường dẫn
@@ -84,7 +86,7 @@ public class AdminController {
     private String resolveSafeRedirect(String referer) {
         if (referer != null) {
             try {
-                java.net.URI uri = java.net.URI.create(referer);
+                URI uri = URI.create(referer);
                 String path = uri.getPath();
                 if (path != null && ALLOWED_REDIRECT_PATHS.contains(path)) {
                     String query = uri.getQuery();

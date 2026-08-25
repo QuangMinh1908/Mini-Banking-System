@@ -7,16 +7,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
     
     private static final long USER_COOLDOWN_TIME = 1000;
     private static final long IP_COOLDOWN_TIME = 50;
-    private static final java.util.Set<String> RATE_LIMITED_GET_PATHS = java.util.Set.of(
-            "/api/transfer/lookup-receiver"
-    );
+    private static final Set<String> RATE_LIMITED_GET_PATHS = Set.of("/api/transfer/lookup-receiver");
 
     // BỘ ĐỆM IP: Tối đa 10,000 IP, tự động dọn dẹp sau 1 phút không truy cập (Chống OOM)
     private final Cache<String, Long> ipRequestCounts = Caffeine.newBuilder()

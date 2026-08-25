@@ -15,8 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.ZoneOffset;
 import java.util.UUID;
@@ -95,8 +97,8 @@ public class TransferService {
             }
 
             LocalDateTime nowUTC = LocalDateTime.now(ZoneOffset.UTC);
-            LocalDateTime startOfDay = nowUTC.with(java.time.LocalTime.MIN);
-            LocalDateTime endOfDay = nowUTC.with(java.time.LocalTime.MAX);
+            LocalDateTime startOfDay = nowUTC.with(LocalTime.MIN);
+            LocalDateTime endOfDay = nowUTC.with(LocalTime.MAX);
             BigDecimal totalSpentToday = transactionRepository.sumOutgoingAmountByAccountIdAndDate(fromAccount.getId(), startOfDay, endOfDay);
 
             if (totalSpentToday.add(amount).compareTo(maxLimit) > 0) {

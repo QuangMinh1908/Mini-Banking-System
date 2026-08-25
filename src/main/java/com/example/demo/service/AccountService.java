@@ -23,7 +23,7 @@ public class AccountService {
     }
 
     @Transactional
-    public Account createNewAccountForUser(Long userId, String accountType, String transactionLimit, Integer termMonths, java.math.BigDecimal interestRate) {
+    public Account createNewAccountForUser(Long userId, String accountType, String transactionLimit, Integer termMonths, BigDecimal interestRate) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng!"));
 

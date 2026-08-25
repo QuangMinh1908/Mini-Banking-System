@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.List;
+import java.math.BigDecimal;
+import java.lang.Integer;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/api")
@@ -83,8 +86,7 @@ public class AdminRestController {
         return ResponseEntity.ok(dto);
     }
 
-    private static final java.util.Set<String> ALLOWED_TRANSACTION_LIMITS =
-            java.util.Set.of("50M", "500M", "UNLIMITED");
+    private static final Set<String> ALLOWED_TRANSACTION_LIMITS = Set.of("50M", "500M", "UNLIMITED");
 
     @PostMapping("/user/{userId}/create-account")
     public ResponseEntity<ResponseDTO<String>> createAccountForUser(@PathVariable Long userId,
@@ -100,12 +102,12 @@ public class AdminRestController {
         }
 
         Integer termMonths = null;
-        java.math.BigDecimal interestRate = null;
+        BigDecimal interestRate = null;
         
         // Nếu là tài khoản tiết kiệm thì mới lấy kỳ hạn và lãi suất
         if ("SAVING".equals(accountType)) {
             termMonths = payload.containsKey("termMonths") ? Integer.parseInt(payload.get("termMonths")) : 0;
-            interestRate = payload.containsKey("interestRate") ? new java.math.BigDecimal(payload.get("interestRate")) : java.math.BigDecimal.ZERO;
+            interestRate = payload.containsKey("interestRate") ? new BigDecimal(payload.get("interestRate")) : BigDecimal.ZERO;
         }
         
         // Gọi hàm Service đã được cập nhật

@@ -9,13 +9,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
     
     private static final long USER_COOLDOWN_TIME = 1000;
     private static final long IP_COOLDOWN_TIME = 50;
-    private static final java.util.Set<String> RATE_LIMITED_GET_PATHS = java.util.Set.of(
+    private static final Set<String> RATE_LIMITED_GET_PATHS = Set.of(
             "/api/transfer/lookup-receiver"
     );
 

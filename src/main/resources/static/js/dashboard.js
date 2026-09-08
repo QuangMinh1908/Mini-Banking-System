@@ -12,6 +12,29 @@ document.addEventListener("DOMContentLoaded", function() {
             badges.forEach(badge => badge.classList.add('hidden'));
             
             fetch('/api/transactions/mark-read').catch(() => {});
+            
+            const txList = document.getElementById('transactionList');
+            if (txList) {
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                if (loadingIndicator) loadingIndicator.style.display = 'block';
+                
+                const futureDate = new Date();
+                futureDate.setFullYear(futureDate.getFullYear() + 1);
+                
+                fetch(`/dashboard/transactions/more?lastDate=${encodeURIComponent(futureDate.toISOString())}&lastId=999999999&source=dashboard`)
+                    .then(res => res.text())
+                    .then(html => {
+                        if (html.includes('tx-card-item')) {
+                            txList.innerHTML = html;
+                            if (typeof formatLocalTime === 'function') {
+                                formatLocalTime();
+                            }
+                        }
+                    })
+                    .finally(() => {
+                        if (loadingIndicator) loadingIndicator.style.display = 'none';
+                    });
+            }
         });
     }
     if (btnCloseTx && txModal) {

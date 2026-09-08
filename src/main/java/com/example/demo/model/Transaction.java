@@ -28,6 +28,9 @@ public class Transaction {
     @Column(name = "related_account_number")
     private String relatedAccountNumber;
 
+    @Column(name = "is_read", nullable = false, columnDefinition = "boolean default false")
+    private boolean isRead = false;
+
     @Column(name = "direction")
     private String direction;
 
@@ -75,6 +78,9 @@ public class Transaction {
     public void setRelatedAccountNumber(String relatedAccountNumber) {
         this.relatedAccountNumber = relatedAccountNumber;
     }
+
+    public boolean isRead() { return isRead; }
+    public void setRead(boolean read) { isRead = read; }
 
     public String getDirection() {
         return direction;

@@ -363,3 +363,60 @@ function formatLocalTime() {
 document.addEventListener("DOMContentLoaded", function() {
     formatLocalTime();
 });
+
+// ==========================================
+// THÔNG BÁO GIAO DỊCH MỚI (REAL-TIME BADGE)
+// ==========================================
+// Định kỳ hỏi server xem có giao dịch chưa đọc mới phát sinh không (ví dụ:
+// vừa có người chuyển tiền tới) và cập nhật badge trên sidebar/quick-action
+// ngay lập tức, không cần người dùng phải F5 lại trang.
+(function initUnreadTransactionPolling() {
+    const POLL_INTERVAL_MS = 15000;
+
+    function getBadges() {
+        return document.querySelectorAll('.notification-badge');
+    }
+
+    function applyCount(count) {
+        const badges = getBadges();
+        const displayText = count > 99 ? '99+' : String(count);
+
+        badges.forEach(badge => {
+            badge.textContent = displayText;
+            if (count > 0) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        });
+    }
+
+    function pollUnreadCount(intervalId) {
+        fetch('/api/transactions/unread-count')
+            .then(res => {
+                if (res.status === 401) {
+                    // Phiên đăng nhập đã hết hạn / không có -> dừng polling
+                    clearInterval(intervalId);
+                    return null;
+                }
+                if (!res.ok) return null;
+                return res.json();
+            })
+            .then(data => {
+                if (data && typeof data.count === 'number') {
+                    applyCount(data.count);
+                }
+            })
+            .catch(() => {
+                // Lỗi mạng tạm thời: bỏ qua, thử lại ở lần poll kế tiếp
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chỉ bật polling trên các trang thực sự có badge thông báo
+        // (tránh chạy thừa ở trang admin/login không liên quan).
+        if (getBadges().length === 0) return;
+
+        const intervalId = setInterval(() => pollUnreadCount(intervalId), POLL_INTERVAL_MS);
+    });
+})();

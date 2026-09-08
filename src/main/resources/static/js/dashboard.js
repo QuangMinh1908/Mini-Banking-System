@@ -5,7 +5,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const btnCloseTx = document.getElementById('btnCloseTxModal');
 
     if (btnOpenTx && txModal) {
-        btnOpenTx.addEventListener('click', () => txModal.classList.add('active'));
+        btnOpenTx.addEventListener('click', () => {
+            txModal.classList.add('active');
+        
+            const badges = document.querySelectorAll('.notification-badge');
+            badges.forEach(badge => badge.classList.add('hidden'));
+            
+            fetch('/api/transactions/mark-read').catch(() => {});
+        });
     }
     if (btnCloseTx && txModal) {
         btnCloseTx.addEventListener('click', () => txModal.classList.remove('active'));

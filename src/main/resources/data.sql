@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     transaction_date TIMESTAMP,
     account_id BIGINT,
     related_account_number VARCHAR(20),
+    is_read BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_account FOREIGN KEY (account_id) REFERENCES accounts(id),
     CONSTRAINT uk_txn_direction UNIQUE (transaction_id, direction)
 );;
@@ -144,9 +145,9 @@ FROM generate_series(1, 100) AS s(i);;
 
 -- NẠP DỮ LIỆU GIAO DỊCH MẪU
 -- 1. Nạp 2 Giao dịch mẫu thủ công ban đầu
-INSERT INTO transactions (transaction_id, type, direction, amount, description, transaction_date, account_id, related_account_number) VALUES
-('TXN-20260708-001', 'DEPOSIT', 'CREDIT', 2000000.00, 'Nạp tiền mặt tại quầy', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 1, NULL),
-('TXN-20260708-002', 'WITHDRAW', 'DEBIT', 500000.00, 'Rút tiền qua ATM', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 1, NULL);;
+INSERT INTO transactions (transaction_id, type, direction, amount, description, transaction_date, account_id, related_account_number, is_read) VALUES
+('TXN-20260708-001', 'DEPOSIT', 'CREDIT', 2000000.00, 'Nạp tiền mặt tại quầy', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 1, NULL, TRUE),
+('TXN-20260708-002', 'WITHDRAW', 'DEBIT', 500000.00, 'Rút tiền qua ATM', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 1, NULL, TRUE);;
 
 -- 2. Sinh 250 giao dịch Chuyển khoản (TRANSFER) 
 WITH transfer_base AS (
@@ -159,34 +160,34 @@ WITH transfer_base AS (
         (MOD((floor(random() * 100)::int + s.i), 100) + 1) AS receiver_acc_id
     FROM generate_series(1, 250) AS s(i)
 )
-INSERT INTO transactions (transaction_id, type, direction, amount, description, transaction_date, account_id, related_account_number)
+INSERT INTO transactions (transaction_id, type, direction, amount, description, transaction_date, account_id, related_account_number, is_read)
 -- Record 1: DEBIT (Tài khoản người gửi)
 SELECT 
-    t.tx_id, 'TRANSFER', 'DEBIT', t.amt, 'Chuyển khoản đến STK ' || r_acc.account_number, t.tx_date, t.sender_acc_id, r_acc.account_number
+    t.tx_id, 'TRANSFER', 'DEBIT', t.amt, 'Chuyển khoản đến STK ' || r_acc.account_number, t.tx_date, t.sender_acc_id, r_acc.account_number, TRUE
 FROM transfer_base t JOIN accounts r_acc ON t.receiver_acc_id = r_acc.id
 UNION ALL
 -- Record 2: CREDIT (Tài khoản người nhận)
 SELECT 
-    t.tx_id, 'TRANSFER', 'CREDIT', t.amt, 'Nhận tiền từ STK ' || s_acc.account_number, t.tx_date, t.receiver_acc_id, s_acc.account_number
+    t.tx_id, 'TRANSFER', 'CREDIT', t.amt, 'Nhận tiền từ STK ' || s_acc.account_number, t.tx_date, t.receiver_acc_id, s_acc.account_number, TRUE
 FROM transfer_base t JOIN accounts s_acc ON t.sender_acc_id = s_acc.id;;
 
 
 -- 3. Sinh 125 giao dịch Nạp tiền (DEPOSIT) 
-INSERT INTO transactions (transaction_id, type, direction, amount, description, transaction_date, account_id, related_account_number)
+INSERT INTO transactions (transaction_id, type, direction, amount, description, transaction_date, account_id, related_account_number, is_read)
 SELECT 
     'TXN-DEP-' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '-' || LPAD(s.i::text, 4, '0'),
     'DEPOSIT', 'CREDIT', (floor(random() * 20) + 1) * 500000, 'Nạp tiền mặt tại quầy',
     CURRENT_TIMESTAMP - (random() * 60 || ' days')::interval,
-    floor(random() * 100) + 1, NULL
+    floor(random() * 100) + 1, NULL, TRUE
 FROM generate_series(1, 125) AS s(i);;
 
 -- 4. Sinh 125 giao dịch Rút tiền (WITHDRAW) 
-INSERT INTO transactions (transaction_id, type, direction, amount, description, transaction_date, account_id, related_account_number)
+INSERT INTO transactions (transaction_id, type, direction, amount, description, transaction_date, account_id, related_account_number, is_read)
 SELECT 
     'TXN-WDL-' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '-' || LPAD(s.i::text, 4, '0'),
     'WITHDRAW', 'DEBIT', (floor(random() * 10) + 1) * 500000, 'Rút tiền qua ATM',
     CURRENT_TIMESTAMP - (random() * 60 || ' days')::interval,
-    floor(random() * 100) + 1, NULL
+    floor(random() * 100) + 1, NULL, TRUE
 FROM generate_series(1, 125) AS s(i);;
 -- CẬP NHẬT LẠI ID ĐỂ TRÁNH XUNG ĐỘT KHI TẠO MỚI
 SELECT setval(pg_get_serial_sequence('transactions', 'id'), coalesce(max(id),0) + 1, false) FROM transactions;;
@@ -201,3 +202,15 @@ ALTER TABLE user_update_requests ALTER COLUMN id RESTART WITH 1;;
 
 CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone_number);;
 CREATE INDEX IF NOT EXISTS idx_users_fullname ON users(full_name);;
+
+UPDATE transactions
+SET is_read = TRUE
+WHERE is_read IS NULL;
+
+UPDATE transactions
+SET is_read = TRUE
+WHERE direction = 'DEBIT' AND is_read = FALSE;
+
+ALTER TABLE transactions ALTER COLUMN is_read SET DEFAULT FALSE;
+ALTER TABLE transactions ALTER COLUMN is_read SET NOT NULL;
+

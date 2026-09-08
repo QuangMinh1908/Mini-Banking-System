@@ -23,20 +23,26 @@
 
             <ul class="nav-links">
                 <li>
-                    <a th:href="@{/dashboard}">
+                    <a th:classappend="${currentUri == '/dashboard' ? 'active' : ''}" th:href="@{/dashboard}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         Tổng quan
                     </a>
                 </li>
                 <li>
-                    <a class="active" th:href="@{/dashboard/transfer}">
+                    <a th:classappend="${currentUri == '/dashboard/transfer' ? 'active' : ''}" th:href="@{/dashboard/transfer}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         Chuyển khoản
                     </a>
                 </li>
                 <li>
-                    <a th:href="@{/dashboard/history}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    <a th:classappend="${currentUri == '/dashboard/history' ? 'active' : ''}" th:href="@{/dashboard/history}">
+                        <div class="icon-wrapper" style="position: relative; display: inline-flex; align-items: center;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                            <span class="notification-badge sidebar-unread-badge" 
+                                  th:classappend="${unreadCount != null and unreadCount > 0} ? '' : 'hidden'" 
+                                  th:text="${unreadCount != null and unreadCount > 99 ? '99+' : unreadCount}">
+                            </span>
+                        </div>
                         Giao dịch
                     </a>
                 </li>

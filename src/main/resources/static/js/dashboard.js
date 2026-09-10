@@ -97,9 +97,8 @@ toggleButtons.forEach(btn => {
     btn.addEventListener('click', function() {
         const card = this.closest('.bank-card');
         const balanceEl = card.querySelector('.balance-value');
-        const eyeOpen = this.querySelector('.eye-open');
-        const eyeClosed = this.querySelector('.eye-closed');
-            
+        const icon = this.querySelector('.toggle-balance-icon');
+
         const rawValue = balanceEl.getAttribute('data-raw-balance');
         const isHidden = balanceEl.getAttribute('data-hidden') === 'true';
 
@@ -107,14 +106,14 @@ toggleButtons.forEach(btn => {
             // Hiện lại số dư thật
             balanceEl.textContent = rawValue;
             balanceEl.setAttribute('data-hidden', 'false');
-            eyeOpen.style.display = 'block';
-            eyeClosed.style.display = 'none';
+            icon.src = '/img/hide.png';
+            icon.alt = 'Ẩn số dư';
         } else {
             // Ẩn số dư thành dấu chấm
             balanceEl.textContent = '•••••••• VND';
             balanceEl.setAttribute('data-hidden', 'true');
-            eyeOpen.style.display = 'none';
-            eyeClosed.style.display = 'block';
+            icon.src = '/img/view.png';
+            icon.alt = 'Hiện số dư';
         }
     });
 });

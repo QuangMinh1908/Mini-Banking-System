@@ -688,11 +688,10 @@
     transform: scale(1.05);
 }
 
-.toggle-balance-btn svg {
+.toggle-balance-btn .toggle-balance-icon {
     width: 15px;
     height: 15px;
-    stroke: currentColor;
-    fill: none;
+    filter: brightness(0) invert(1);
 }
 
 .transfer-layout-grid {

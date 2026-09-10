@@ -30,14 +30,14 @@
                 </li>
                 <li>
                     <a th:classappend="${currentUri == '/dashboard/transfer' ? 'active' : ''}" th:href="@{/dashboard/transfer}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <img th:src="@{/img/money-transfer.png}" width="20" height="20" alt="Chuyển khoản">
                         Chuyển khoản
                     </a>
                 </li>
                 <li>
                     <a th:classappend="${currentUri == '/dashboard/history' ? 'active' : ''}" th:href="@{/dashboard/history}">
                         <div class="icon-wrapper" style="position: relative; display: inline-flex; align-items: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                            <img th:src="@{/img/history.png}" width="20" height="20" alt="Giao dịch">
                             <span class="notification-badge sidebar-unread-badge" 
                                   th:classappend="${unreadCount != null and unreadCount > 0} ? '' : 'hidden'" 
                                   th:text="${unreadCount != null and unreadCount > 99 ? '99+' : unreadCount}">
@@ -82,10 +82,10 @@
                         <div class="action-grid" style="grid-template-columns: repeat(4, 1fr); max-width: 800px; margin: 0 auto;">
                             <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nạp tiền</div>
                             <div class="action-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg> Rút tiền</div>
-                            <a class="action-item" th:href="@{/dashboard/transfer}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> Chuyển khoản</a>
+                            <a class="action-item" th:href="@{/dashboard/transfer}"><img th:src="@{/img/money-transfer.png}" width="16" height="16" alt="Chuyển khoản"> Chuyển khoản</a>
                             <div class="action-item" id="btnOpenTxHistory">
                                 <div class="icon-wrapper" style="position: relative; display: inline-flex; align-items: center;">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> 
+                                    <img th:src="@{/img/history.png}" width="16" height="16" alt="Lịch sử">
                                     <span class="notification-badge quick-unread-badge" 
                                         th:classappend="${unreadCount != null and unreadCount > 0} ? '' : 'hidden'" 
                                         th:text="${unreadCount != null and unreadCount > 99 ? '99+' : unreadCount}">
@@ -122,8 +122,7 @@
                                         <div class="card-balance-header">
                                             <p class="card-balance-label">Số dư khả dụng</p>
                                             <button type="button" class="toggle-balance-btn" title="Ẩn/Hiện số dư">
-                                                <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                                <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: block;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                                <img class="toggle-balance-icon" th:src="@{/img/view.png}" width="16" height="16" alt="Hiện số dư">
                                             </button>
                                         </div>
                                         <h2 class="balance-value card-balance-amount"
@@ -169,8 +168,7 @@
                                         <div class="card-balance-header">
                                             <p class="card-balance-label">Số dư khả dụng</p>
                                             <button type="button" class="toggle-balance-btn" title="Ẩn/Hiện số dư">
-                                                <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                                <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: block;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                                <img class="toggle-balance-icon" th:src="@{/img/view.png}" width="16" height="16" alt="Hiện số dư">
                                             </button>
                                         </div>
                                         <h2 class="balance-value card-balance-amount"

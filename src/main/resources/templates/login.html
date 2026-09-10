@@ -6,26 +6,6 @@
   <title>E-Banking - Đăng nhập</title>
   <link rel="stylesheet" th:href="@{/css/style.css}">
   <link rel="stylesheet" th:href="@{/css/login.css}">
-  
-  <style>
-    .password-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .password-wrapper input {
-      width: 100%;
-      padding-right: 40px;
-    }
-    .toggle-password {
-      position: absolute;
-      right: 12px;
-      cursor: pointer;
-      user-select: none;
-      font-size: 1.1rem;
-      color: var(--text-muted);
-    }
-  </style>
 </head>
 <body>
 
@@ -51,7 +31,7 @@
           </div>
           <div class="password-wrapper">
             <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required>
-            <span class="toggle-password" id="togglePasswordBtn" title="Hiển thị mật khẩu">👁️</span>
+            <img th:src="@{/img/view.png}" class="toggle-password" id="eyeIcon" alt="Hiện mật khẩu" width="20" height="20">
           </div>
         </div>
 

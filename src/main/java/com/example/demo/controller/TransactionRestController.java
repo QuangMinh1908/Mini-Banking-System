@@ -51,4 +51,25 @@ public class TransactionRestController {
         );
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping("/mark-read")
+    public ResponseEntity<Void> markAllAsRead(HttpSession session) {
+        Long currentUserId = (Long) session.getAttribute("userId");
+        if (currentUserId != null) {
+            transactionRepository.markAllAsReadByUserId(currentUserId);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    // Dùng cho polling định kỳ ở client để cập nhật badge thông báo real-time,
+    // không cần người dùng tải lại trang khi có giao dịch mới phát sinh.
+    @GetMapping("/unread-count")
+    public ResponseEntity<Map<String, Long>> getUnreadCount(HttpSession session) {
+        Long currentUserId = (Long) session.getAttribute("userId");
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        long count = transactionRepository.countUnreadByUserId(currentUserId);
+        return ResponseEntity.ok(Map.of("count", count));
+    }
 }

@@ -688,11 +688,10 @@
     transform: scale(1.05);
 }
 
-.toggle-balance-btn svg {
+.toggle-balance-btn .toggle-balance-icon {
     width: 15px;
     height: 15px;
-    stroke: currentColor;
-    fill: none;
+    filter: brightness(0) invert(1);
 }
 
 .transfer-layout-grid {
@@ -769,4 +768,34 @@ input:checked + .slider:before {
     color: #0f172a; 
     cursor: pointer; 
     user-select: none; 
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;            
+    right: -8px;         
+    background-color: #ef4444; 
+    color: white;
+    font-size: 0.65rem; 
+    font-weight: 700;
+    padding: 0.15rem 0.35rem;
+    border-radius: 999px; 
+    border: 1.5px solid #ffffff; 
+    line-height: 1;
+    z-index: 10;
+    min-width: 18px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    
+    animation: bounceBadge 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bounceBadge {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.notification-badge.hidden {
+    display: none !important;
 }

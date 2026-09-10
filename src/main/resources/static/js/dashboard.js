@@ -5,7 +5,37 @@ document.addEventListener("DOMContentLoaded", function() {
     const btnCloseTx = document.getElementById('btnCloseTxModal');
 
     if (btnOpenTx && txModal) {
-        btnOpenTx.addEventListener('click', () => txModal.classList.add('active'));
+        btnOpenTx.addEventListener('click', () => {
+            txModal.classList.add('active');
+        
+            const badges = document.querySelectorAll('.notification-badge');
+            badges.forEach(badge => badge.classList.add('hidden'));
+            
+            fetch('/api/transactions/mark-read').catch(() => {});
+            
+            const txList = document.getElementById('transactionList');
+            if (txList) {
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                if (loadingIndicator) loadingIndicator.style.display = 'block';
+                
+                const futureDate = new Date();
+                futureDate.setFullYear(futureDate.getFullYear() + 1);
+                
+                fetch(`/dashboard/transactions/more?lastDate=${encodeURIComponent(futureDate.toISOString())}&lastId=999999999&source=dashboard`)
+                    .then(res => res.text())
+                    .then(html => {
+                        if (html.includes('tx-card-item')) {
+                            txList.innerHTML = html;
+                            if (typeof formatLocalTime === 'function') {
+                                formatLocalTime();
+                            }
+                        }
+                    })
+                    .finally(() => {
+                        if (loadingIndicator) loadingIndicator.style.display = 'none';
+                    });
+            }
+        });
     }
     if (btnCloseTx && txModal) {
         btnCloseTx.addEventListener('click', () => txModal.classList.remove('active'));
@@ -67,9 +97,8 @@ toggleButtons.forEach(btn => {
     btn.addEventListener('click', function() {
         const card = this.closest('.bank-card');
         const balanceEl = card.querySelector('.balance-value');
-        const eyeOpen = this.querySelector('.eye-open');
-        const eyeClosed = this.querySelector('.eye-closed');
-            
+        const icon = this.querySelector('.toggle-balance-icon');
+
         const rawValue = balanceEl.getAttribute('data-raw-balance');
         const isHidden = balanceEl.getAttribute('data-hidden') === 'true';
 
@@ -77,14 +106,14 @@ toggleButtons.forEach(btn => {
             // Hiện lại số dư thật
             balanceEl.textContent = rawValue;
             balanceEl.setAttribute('data-hidden', 'false');
-            eyeOpen.style.display = 'block';
-            eyeClosed.style.display = 'none';
+            icon.src = '/img/hide.png';
+            icon.alt = 'Ẩn số dư';
         } else {
             // Ẩn số dư thành dấu chấm
             balanceEl.textContent = '•••••••• VND';
             balanceEl.setAttribute('data-hidden', 'true');
-            eyeOpen.style.display = 'none';
-            eyeClosed.style.display = 'block';
+            icon.src = '/img/view.png';
+            icon.alt = 'Hiện số dư';
         }
     });
 });

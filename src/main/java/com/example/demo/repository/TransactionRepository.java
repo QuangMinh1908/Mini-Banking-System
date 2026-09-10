@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,4 +26,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             @Param("startOfDay") LocalDateTime startOfDay,
             @Param("endOfDay") LocalDateTime endOfDay
     );
+
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.account.user.id = :userId AND t.isRead = false")
+    long countUnreadByUserId(@Param("userId") Long userId);
+    @Modifying
+    @Transactional
+    @Query("UPDATE Transaction t SET t.isRead = true WHERE t.account.id IN " +
+           "(SELECT a.id FROM Account a WHERE a.user.id = :userId) AND t.isRead = false")
+    void markAllAsReadByUserId(@Param("userId") Long userId);
 }

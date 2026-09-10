@@ -130,6 +130,7 @@ public class TransferService {
         debitTx.setAmount(amount);
         debitTx.setDirection("DEBIT");
         debitTx.setTransactionDate(now);
+        debitTx.setRead(true);
         debitTx.setDescription((reqDescription == null || reqDescription.isBlank()) 
                 ? "Chuyển tiền đến " + toAccount.getUser().getFullName() 
                 : reqDescription.trim());

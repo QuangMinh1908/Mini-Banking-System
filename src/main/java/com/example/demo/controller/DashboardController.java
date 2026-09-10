@@ -108,6 +108,9 @@ public class DashboardController {
                                                 @RequestParam(defaultValue = "20") int size) {
         Long currentUserId = (Long) session.getAttribute("userId");
         User currentUser = userRepository.findById(currentUserId).orElseThrow();
+
+        transactionRepository.markAllAsReadByUserId(currentUserId);
+        model.addAttribute("unreadCount", 0);
         
         model.addAttribute("username", session.getAttribute("username"));
         model.addAttribute("user", currentUser); 

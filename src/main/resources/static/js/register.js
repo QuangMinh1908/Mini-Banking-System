@@ -1,14 +1,23 @@
 document.addEventListener("DOMContentLoaded", function() {
     // 1. Logic ẩn/hiện mật khẩu
-    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+    const eyeIcon = document.getElementById("eyeIcon");
     const passwordInput = document.getElementById("password");
 
-    if (togglePasswordBtn && passwordInput) {
-        togglePasswordBtn.addEventListener("click", function () {
+    if (eyeIcon && passwordInput) {
+        eyeIcon.addEventListener("click", function () {
             const isPassword = passwordInput.getAttribute("type") === "password";
+            
             passwordInput.setAttribute("type", isPassword ? "text" : "password");
-            this.textContent = isPassword ? "🙈" : "👁️";
-            this.title = isPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu";
+            
+            if (isPassword) {
+                this.src = "/img/hide.png";
+                this.alt = "Ẩn mật khẩu";
+                this.title = "Ẩn mật khẩu";
+            } else {
+                this.src = "/img/view.png";
+                this.alt = "Hiện mật khẩu";
+                this.title = "Hiển thị mật khẩu";
+            }
         });
     }
 

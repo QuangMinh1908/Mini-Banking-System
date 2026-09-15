@@ -26,6 +26,8 @@ public class TransferRequestDTO {
     @Size(max = 255, message = "Nội dung giao dịch không được vượt quá 255 ký tự")
     private String description;
 
+    private String idempotencyKey;
+
     public TransferRequestDTO() {
     }
 
@@ -41,4 +43,7 @@ public class TransferRequestDTO {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getIdempotencyKey() { return idempotencyKey; }
+    public void setIdempotencyKey(String idempotencyKey) { this.idempotencyKey = idempotencyKey; }
 }

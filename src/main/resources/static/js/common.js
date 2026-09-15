@@ -32,12 +32,21 @@ function showConfirmModal(title, message, iconType, confirmCallback) {
     const oldConfirmBtn = document.getElementById('btnGlobalConfirm');
     const newConfirmBtn = oldConfirmBtn.cloneNode(true);
     oldConfirmBtn.parentNode.replaceChild(newConfirmBtn, oldConfirmBtn);
-    
+
+    // Chặn double-click: chỉ cho phép confirmCallback chạy đúng 1 lần cho mỗi lần mở modal.
+    // Trước đây nếu click rất nhanh 2 lần liên tiếp, modal chưa kịp ẩn (do CSS transition)
+    // thì listener này bị gọi 2 lần -> confirmCallback() (vd: submit form chuyển tiền) chạy 2 lần
+    // -> gửi 2 request thật lên server gần như đồng thời.
+    let alreadyConfirmed = false;
     newConfirmBtn.addEventListener('click', function() {
+        if (alreadyConfirmed) return;
+        alreadyConfirmed = true;
+
+        newConfirmBtn.disabled = true;
         confirmCallback();
         modal.classList.remove('active');
     });
-    
+
     modal.classList.add('active');
 }
 

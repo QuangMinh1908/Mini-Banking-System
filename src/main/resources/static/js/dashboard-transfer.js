@@ -1,4 +1,14 @@
 document.addEventListener("DOMContentLoaded", function() {
+    // Sinh 1 token duy nhất cho mỗi lần trang được tải (kể cả reload sau lỗi validate).
+    // Dù người dùng bấm "Xác nhận" nhiều lần cho CÙNG 1 lần tải trang, tất cả request
+    // gửi lên đều mang chung token này -> server chỉ xử lý chuyển tiền cho request đầu tiên.
+    const idempotencyInput = document.getElementById('idempotencyKey');
+    if (idempotencyInput) {
+        idempotencyInput.value = (window.crypto && crypto.randomUUID)
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('rateLimited') === 'true') {
         alert('Bạn vừa thao tác quá nhanh. Vui lòng kiểm tra lại lịch sử giao dịch và thử lại sau ít giây.');

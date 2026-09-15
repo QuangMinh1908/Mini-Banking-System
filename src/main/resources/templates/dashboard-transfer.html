@@ -89,6 +89,9 @@
 
                         <form id="transferForm" th:action="@{/dashboard/transfer}" method="post" autocomplete="off">
                             <input type="hidden" id="realToAccountNumber" name="toAccountNumber" th:value="${transferRequest.toAccountNumber}">
+                            <!-- Token chống gửi trùng: JS sinh giá trị mới mỗi lần trang được tải (xem dashboard-transfer.js).
+                                 Server dùng token này để nhận biết 2 request cùng 1 lần submit và chặn xử lý trùng. -->
+                            <input type="hidden" id="idempotencyKey" name="idempotencyKey" value="">
             
                             <div class="input-group">
                                 <label for="fromAccountNumber">Tài khoản nguồn</label>

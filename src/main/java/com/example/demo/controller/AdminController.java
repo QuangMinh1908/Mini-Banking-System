@@ -79,10 +79,7 @@ public class AdminController {
     }
 
     private static final Set<String> ALLOWED_REDIRECT_PATHS = Set.of("/admin", "/admin/account");
-    /**
-     * Chỉ tin tưởng phần PATH của Referer (bỏ qua scheme/host hoàn toàn), và chỉ chấp nhận
-     * nếu path nằm trong allowlist bên trên. Nhờ vậy kết quả trả về luôn là một đường dẫn
-     * nội bộ bắt đầu bằng "/", không thể bị lợi dụng để redirect ra domain khác (Open Redirect).*/
+    
     private String resolveSafeRedirect(String referer) {
         if (referer != null) {
             try {

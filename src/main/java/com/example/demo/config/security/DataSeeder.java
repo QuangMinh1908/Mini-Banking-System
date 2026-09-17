@@ -25,8 +25,6 @@ public class DataSeeder implements CommandLineRunner {
         List<User> users = userRepository.findAll();
 
         for (User user : users) {
-            // Chuỗi mã hóa BCrypt luôn bắt đầu bằng ký tự "$2a$" hoặc "$2b$"
-            // Nếu mật khẩu không bắt đầu bằng ký tự này -> Đây là mật khẩu chữ thường cần được mã hóa
             if (user.getPassword() != null && !user.getPassword().startsWith("$2a$")) {
                 
                 String rawPassword = user.getPassword();

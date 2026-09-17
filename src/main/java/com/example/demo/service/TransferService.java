@@ -77,9 +77,7 @@ public class TransferService {
             throw new InvalidTransferException("Giao dịch thất bại! Chỉ được phép chuyển tiền từ tài khoản thanh toán.");
         }
 
-        // 4b. XÁC THỰC LOẠI TÀI KHOẢN ĐÍCH: tài khoản tiết kiệm (SAVING) là sổ kỳ hạn riêng
-        // của từng chủ sở hữu, KHÔNG cho phép người khác chuyển thẳng tiền vào (chỉ chủ sổ
-        // được tự nạp thêm vào chính sổ của mình từ tài khoản thanh toán).
+        // 4b. XÁC THỰC LOẠI TÀI KHOẢN ĐÍCH
         if (toAccount.getAccountType() == AccountType.SAVING
                 && (toAccount.getUser() == null || !toAccount.getUser().getId().equals(currentUserId))) {
             throw new InvalidTransferException("Không thể chuyển tiền vào tài khoản tiết kiệm của người khác!");

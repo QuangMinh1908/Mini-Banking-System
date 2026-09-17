@@ -43,11 +43,6 @@ public class TransferController {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-    // Ghi nhận các idempotencyKey đã xử lý (theo userId) để chặn xử lý trùng khi client
-    // (do double-click, mạng chập chờn dẫn tới người dùng bấm lại, v.v.) gửi lên 2 request
-    // mang cùng 1 token cho cùng 1 lần "Xác nhận". Khác với RateLimitInterceptor (chặn theo
-    // thời gian, không đáng tin cậy để chống double-submit), cơ chế này chặn theo đúng hành
-    // động cụ thể của người dùng, không phụ thuộc khoảng cách thời gian giữa 2 request.
     private final Cache<String, Boolean> processedIdempotencyKeys = Caffeine.newBuilder()
             .maximumSize(50_000)
             .expireAfterWrite(10, TimeUnit.MINUTES)
@@ -91,15 +86,11 @@ public class TransferController {
             model.addAttribute("sourceAccounts", loadSourceAccounts(currentUserId));
             model.addAttribute("allMyAccounts", loadAllMyAccounts(currentUserId));
 
-            // Lấy message lỗi để hiển thị cho người dùng (trước đây bị bỏ sót -> không có thông báo nào hiện ra)
             String errorMessage = bindingResult.getFieldErrors().stream()
                     .map(err -> {
-                        // Lỗi do @Positive/@Digits/@NotNull... trả về message tự định nghĩa trong DTO
                         if (!"typeMismatch".equals(err.getCode())) {
                             return err.getDefaultMessage();
                         }
-                        // Lỗi do bind kiểu dữ liệu thất bại (VD: nhập "abc"/số âm sai định dạng vào field BigDecimal)
-                        // -> Spring tự sinh message kỹ thuật, không thân thiện, nên thay bằng message rõ ràng theo field
                         if ("amount".equals(err.getField())) {
                             return "Số tiền không hợp lệ, vui lòng nhập đúng định dạng số!";
                         }
@@ -115,9 +106,6 @@ public class TransferController {
         }
 
         // CHẶN GỬI TRÙNG (IDEMPOTENCY CHECK)
-        // putIfAbsent là thao tác atomic: nếu 2 request cùng token tới gần như đồng thời,
-        // chỉ 1 request "thắng" (nhận về null) và được xử lý; request còn lại bị chặn ở đây,
-        // không tạo giao dịch mới, tránh trừ tiền 2 lần dù có vượt qua được RateLimitInterceptor.
         String idempotencyKey = transferRequest.getIdempotencyKey();
         if (idempotencyKey != null && !idempotencyKey.isBlank()) {
             String cacheKey = currentUserId + ":" + idempotencyKey;

@@ -61,8 +61,6 @@ public class TransactionRestController {
         return ResponseEntity.ok().build();
     }
 
-    // Dùng cho polling định kỳ ở client để cập nhật badge thông báo real-time,
-    // không cần người dùng tải lại trang khi có giao dịch mới phát sinh.
     @GetMapping("/unread-count")
     public ResponseEntity<Map<String, Long>> getUnreadCount(HttpSession session) {
         Long currentUserId = (Long) session.getAttribute("userId");

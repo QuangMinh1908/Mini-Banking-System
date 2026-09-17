@@ -11,24 +11,19 @@ import java.util.List;
 @Table(name = "accounts")
 public class Account {
 
-    // ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Optimistic Locking của JPA/Hibernate
     @Version
     private Long version;
 
-    // Số tài khoản
     @Column(name = "account_number", unique = true, nullable = false)
     private String accountNumber;
 
-    // Ngày mở tài khoản
     @Column(name = "date_open", nullable = false, updatable = false)
     private LocalDateTime dateOpen;
 
-    // Số dư
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
@@ -52,7 +47,6 @@ public class Account {
     @Column(name = "term_months")
     private Integer termMonths;
 
-    // tự động gán ngày mở tài khoản khi tạo mới
     @PrePersist
     protected void onCreate() {
         if (this.dateOpen == null) {
